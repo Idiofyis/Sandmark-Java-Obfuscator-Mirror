@@ -1,0 +1,15 @@
+
+Author 
+Idea : {Christian S .Collberg} collberg@cs.arizona.edu
+Algorithm Design & Implementation : {Ashok Purushotham Ramasamy Venkatraj} ashok@cs.arizona.edu
+
+The Array Splitting algorithm splits a single array ,which is a local variable in a method ,into two arrays and modifies all the array
+initialization ,read,write,and arraylength references consistently and correctly .
+
+Files :
+IntArraySplitter.java : The class file which does the actual implementation of the Integer Array Splitting .
+
+Future Work :
+1) Extending Array Splitting for other basic types
+2) Implementing Array Merging Obfuscation . I believe that ,the integration of Array Spltting and Array Merging into one
+obfuscation will provide better results .

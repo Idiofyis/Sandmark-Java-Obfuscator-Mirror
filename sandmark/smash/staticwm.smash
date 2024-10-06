@@ -1,0 +1,211 @@
+//  staticwm.smash -- 
+//  Author          : Jasvir Nagra <jas@cs.auckland.ac.nz>
+//  Created On      : Thu Jul 31 00:05:23 2003
+//  Last Modified   : <03/07/31 00:20:43 jas>
+//  Description     : Initialization script for smash
+//  Keywords        : smash init
+//  PURPOSE
+//      | Sandmark project |
+
+
+
+/* Set the Input file name by passing its full path jar file name; w.r.t SMARK_ROOT*/
+public void setInputFile(String jar) {
+    sandmark.smash.Smash.inputJar = jar;
+}
+
+public void setOutputFile(String jar) {
+    sandmark.smash.Smash.outputJar = jar;
+}
+
+public void setKey(String key) {
+    sandmark.smash.Smash.wmKey = key;
+}
+
+
+public void setWM(String wm) {
+    sandmark.smash.Smash.wmVal = wm;
+}
+
+public void setProperty(String name,String val) {
+    sandmark.smash.Smash.algo.getConfigProperties().setProperty(name,val);
+}
+
+/* Set the algorithm name by passing its short name */
+public void selectAlg(String alg) {
+    sandmark.smash.Smash.algo = sandmark.smash.Smash.getAlgorithmObj(alg);
+}
+
+public void getAlgDesc()
+{
+    if(sandmark.smash.Smash.algo==null||sandmark.smash.Smash.algo.equals(""))
+        print("ERROR: Algorithm unspecified");
+    else
+        print(sandmark.smash.Smash.algo.getDescription());
+}
+
+public void getAlgDesc(String alg)
+{
+    sandmark.Algorithm algoDesc = sandmark.smash.Smash.getAlgorithmObj(alg);
+    if(algoDesc==null)
+        print("ERROR: Invalid Algorithm");
+    else
+        print(algoDesc.getDescription());
+}
+
+public void embed() {
+    if(!algorithmSelected("embed"))
+        return;
+
+    if(sandmark.smash.Smash.outputJar==null||
+	sandmark.smash.Smash.outputJar.equals("")) {
+        /* set the outJar to default inJar_wm.jar */
+	sandmark.smash.Smash.outputJar = 
+            sandmark.smash.Smash.inputJar.substring(
+		0, sandmark.smash.Smash.inputJar.indexOf(".jar"))+"_wm.jar";
+	System.out.println(" Default outputJar: "+sandmark.smash.Smash.outputJar);
+    }
+
+   try {
+    sandmark.program.Application app = 
+	new sandmark.program.Application(sandmark.smash.Smash.inputJar);
+    if(sandmark.smash.Smash.algo instanceof sandmark.watermark.DynamicWatermarker) {
+       sandmark.util.ConfigProperties cp =
+          sandmark.watermark.DynamicWatermarker.getProperties();
+       cp.setProperty("Watermark",sandmark.smash.Smash.wmVal);
+       ((sandmark.watermark.DynamicWatermarker)sandmark.smash.Smash.algo)
+       .embed(sandmark.watermark.DynamicWatermarker.getEmbedParams(app));
+    } else if(sandmark.smash.Smash.algo instanceof sandmark.watermark.StaticWatermarker) {
+       sandmark.util.ConfigProperties cp =
+          sandmark.watermark.StaticWatermarker.getProperties();
+       cp.setProperty("Watermark",sandmark.smash.Smash.wmVal);
+       cp.setProperty("Key",sandmark.smash.Smash.wmKey);
+	    sandmark.watermark.StaticEmbed.runEmbed
+	       (sandmark.smash.Smash.algo,
+	        sandmark.watermark.StaticWatermarker.getEmbedParams(app));
+    } else
+	    throw new Error("Unknown alg type " + sandmark.smash.Smash.algo.getClass().getName());
+	app.save(sandmark.smash.Smash.outputJar);
+    } catch(Throwable t) {
+	System.out.println("ERROR: " + t);
+	t.printStackTrace();
+    }
+}
+
+public void recognize() {
+    if(!algorithmSelected("recognize"))
+        return;
+    sandmark.program.Application app = new sandmark.program.Application
+       (sandmark.smash.Smash.inputJar);
+    sandmark.smash.Smash.wmRetrieveIter = null;
+    if(sandmark.smash.Smash.algo instanceof sandmark.watermark.StaticWatermarker)
+        wmRetrieveIter = sandmark.watermark.StaticRecognize.runRecognition(
+		sandmark.smash.Smash.algo, sandmark.watermark.StaticWatermarker.getRecognizeParams(app));
+    else {
+	sandmark.watermark.DynamicWatermarker dwm = 
+	    (sandmark.watermark.DynamicWatermarker)sandmark.smash.Smash.algo;
+	dwm.startRecognition(sandmark.watermark.DynamicWatermarker.getRecognizeParams(app));
+	dwm.waitForProgramExit();
+	wmRetrieveIter = dwm.watermarks();
+	dwm.stopRecognition();
+    }
+    while(wmRetrieveIter.hasNext()) {
+	String wmStr = (String)wmRetrieveIter.next();
+	if(wmStr!=null) 
+            print(wmStr);
+	else
+            print("No watermark found");
+    }
+    return;
+}
+
+public void getNextWM() {
+    if(sandmark.smash.Smash.wmRetrieveIter.hasNext()) {
+	String wmStr = (String)sandmark.smash.Smash.wmRetrieveIter.next();
+	if(wmStr!=null) 
+            print("watermark retrieved: "+wmStr);
+	else 
+            print("No watermark found");
+    }
+    else 
+        print("No watermark found");
+}
+
+
+
+
+/* Run single algo(embed/recognize) on multiple input Jar files;
+   pass param in format <jar1>:<jar2>: ... :<jarN>
+*/
+public void runEmbedWM(String jarStr)
+{
+    java.util.StringTokenizer input = new java.util.StringTokenizer(jarStr, ":");
+    for(int k=0; k<input.countTokens(); k++) {
+        setInputFile(input.nextToken());
+        embed();
+    }
+    return;
+}
+public void runRecognizeWM(String jarStr)
+{
+    java.util.StringTokenizer input = new java.util.StringTokenizer(jarStr, ":");
+    for(int k=0; k<input.countTokens(); k++) {
+        setInputFile(input.nextToken());
+        recognize();
+    }
+    return;
+}
+
+/* Run multiple algo(embed) in-sequence on single input Jar file;
+   pass param in format <algo1.wmark1>:<algo2.wmark2>: ... :<algoN.wmarkN>
+*/
+public void embedMultipleWM(String algoWmarkStr)
+{
+    if(sandmark.smash.Smash.inputJar==null || sandmark.smash.Smash.inputJar.equals("")) {
+ 	print("ERROR: Input jarfile not set; embedMultipleWM failed");
+	return;
+    }
+    else
+        print("Running multiple embedding on : "+sandmark.smash.Smash.inputJar);
+
+    java.util.StringTokenizer input = new java.util.StringTokenizer(algoWmarkStr, ":");
+    for(int k=0; k<input.countTokens(); k++) {
+	sandmark.smash.Smash.outputJar = 
+	    sandmark.smash.Smash.inputJar.substring(
+		0, sandmark.smash.Smash.inputJar.indexOf(".jar")) +"_wm.jar";
+        String str = input.nextToken();
+	selectAlg(str.substring(0, str.indexOf(".")));
+	setWM(str.substring(str.indexOf(".")+1));
+	embed();
+	sandmark.smash.Smash.inputJar = sandmark.smash.Smash.outputJar;
+    }
+    return;
+}
+
+/* Run multiple algo(recognize) in-sequence on single input Jar file;
+   Pass param in format <algo1>:<algo2>: ... :<algoN>
+*/
+public void recognizeMultipleWM(String algoStr)
+{
+    if(sandmark.smash.Smash.inputJar==null || sandmark.smash.Smash.inputJar.equals("")) {
+ 	print("ERROR: Input jarfile not set; recognizeMultipleWM failed");
+	return;
+    }
+    else
+        print("Running multiple recognition on : "+sandmark.smash.Smash.inputJar);
+
+    java.util.StringTokenizer input = new java.util.StringTokenizer(algoStr, ":");
+    for(int k=0; k<input.countTokens(); k++) {
+	selectAlg(input.nextToken());
+        recognize();
+    }
+    return;
+}
+
+
+//  Emacs bunkum
+//  Local Variables:
+//  mode: jde
+//  time-stamp-start: "Last Modified[ \t]*:[    ]+\\\\?[\"<]+"
+//  time-stamp-end:   "\\\\?[\">]"
+//  End:

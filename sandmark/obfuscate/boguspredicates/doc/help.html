@@ -1,0 +1,92 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Bogus Predicates Obfuscation Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Bogus Predicates Obfuscation Algorithm</H1>
+    <H2>Authors</H2>
+    <P>
+      Ashok Purushotham
+      (<A HREF="mailto:ashok@cs.arizona.edu">ashok@cs.arizona.edu</A>)<BR>
+      Rathna Prabhu Rajendran
+      (<A HREF="mailto:prabhu@cs.arizona.edu">prabhu@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      This is an algorithm that implements simple boolean identities and adds
+      them to the user's code. Our aim is to embed opaquely true constructs
+      which must be stealthy. So we have selected some constructs based on 
+      algebraic properties and known facts in mathematics. For example, we know
+      for all x,y in I, (7y<SUP STYLE=font-size:small>2</SUP> - 1) is not
+      equal to x<SUP STYLE=font-size:small>2</SUP>. A list of all the
+      available constructs is maintained. At runtime, whenever we encounter a
+      conditional expression, we randomly select one among these to append to
+      the current expression. Since the expression that we add is opaquely
+      true, but the reverse engineer has to try out many inputs to find that
+      this added expression is indeed opaquely true,if he is not aware of
+      mathematical properties.
+    </P>
+    <H2>Example</H2>
+    <P>
+      Here is an example of the original method and its transformation on
+      applying Bogus Predicates Algorithm:
+    </P>
+    <PRE>
+        main(){             main(){
+          int a=10;           int a=10;
+          int b=20;           int b=20;  
+          if (a<30)            int c;
+             b=a+99;          if (a<30 && c(c+1)%2 == 0)
+        }                       b=a+99;
+                            }
+    </PRE>
+    <P>
+      The original byte code in a conditional expression was:
+    </P>
+    <PRE>
+        iload_1
+        bipush 7
+        if_icmpne 29
+    </PRE>
+    <P>
+      The new added byte code as a result of our algorithm is:
+    </P>
+    <PRE>
+        iload_1
+        bipush 7
+        if_icmpne 29
+        iload_3
+        dup
+        iconst_1
+        iadd
+        imul
+        iconst_2
+        irem
+        iconst_0
+        if_icmpne 29
+    </PRE>
+    <H2>Configuration</H2>
+    <P>
+      There are no extra configuration parameters necessary to run this
+      obfuscator.
+    </P>
+    <H2>References</H2>
+    <BR>
+  </BODY>
+</HTML>

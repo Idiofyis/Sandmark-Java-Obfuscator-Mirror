@@ -1,0 +1,153 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>The Add Methods and Fields Watermarking Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Add Methods and Fields Watermarking Algorithm</H1>
+    <H2>Authors</H2>
+    <P>Ginger Myles
+       (<A HREF="mailto:mylesg@cs.arizona.edu">mylesg@cs.arizona.edu</A>)<BR>
+       Miriam Miklofsky
+       (<A HREF="mailto:miriamm@cs.arizona.edu">miriamm@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>AddMethodField is a watermarking algorithm that embeds a watermark by
+      splitting it into two parts. The first part is attached to a field name
+      and the second is attached to a method name. Both the field and the
+      method are new items inserted into the code.
+    </P>
+    <H2>Example</H2>
+    <P><B>Embedding</B><BR>
+      To embed the watermark we split the watermark into two parts, wmPart1
+      and wmPart2. wmPart1 is combined with "sm$" to create the name of a new
+      field that is added to the class. In order to embed wmPart2 we first
+      randomly choose a method that already exists in the class. This method
+      is chosen by seeding a random number generator with the key. Since the
+      key is provided as a String we convert the String to a long. If a key is
+      not specified then the seed has a default value. The randomly chosen
+      method is used for two different purposes. The first purpose is for the
+      naming of the new method. The name of the random method is used as the
+      first part of the watermarked method's name, i.e.
+      newMethodName = randomMethodName + "$" + wmPart2. The second purpose is
+      that the chosen method will make a call to the watermarked method, so as
+      to disguise the watermarked method. Since we have inserted a new method
+      into the class, this method should do something.<BR>
+      The watermarked method takes two parameters, whose values were also
+      inserted into the chosen method, adds them together and places the
+      result into the watermarked field. This assignment will aid in the
+      recovery of the watermarked field.</P>
+
+    <P><PRE>
+        //break the watermark into two parts
+        wmPart1 = first half of watermark
+        wmPart2 = second half of watermark
+
+        //get a pseudorandom number to indicate which method will make a call
+        //to the watermarked method.
+        //we are going to seed the random number generator with the key
+        if(key == empty string){
+           seed = 42;
+        }else{
+           seed = key converted to a long
+        }
+        methodIndex = randomGenerator(seed) % number of methods in class
+
+        //get the name of method where the watermarked method will be
+        //inserted. We are using this name to tack on the second part
+        //of the watermark.
+        String modMethodName = methods[methodIndex].getName();
+        String newMethodName = modMethodName + "$" + wmPart2;
+
+        create a new field
+
+        create a new method
+        //This new method takes the values of the two parameters, adds them
+        //together and places the result in the watermarked field.
+        //the instruction list for the method: load the value of the
+        //parameters, add, put the value in the watermarked field, return.
+        il.append(load1)
+        il.append(load2)
+        il.append(putfield(watermarkedField)
+        il.append(return)
+
+        add the new method so it becomes part of the class
+
+        //modify the randomly chosen method so that it makes a call to the new
+        //method. The instruction list that is to be inserted will be the
+        //following: store 5, store 10, invoke watermarked method.
+        il2.append(store5)
+        il2.append(store10)
+        il2.append(invoke watermarked method)
+        insert il2 into instruction list of chosen method
+    </PRE></P>
+    <P>
+      <B>Recognition</B></BR>
+      During recognition the key is again used to seed a random number
+      generator. This is used to determine which method contains the call to
+      our watermarked method. The watermarked method can be distinguished from
+      any other method calls because the begining of its name will be the same
+      as the name of the method from which it is being called. Once the
+      watermarked method is identified the instruction list of the watermarked
+      method is searched to find a putfield instruction. The field that is
+      being assigned to is the watermarked field. Once the two pieces of the
+      watermark are identified they are tacked together to form the watermark
+      that is returned.
+    </P>
+    <P><PRE>
+        //get a pseudorandom number to indicate which method will make a call
+        //to the watermarked method.
+        //we are going to seed the random number generator with the key
+        if(key == empty string){
+           seed = 42;
+        }else{
+           seed = key converted to a long
+        }
+        methodIndex = randomNumberGenerator(seed) % number of methods in class
+
+        String methodName = methods[methodIndex].getName()
+        //extract the second half of the watermark from the added method
+        //the watermarked method will have the same beginning as methodName
+        newMethodIndex = 0;
+        for(each method in the class) {
+           if(k != methodIndex) {
+              methodName2 = methods[k].getName();
+              if(methodName2.startsWith(methodName + "$" )) {
+                 wmprt2 = methodName2.substring((methodName.length()+1), methodName2.length())
+                 newMethodIndex = k;
+              }
+           }
+        }
+
+        //search the watermarked method's instruction list for putfield
+        if(instruction instanceof PUTFIELD){
+           fieldName = get field name
+           wmprt1 = fieldName - "sm$"
+        }
+
+        //put pieces of watermark together
+        watermark = wmprt1 + wmprt2;
+    </PRE></P> 
+    <H2>Configuration</H2>
+    <P> No additional configuration parameters are required for embedding and
+      recognition.
+    </P>
+    <H2>References</H2>
+    <BR>
+  </BODY>
+</HTML>

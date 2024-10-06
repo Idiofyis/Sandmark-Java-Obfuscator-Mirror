@@ -1,0 +1,206 @@
+\section{Using CVS}
+CVS is a {\em source code control system}. It is used extensively
+in industry and in the open source community to organize source
+code that many people are working on simultaneously. 
+
+The basic idea is to have one master copy of the source code,
+residing in a special source code repository.
+Programmers check out the latest version of the code to
+their local account and work on it until they're ready to
+share their new code with their co-workers. They then
+check in the new code to the repository from which the
+rest of the team can download the new changes. 
+
+A programmer can have several versions of the code checked 
+out at the same time: one at work, one at home, one on the
+laptop, etc. Furthermore, every change ever made to a file
+is stored in the repository allowing a programmer to check
+out ``the version of the program from last Monday.''
+
+
+\subsection{Installing CVS}
+If you are running Linux on your home machine (and why wouldn't
+you be?) you should have CVS installed already. Otherwise you
+can download CVS from here: \url{http://www.cvshome.org/downloads.html}.
+The manual is here: \url{http://www.cvshome.org/docs/manual}. 
+\CC{man cvs} gives you the basic information you need.
+
+You also need to have {\tt ssh} installed on your machine
+in order to communicate with our CVS server, 
+\url{cvs.cs.arizona.edu}.
+
+If you just intend to do your assignments on {\tt lectura},
+no installation is necessary.
+
+\subsection{Getting Started}
+Let's assume that your team consists of Alice and Bob whose
+{\tt lectura} logins are {\tt alice} and {\tt bob} with
+the passwords {\tt alice-pw} and {\tt bob-pw}, respectively.
+The team name is {\tt cs453bd}.
+
+{\em One} team member (in our case Alice) should do the following 
+to get the team's source repository set up:
+\begin{verbatim}
+> whoami
+alice
+> mkdir ass1            # Create a temorary directory.
+> cd ass1
+> setenv CVS_RSH ssh    # Or export CVS_RSH=ssh. Must always be set.
+> cvs -d :ext:alice@cvs.cs.arizona.edu:/cvs/cvs/cs453/cs453bd import -m "New!" ass1 aaa bbb ass1
+   alice@cvs.cs.arizona.edu's password: alice-pw
+\end{verbatim}
+
+Now, Alice deletes the temporary directory:
+\begin{verbatim}
+> rmdir ass1
+\end{verbatim}
+
+
+\subsection{Checking out code}
+Everything should now be set up properly on the CVS server.
+Alice can check out the code (which so-far only consists of a
+single directory):
+\begin{verbatim}
+> cvs -d :ext:alice@cvs.cs.arizona.edu:/cvs/cvs/cs453/cs453bd checkout ass1
+   alice@cvs.cs.arizona.edu's password: alice-pw
+cvs server: Updating ass1
+> ls ass1
+CVS
+\end{verbatim}
+
+Alice now wants to start programming. She creates a new C module
+in her CVS directory:
+\begin{verbatim}
+> cd ass1
+/home/alice/ass1
+> cat > interpreter.c
+main() { 
+}
+> cvs add -m "Started the project" interpreter.c 
+   alice@cvs.cs.arizona.edu's password: alice-pw
+   cvs server: scheduling file `interpreter.c' for addition
+   cvs server: use 'cvs commit' to add this file permanently
+
+> cvs commit -m "Finished first part of interpreter."
+   cvs commit: Examining .
+   alice@cvs.cs.arizona.edu's password: 
+   RCS file: /cvs/cvs/cs453/cs453bd/ass1/interpreter.c,v
+   done
+   Checking in interpreter.c;
+   /cvs/cvs/cs453/cs453bd/ass1/interpreter.c,v  <--  interpreter.c
+   initial revision: 1.1
+   done
+\end{verbatim}
+
+The {\tt add} command told the CVS system that a new file 
+is being created. The {\tt commit} command actually uploaded
+the new file to the repository.
+
+Now Alice realizes that she needs to add some more code
+the project:
+\begin{verbatim}
+> emacs interpreter.c 
+> cat interpreter.c 
+main() { 
+  int i;
+}
+> cvs commit -m "Added more code."
+   cvs commit: Examining .
+   alice@cvs.cs.arizona.edu's password: alice-pw
+   Checking in interpreter.c;
+   /cvs/cvs/cs453/cs453bd/ass1/interpreter.c,v  <--  interpreter.c
+   new revision: 1.2; previous revision: 1.1
+   done
+\end{verbatim}
+
+OK, so what about Bob? Well, he decides he should also contribute
+to the project, so he checks out the source:
+\begin{verbatim}
+> cvs -d :ext:bob@cvs.cs.arizona.edu:/cvs/cvs/cs453/cs453bd checkout ass1
+   bob@cvs.cs.arizona.edu's password: bob-pw
+cvs server: Updating ass1
+> cd ass1
+> ls
+CVS interpreter.c
+> cat interpreter.c 
+main() { 
+  int i;
+}
+> emacs interpreter.c 
+> cat interpreter.c 
+main() { 
+  int i=5;
+}
+> cvs commit -m "Added more stuff to the project."
+\end{verbatim}
+
+Alice has now gone back to her dorm-room where she wants to
+continue working on the project on her home computer. She
+has installed CVS and she has added
+\begin{verbatim}
+> setenv CVS_RSH ssh    # Or export CVS_RSH=ssh
+\end{verbatim}
+to her {\tt .cshrc} file to make sure that she runs
+this command every time. Now she can go ahead and
+check out the code again, this time on the home 
+machine: 
+\begin{verbatim}
+> cvs -d :ext:alice@cvs.cs.arizona.edu:/cvs/cvs/cs453/cs453bd checkout ass1
+   alice@cvs.cs.arizona.edu's password: alice-pw
+> cat ass1/interpreter.c 
+main() { 
+  int i=5;
+}
+\end{verbatim}
+Notice that she got the code that Bob checked in to CVS!
+
+Alice can continue working on the code from home. When
+she's done for the day she uses the {\tt commit} command
+to submit her changes to the cvs database. 
+
+\subsection{Updating}
+The next day Bob is getting ready to work on the project again.
+In case Alice has made some changes to the code, he runs
+the {\tt update} command:
+\begin{verbatim}
+> cvs update -d
+\end{verbatim}
+Any files that have changed since the last time Bob worked
+on the project will be downloaded from the server. Bob
+makes his edits, then runs {\tt commit} when he is done to
+upload the changes to the repository.
+
+\subsection{Deleting files}
+If Alice needs to delete a file she runs the CVS {\tt rm} command:
+\begin{verbatim}
+> rm interpreter.c
+> cvs rm interpreter.c
+> cvs commit
+\end{verbatim}
+Note that you have to delete the file before you can run the
+{\tt cvs rm} command.
+
+\subsection{Summary}
+These are the most common CVS commands:
+\begin{description}
+   \item[cvs add file] Add a new file to the project.
+         The file will not actually be uploaded to the
+         repository until you run the {\tt commit} command.
+   \item[cvs rm file] Remove a file from the project.
+         The file will not actually be removed from the
+         repository until you run the {\tt commit} command.
+   \item[cvs commit] Update the repository with any changed
+         files.
+   \item[cvs update -d] Download any changed files to your
+        local machine.
+\end{description}
+
+The figure below describes a typical situation.
+Alice and Bob have three versions of the code checked out:
+two on their lectura accounts, and one version in Alice's
+home machine. Alice adds a new file {\tt file3.c} and 
+checks it in to the repository. To see the new file, 
+Bob has to run the {\tt update} command.
+\begin{center}
+   \input{EEPIC/cvs.eepic}
+\end{center}

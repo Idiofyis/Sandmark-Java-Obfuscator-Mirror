@@ -1,0 +1,87 @@
+# -*- Makefile -*-
+
+# Template file for common definitions for Sandmark Makefiles.
+# Copy this file (Makedefs.std) to 'Makedefs' and set the
+# macros below.
+
+
+####################  begin configuration section  ####################
+
+#  Directory that all files will be installed under
+INSTALLDIR = /cs/www/sandmark
+
+#  NOTE: you do not need to edit this file to build Sandmark!
+#  You can set two environment variables instead of setting JDK and HOME below.
+#  Set JDK_ROOT to the root install directory of j2sdk 1.4.0 or above (that is,
+#  $(JDK_ROOT)/bin/javac should be a java compiler from j2sdk 1.4.0).
+#  Then set SMEXTERN to a directory where the CVS module smextern is checked
+#  out.  This variable should include the smextern directory itself.
+#
+#  If JDK and HOME are set below, these environment variables will be ignored.
+
+#  Any paths appearing here should be absolute paths,
+#  except for commands found on the shell search path.
+
+#  Sun's jsdk1.4.0beta2 is known to work.
+JDK = 
+
+#  Directory where sandmark is installed. 
+HOME = 
+
+# Java compiler
+# We need to compile with -g in order for the local variable
+# tables to be intact for sandmark.trace.Annotator.
+JC = jikes +F -g -source 1.4
+
+ifeq ($(strip $(JDK)),)
+   JDK = $(JDK_ROOT)
+endif
+
+#  Java interpreter
+JAVA = $(JDK)/bin/java
+
+#  Java ARchiver
+JAR = $(JDK)/bin/jar
+
+ifneq ($(strip $(HOME)),)
+   SMEXTERN = $(HOME)/smextern3
+endif
+
+#  Jar file of ByteCode Engineering Library (JavaClass)
+#
+#  (obtain this from http://jakarta.apache.org/bcel/)
+BCEL = $(SMEXTERN)/BCEL.jar
+
+#  Jar file for Dynamic Java
+#
+#  (obtain this from http://koala.ilog.fr/djava/)
+DYNJAVA = $(SMEXTERN)/dynamicjava.jar
+
+#  JUnit jar file
+#
+JUNIT = $(SMEXTERN)/junit.jar
+
+#  Zip file of BLOAT classes.
+#
+#  (extract from the "Java libraries" file distributed from
+#   http://www.cs.purdue.edu/homes/hosking/bloat/)
+#BLOAT = $(SMEXTERN)/bloat-1.0.jar
+
+####################  end configuration section  ####################
+
+
+JRE = $(JDK)/jre/lib/rt.jar
+TOOLS = $(JDK)/lib/tools.jar
+JCE = $(JDK)/jre/lib/jce.jar
+
+SMJAR = sandmark.jar
+
+LIBIMPORTS = $(BCEL):$(DYNJAVA):$(JUNIT):$(BLOAT)
+IMPORTS = $(JCE):$(JRE):$(TOOLS):$(LIBIMPORTS)
+ALLJARS = $(SMJAR):$(IMPORTS)
+
+
+
+
+
+

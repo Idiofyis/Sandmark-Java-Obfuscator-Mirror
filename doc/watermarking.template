@@ -1,0 +1,28 @@
+\algorithm{The MyAlgorithm .... Watermarking Algorithm}%
+          {My Name and My Partner's Name}
+
+\section{Introduction}
+This is an algorithm that ....
+The code of this algorithm
+resides in \url{sandmark.watermark.myalgorithm}.
+
+
+\section{Embedding}
+To embed the watermark we ....:
+\begin{listing}{1}
+   String jarInput  = props.getProperty("WM_Embed_JarInput");
+   String jarOutput = props.getProperty("WM_Embed_JarOutput");
+   String watermark = props.getProperty("WM_Encode_Watermark");
+   ....
+\end{listing}
+
+
+\section{Recognition}
+During recognition we ....:
+\begin{listing}{1}
+   String jarInput  = props.getProperty("WM_Recognize_JarInput");
+   sandmark.util.ClassFileCollection cfc =
+       new sandmark.util.ClassFileCollection(jarInput);
+   ....
+   cfc.close();
+\end{listing}

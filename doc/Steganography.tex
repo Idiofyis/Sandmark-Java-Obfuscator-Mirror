@@ -1,0 +1,18 @@
+\algorithm{Steganography  Watermarking Algorithm}%
+          {Kamlesh Kantilal}
+
+\section{Introduction}
+This algorithm embeds a static watermark and a class across an image. The watermark is stored randomly based on a given key.
+
+\section{Embed}
+The algorithm requires an image as an input. It also needs to know the class file to be encoded inside the image. 
+It then encodes the class into the image by modifying the lower order bits of the image file. All the references in other classes to the encoded class are modified to call the decoder dynamically during runtime.
+The encoded class file is then deleted from the jar file as it is no longer needed. 
+Finally based on a key it store the watermark randomly in the rest of the image.
+
+\section{Recognize}
+Inoder to determine the watermark it requires the correct key to be given as input. Then it uses the key as a seed for generating the random position where the watermark is stored and obtains the correct watermark.
+When someone tries to run the application it dynamically decodes the class file from the image and loads it.
+
+
+\end

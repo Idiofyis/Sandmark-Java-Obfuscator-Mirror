@@ -1,0 +1,12 @@
+Algorithms in sandmark/obfuscate/renameidentifiers
+    - NameObfuscator by: Kelly Heffner
+      Name Obfuscator renames all of the methods and fields in an 
+      application, while keeping inheritance relations intact. 
+
+Files sandmark/obfuscate/renameidentifiers
+    - NameObfuscator.java
+    - package.html
+    - Makefile
+    - README
+    - doc/
+      -  help.html

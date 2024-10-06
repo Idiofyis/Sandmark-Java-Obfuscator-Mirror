@@ -1,0 +1,2013 @@
+=============================================================
+=                    Tasks in Progress                      =
+=============================================================
+
+-------------------------------------------------------------
+IMPORTANCE: 10
+TITLE: Protecting watermarks by obfuscation
+AREA: WATERMARKING
+AUTHOR: 
+
+What's wrong with the following idea:
+   * We subject an application to as many obfuscations as possible.
+     We particularly apply lots of obfuscations that add aliases,
+     and other complexity-inducing stuff.
+   * Ideally, we continue running the obfuscator until it reaches
+     a fix-point - the code is now so hard to analyze that no
+     more obfuscations can be applied.
+   * We then watermark the resulting obfuscated application.
+   * An attacker now launches an automated attack against
+     the watermark by sending the application through an
+     obfuscator. But, due to the previous obfuscation step the code
+     is now so convoluted -- aliases everywhere, for example --
+     that there's very little the obfuscator can do about it.
+   * Hence, the watermark remains intact.
+
+Yes, I realize that adding the watermark may also be harder
+due to the obfuscation step.
+
+-------------------------------------------------------------
+IMPORTANCE: 10
+TITLE: Uniform Obfuscation
+AREA: OBFUSCATION
+AUTHOR: 
+
+What if we organized the obfuscation loop such that it
+applied the transformations such that "every part of
+the program looks the same". I.e., we try to make
+no part of the program distinguishable from any
+other part. Regardless of where the reverse engineer
+looks, the code looks the same.
+
+One could imagine placing every part of the program
+in an equivalence class, based on a set of software
+metrics. Two parts of the program are in the same
+class if the "look the same". We then try to
+merge equivalence classes as much as possible.
+We may try to pick two classes C1 and C2 which
+are both large and "quite similar". We then
+find two sets T1 and T2 of transformations that when
+applied to C1 and C2 respectively allow them
+to be merged into a single equivalence class.
+We continue until there are as few equivalence
+classes as possible.
+
+-------------------------------------------------------------
+IMPORTANCE: 10
+TITLE: Opaque predicates
+AREA: OBFUSCATION
+AUTHOR: 
+
+Implement other opaque predicates described in the literature,
+for example by Chenxi Wang and others. Write a paper on 
+"Experience with Opaque Predicates for Code Obfuscation and
+Software Watermarking".
+
+-------------------------------------------------------------
+IMPORTANCE: 7
+TITLE: Dynamic Semantic Watermarking
+AREA: WATERMARKING
+AUTHOR: 
+
+Dynamic watermarking is a nice idea since, at least in
+theory, the watermark should remain after any purely
+syntactic modifications of a program. The current
+algorithms, however, watermark entire applications
+rather than parts of applications. Would it be
+possible to fix this?
+
+I'm imagining a system whereby we chunk up the program
+in "independent" expressions/slices each of which we
+watermark. To recognize the mark we again chunk the
+program and execute each expression/slice with the
+watermark key. The result is combined into the watermark.
+
+How do we chunk up the program in expressions? Well,
+we could do a flow-insensitive algorithm. We simply
+   b) inline all methods;
+   a) ignore all control flow instructions;
+   c) build expression trees for all all expressions;
+   d) replace references to local variables with their
+      corresponding expression trees.
+This gives us a set of expression trees that we can
+somehow watermark.
+
+How do we dynamically watermark an expression? Well,
+we could assume that in a correct program no 
+sub-expression will ever overflow. This means that
+there are expressions for which some inputs are
+illegal (because they would induce an overflow).
+We can alter the expressions such that for these
+illegal inputs they produce a share of the 
+watermark.
+
+An alternative idea is to simply add a bunch of
+expressions to the program (protected by opaque
+predicates, for example). Each expression computes
+a secret share. We would use a secret sharing algorithm
+that is resilient to bogus shares (corresponding to
+the original non-watermarking expressions).
+
+Simpler still, we could do a regular dynamic watermarking
+algorithm where during recognition we monitor all the values 
+that are stored during a run with a special input sequence. 
+I.e. we get all the values that are saved by an istore instruction.
+Each is either a secret share or a bogus share that we discard.
+
+-------------------------------------------------------------
+IMPORTANCE: 10
+TITLE: Improving CT
+AREA: WATERMARKING
+AUTHOR: 
+
+On a false path the graph components should be destroyed.
+Easiest would be to simply say
+   A[i] = null;
+or
+   A[i] = new T();
+where A is the global storage container for root nodes.
+
+Rather than splitting the graph we could split the 
+watermark number and generate one graph for each 
+partial integer. The question is then how we find
+the different graphs - they're no longer just the
+last dynamic structure to be built. 
+
+Right now the graphs we're building aren't actually
+used anywhere. We should somehow connect them to the
+rest of the program. We could, for example, look
+for values that are needed at the point where the
+graph is built and extract them from the graph.
+Obviously, we can always construct some encoding
+that will allow us to extract any particular value
+from any graph.
+
+We could also pass on the generated graph to
+some random part of the program by passing it
+as arguments to called methods.
+
+-------------------------------------------------------------
+IMPORTANCE: 10
+TITLE: Reordering Obfuscations
+AREA: OBFUSCATION
+AUTHOR: Ashok
+
+Implement all possible reordering obfuscations: 
+   1) reorder locals within methods;
+   2) reorder cases within switch statements;
+   3) reorder methods within classes;
+   4) reorder classes within jar-files;
+   5) reorder fields within classes;
+   6) reorder arguments in method signatures, when legal;
+   * reorder statements within basic blocks;
+   * reorder basic blocks within methods;
+   * reorder sub-expressions within expressions, when legal;
+   * move static fields and methods into classes other
+     than the ones in which they were declared.
+
+
+
+=============================================================
+=                        New  Tasks                         =
+=============================================================
+
+-------------------------------------------------------------
+IMPORTANCE: 7
+TITLE: Simple generation of code
+AREA: UTIL
+AUTHOR: 
+
+In many algorithms we want to generate some bytecode.
+This can be done directly by calling BCEL, which is
+a pain. Or, we can call sandmark.util.javagen.* which
+builds up an AST from which BCEL is generated. Also
+painful. It would be nice to be able to construct
+textual Java from which bytecode could then be
+generated. Sort of like having a built-in mini-compiler.
+You could do:
+   MethodGen g = 
+      sandmark.util.compile.Method(
+          "public static void P() {" +
+          "   int x=5; "
+          "   System.out.println(x)" +
+          "}");
+
+   InstructionList l = 
+      sandmark.util.compile.Expression("_5 + 67*_8");
+
+Here, "_5" refers to slot number 5.
+
+   ClassGen c = 
+      sandmark.util.compile.Class(
+          "public class C {" +
+          "   static int v;" +
+          "   public static void P() {" +
+          "      int x=5; "
+          "      System.out.println(x + #v)" +
+          "   }" +
+          "}");
+
+Here, "#v" refers to the global static variable "v".
+
+In other words, we'd expand the syntax of Java a bit
+to make it trivial to compile. For example:
+   * We could require all tokens to be surrounded
+     by white-space ("a + b * 3" rather than "a+b*3").
+     This would allow us to use StringTokenizer to
+     do lexical analysis.
+   * We could require all generated identifiers to
+     be distinct.
+   * We could require types to be inserted everywhere,
+     for example "a int:+ b int:* 3".
+Also, we'd assume that the generated code is semantically 
+correct so that we'd just have to parse it, not do semantic 
+analysis. We'd only cover the simple cases of Java  -  
+anything complicated would have to be done by hand, as usual.
+
+I believe JavaCup
+   http://www.cs.princeton.edu/~appel/modern/java/CUP/ 
+comes with a Java grammar. All that needs to be done
+is to add actions to this grammar that call
+the AST-building methods in sandmark.util.javagen.*.
+
+Lot's of cool stuff could be done with this system.
+For example, the opaque predicate library could
+simply be an array of strings:
+   String[] opaqueArith = {
+       "7 * y * y - 1 != x * x",
+       "..."
+   }
+To use an opaque predicate you'd simply do a global replace
+of "y" and "x" with the relevant slot numbers and then compile
+the resulting string:
+
+   InstructionList l = 
+      sandmark.util.compile.Expression("7 * _2 * _2 - 1 != _4 * _4");
+
+-------------------------------------------------------------
+IMPORTANCE: 7
+TITLE: Simple generation of code
+AREA: UTIL
+AUTHOR: 
+
+It would be nice to be able to generate bytecode
+textually without having to go through BCEL. We
+could write a simple bytecode assembler to
+do this:
+
+   InstructionList l = 
+      sandmark.util.assembler.Expression(
+          "iconst_2\n" +
+          "iload_1\n" +
+          "iadd\n" +
+          "istore_2\n"
+      );
+
+-------------------------------------------------------------
+IMPORTANCE: 7
+TITLE: Decompiler
+AREA: UTIL
+AUTHOR: 
+
+Implement a decompiler. This would translate 
+the expression trees/CFG into sandmark.util.javagen
+(which probably should be renamed sandmark.util.ast).
+javagen probably needs to be cleaned up. 
+
+-------------------------------------------------------------
+IMPORTANCE: 7
+TITLE: Class and method selectors
+AREA: GUI
+AUTHOR: 
+
+Eventually we are going to have to
+extend the obfuscation gui panes. For a method obfuscator
+you should be able to indicate that you want
+   *) a particular method obfuscated
+   *) all the methods in a class obfuscated
+   *) all methods in an application obfuscated.
+For a class obfuscator you should be able to indicate that you want
+   *) a particular class obfuscated
+   *) all classes in an application obfuscated.
+Right now both class and method obfuscators are applied to the entire
+application.
+
+We should implement 
+   *) sandmark.gui.ClassSelector
+   *) sandmark.gui.MethodSelector
+along the lines of what the view pane now does, i.e. present
+a package tree that allows you to select a set of classes
+or a set of methods. 
+
+-------------------------------------------------------------
+IMPORTANCE: 7
+TITLE: Combining watermarks
+AREA: WATERMARKING
+AUTHOR: 
+
+What happens when you combine several different types
+of watermarks in the same application? Does the total
+resilience to attacks increase? In which order do you
+apply the algorithms? What is the performance hit?
+
+-------------------------------------------------------------
+IMPORTANCE: 7
+TITLE: Frequency based graph watermarks
+AREA: WATERMARKING
+AUTHOR: 
+
+Would it be possible to combine graph-based watermarking
+schemes with frequency based ones? Instead of
+manipulating instruction frequencies (the way Stern's
+algorithm does) the idea is to manipulate the statistical
+properties of all the graphs (of some kind) in the
+program. For example, maybe the watermark is embedded
+in the average diameter of all the interference graphs
+in the program.
+
+-------------------------------------------------------------
+IMPORTANCE: 5
+TITLE: Java code statistics
+AREA: STATISTICS
+AUTHOR:
+
+We now have (or should soon have) the ability to compute
+all kinds of statistics about Java programs: depth of
+inheritance hierarchy, size of CFGs, complexity of call-graphs,
+Software Complexity Metric values, etc. It would be
+interesting to download all the Java programs we can
+find on the web, compute all these measures, and do
+some statistical analysis. Seems like there would be
+room for a paper on the structure of real Java programs.
+
+This would be similar to Knuth's classic paper
+    An Empirical Study of Fortran Programs
+    Software, Practice and Experience 1 (2), 1971.
+Maybe there have already been such studies done
+for Java? We should do a literature survey.
+
+   http://plg.uwaterloo.ca/~itbowman/pub/paste99.pdf
+   http://www.ii.uib.no/~telle/bib/GMT.pdf
+   http://www.csr.uvic.ca/~mstorey/research/papers/iwpc2001.pdf
+
+-------------------------------------------------------------
+IMPORTANCE: 1
+TITLE: Locking down binaries
+AREA: INSTALLATION
+AUTHOR: 
+STATUS: 
+
+Saumya had the idea that it might be possible to
+"lock down" binaries to make tampering with
+watermarks harder. The idea is to use
+branch instructions as data. Something like
+this:
+      .
+      .
+      .
+   ld R,[A]
+   use R        # Use bit-pattern 1010101... here
+      .
+      .
+      .
+A: breq L       # Some bit-pattern 1010101... here
+      .
+      .
+      .
+
+In other words, we insert code that somehow uses
+the bit-pattern of a particular branch target
+as data in the program. Any attack that inserts or
+removes instructions would change the branch address
+and crash the program.
+
+This looks like a slimmed-down version of Mike Atallah's
+"interlocking graph of checkers" idea.
+
+-------------------------------------------------------------
+
+IMPORTANCE: 10
+TITLE: Informed Watermarking
+AREA: WATERMARKING
+AUTHOR: 
+
+As far as I'm aware, all published software watermarking 
+algorithms are blind, i.e. the original program is not
+used by the recognizer. What algorithms, if any, could
+be improved by making them informed (non-blind)?
+
+I think a dynamic informed watermarking recognizer would 
+be quite cool. One could imagine a version of the CT 
+algorithm where the watermarked and original programs
+are run in parallel, on the same key input. When we
+get to the end of the input we have two heaps that,
+assuming no attacks, only differ in that the watermarked
+heap has an extra structure on it, the watermark graph.
+IMPORTANCE: 7
+TITLE: Graph Splitting
+AREA: WATERMARKING
+AUTHOR: 
+
+Implement new splitting and storage methods for the ct algorithm.
+The idea is to split the graph in "concentric circles"
+such that there is one root pointer emanating from each circle:
+
+                 ^
+                 |
+        +-----------------+
+        |        ^        |
+        |        |        |
+        |  +-----------+  |
+        |  |     ^     |  |
+        |  |     |     |  |
+        |  | +-------+ |  |
+        |  | |       | |  |
+        |  | |       | |  |
+        |  | +-------+ |  |
+        |  |           |  |
+        |  +-----------+  |
+        |                 |
+        +-----------------+
+
+The inner sub-graphs are built first, combined with the
+next level graph, etc. We only keep one root pointer
+around for each graph which simplifies storing global
+pointers, (or at least makes this stealthier.)
+
+-------------------------------------------------------------
+IMPORTANCE: 5
+TITLE: CloakWare Algorithms
+AREA: OBFUSCATION
+AUTHOR: 
+
+Do an indepth study of the CloakWare technology.
+Can we implement this? Is there enough information
+in the papers/patents to figure out what they do?
+
+-------------------------------------------------------------
+
+IMPORTANCE: 5
+TITLE: PPCT Graph Implementation
+AREA: WATERMARKING
+AUTHOR: 
+
+Implement the PPCT graphs. Ask Clark Thomborson's
+student (cthombor@cs.auckland.ac.nz) for his code, 
+then recode it in SandMark. It should just involve 
+adding another class to sandmark.util.graph.codec. 
+
+-------------------------------------------------------------
+IMPORTANCE: 5
+TITLE: Branch-based Dynamic Watermarking
+AREA: WATERMARKING
+AUTHOR: 
+
+Implement a dynamic branch-based watermarking scheme.
+The idea is to embed the watermark in whether forward
+branches are taken (a 1) or not taken (a 0).
+
+-------------------------------------------------------------
+IMPORTANCE: 5
+TITLE: Ultimate Name-Overloading Obfuscation
+AREA: OBFUSCATION
+AUTHOR: 
+
+Extend Tyma's name overloading obfuscation algorithm
+(in sandmark.obfuscate.nameoverloading) so that *all* 
+methods (except toString, etc) have the same name, by 
+   1) reordering method arguments, or, 
+   2) when this isn't enough, adding extra arguments.
+
+-------------------------------------------------------------
+
+IMPORTANCE: 5
+TITLE: BCEL Library
+AREA: ORGANIZATION
+AUTHOR: 
+
+Move common code out of the javagen and obfuscation
+packages into sandmark.util.BCEL. For example, there 
+should be methods for 'add new local variable', etc.
+
+-------------------------------------------------------------
+IMPORTANCE: 5
+TITLE: QuickStart Menu
+AREA: GUI
+Add a "QuickStart" entry to the help menue. This should
+describe system requirements, what each pane does,
+how to quickly watermark something.
+-------------------------------------------------------------
+
+IMPORTANCE: 3
+TITLE: Code Improvement
+AREA: ORGANIZATION
+AUTHOR: 
+
+A few classes have public fields which can be read by
+anyone. This works, but is bad coding practice, I guess.
+We should change these classes to have the obvious 'get'
+methods, and make the corresponding fields private.
+Classes I know of are:
+   sandmark.util.ByteCodeLocation
+   sandmark.util.MethodID
+   sandmark.util.StackFrame
+
+-------------------------------------------------------------
+
+IMPORTANCE: 3
+TITLE: Configure Widgets
+AREA: GUI
+AUTHOR: 
+
+Add cute controls (knobs, sliders, selection
+panes, etc) to config panel, and corresponding
+types to the 'getConfigItems' methods.
+
+-------------------------------------------------------------
+IMPORTANCE: 3
+TITLE: Obfuscation Visualization
+AREA: GUI, OBFUSCATION
+AUTHOR: 
+
+It would be interesting to allow users to visualize
+the obfuscations they have applied and what they
+did to the code. Right now you can see what happened
+to the bytecode, but that's about it. We should build
+some cool tool that animates how the obfuscation loop
+picks obfuscations and source code objects to obfuscate.
+
+We could now use the graph visualizer to display the
+executive's dependency graph and how it changes over
+time.
+-------------------------------------------------------------
+IMPORTANCE: 3
+TITLE: Dynamic Profiling
+AREA: OBFUSCATION
+AUTHOR: 
+
+Add a new pane, similar to the statistics pane,
+for collecting dynamic profiling information.
+Design an API for using this information. The
+obfuscation loop should be augmented to make
+use of this information. One issue is how to 
+keep the information up-to-date as we transmogrify 
+the code. 
+
+-------------------------------------------------------------
+
+IMPORTANCE: 3
+TITLE: SandMark Web Interface
+AREA: GUI
+AUTHOR: 
+
+At some point we should write a servlet web-interface
+to SandMark. This would allow us to distribute 
+patented algorithms, or, rather, their services.
+
+-------------------------------------------------------------
+
+IMPORTANCE: 2
+TITLE: GUI Event Replay
+AREA: WATERMARKING
+AUTHOR: 
+
+It ought to be possible to catch all events coming
+into a Java program to be able to replay it later
+on. This would be cool functionality for the CT
+algorithm:
+   *) During tracing we catch the events the user
+      is generating (mouse clicks/keyboard input/
+      network trafic) and save to a file.
+   *) During recognition we replay these events
+      and extract the watermark automatically.
+Wimilar work seems to have been done in the past:
+   http://jan.netcomp.monash.edu.au/java/replayJava/manual.html
+   http://jan.netcomp.monash.edu.au/java/replayJava/paper.html
+
+-------------------------------------------------------------
+
+IMPORTANCE: 2
+TITLE: Log improvement
+AREA: GUI
+AUTHOR: 
+
+Add the ability to have multiple colors of log messages.
+Errors in red, information in blue, prompts in black,
+etc.
+
+Probably painful.
+
+Add some different levels of logging, as constants.
+
+Add log messages for all algorithms, to show progress.
+
+Add "welcome" log messages to all algorithms. Each one
+should say something like: "Welcome to algorithm X.
+This watermarking/obfuscation algorithm does..."
+
+=============================================================
+=                     Completed Tasks                       =
+=============================================================
+
+-------------------------------------------------------------
+
+IMPORTANCE: 2
+TITLE: Message Pane
+AREA: GUI
+AUTHOR: 
+
+Add a 3-line text-pane to the bottom of the GUI. This
+is used to display a short informational message about 
+each algorithm, as they are selected:
+
+   +--------------------------------------------------------------+
+   |  SandMark 3.1                                                |
+   |                                                              |
+   |                                                              |
+   |                                                              |
+   |                                                              |
+   |                                                              |
+   |                                                              |
+   |                                                              |
+   |                                                              |
+   |                                                              |
+   |                                                              |
+   +--------------------------------------------------------------+
+   | This is the Collberg-Thomborson Watermarking Algorithm.      |
+   | To use it, first add calls to sm$mark() to your code, then   |
+   | trace it, and finally embed the watermark.                   |
+   +--------------------------------------------------------------+
+
+
+-------------------------------------------------------------
+
+IMPORTANCE: 5
+TITLE: File Browser Widget
+AREA: GUI
+AUTHOR: kobes
+
+Redo the way we keep track of file-names in the GUI.
+Right now the code (in Console.java, mostly) is
+horrible (Collberg wrote it, of course). It tries to
+generate intelligent guesses for what files the
+user would like to enter. This is the wrong
+strategy.
+
+Instead what I would like to see is that each BROWSE 
+button gets a pulldown menu of the last 5-10 files 
+touched. Something like this:
+
+        +--------------------+    
+Enter   |                    |  +----+   +--------+
+Jar:    |                    |   \  /    | BROWSE |
+        |                    |    \/     +--------+
+        +--------------------+ 
+
+Thus, to enter a file name you can either type it,
+click BROWSE, or click on the triangle for a list of
+the last few files entered into the system.
+
+-------------------------------------------------------------
+
+IMPORTANCE: 4
+TITLE: Decompilation
+AREA: GUI
+AUTHOR: 
+
+Add a "decompile"-tab to the SandMark GUI. Find some 
+free decompiler (Jed?) and incorporate it.
+
+-------------------------------------------------------------
+
+IMPORTANCE: 4
+TITLE: String Obfuscation
+AREA: OBFUSCATION
+AUTHOR: david
+
+Implement some rudimentary string obfuscations.
+
+-------------------------------------------------------------
+
+-------------------------------------------------------------
+
+IMPORTANCE: 3
+TITLE: Obfuscation Widgets
+AREA: GUI, OBFUSCATION
+AUTHOR: 
+
+Add an "overall obfuscation" and "max overhead" knobs 
+to the obfuscation pane 
+
+-------------------------------------------------------------
+
+IMPORTANCE: 3
+TITLE: Graph Visualization
+AREA: GUI
+AUTHOR: 
+
+Add the ability to view graphs, using some simple
+graph drawing algorithm. Right now we're generating
+dot-files but it would be nice if we could instead
+pop up a window that visualizes one of the many
+graphs we use in the system.
+
+-------------------------------------------------------------
+
+IMPORTANCE: 3
+TITLE: Jar-File Visualization
+AREA: GUI
+AUTHOR: 
+
+Add the ability to view all kinds of information
+about a jar-file, for example, inheritance 
+hierarchy, control-flow graph, etc. 
+-------------------------------------------------------------
+
+IMPORTANCE: 3
+TITLE: ClassFileCollection Improvement
+AREA: ORGANIZATION, GUI
+AUTHOR: 
+
+Fix 
+   sandmark.util.ClassFileCollection 
+so that it can open/save a single class, not just
+a jar-file. Also fix the rest of the code to
+handle the case when the user enters a single
+class, rather than a jar. There is one complication:
+we add the watermarkClass to the user's application,
+which will be hard if the user just enters a single
+class file. Maybe we always return jar but allow
+single class inputs?
+
+The class 
+   sandmark.embed.EditedClass
+should be renamed
+   sandmark.util.EditClass
+It is only referenced in sandmark.embed and sandmark.trace.
+Also add some extensive testing code in a main method.
+
+-------------------------------------------------------------
+IMPORTANCE: 5
+TITLE: Deobfuscating the Name-Overloading Obfuscation
+AREA: OBFUSCATION
+AUTHOR: 
+
+Break Tyma's name overloading obfuscation algorithm
+(in sandmark.obfuscate.nameoverloading) by breaking
+overloading chains, so that every method has a
+different name (when appropriate). Do this by
+   1) reordering method arguments, or, 
+   2) when this isn't enough, removing bogus arguments.
+1
+-------------------------------------------------------------
+
+IMPORTANCE: 5
+TITLE: CFG Watermark Graph
+AREA: WATERMARKING
+AUTHOR: 
+
+The GTW algorithm requires us to generate as stealthy 
+CFGs as possible. We should therefore embed a number 
+into a reducible, "pretty" CFG. The graph is made up of 
+components for loops, if:s, if-then-else:s, and concatenation:
+
+      * <---+
+      |     |     (L a)
+      |     |
+      *-----+ 
+
+         *
+        / \
+       /   \ 
+      *     *     (E a a)
+       \   /
+        \ /
+         *
+
+         *
+         |\
+         | \
+         |  *     (I a)
+         | /
+         |/
+         *
+
+         *
+         |
+         |
+         *
+
+We should find a way to enumerate these graphs. Ideally,
+IF-constructions should ignore orientation. Typical CFGs are 
+skinny and long, i.e. to make the graphs stealthy there's a 
+limit to the amount of nesting that should be done; probably
+no more than three levels. Note that concatenation isn't
+really part of the graph - it's just a way to merge components
+together.
+
+One trivial idea is to generate all possible CFGs using
+(L a), (E a a), (I a), and no more than three levels of
+nesting. Say that there are K such CFGs. Now we can use
+a radix-K encoding by simply concatenating CFG components
+together, one per base-K digit. This doesn't seem to be
+optimial, though.
+
+-------------------------------------------------------------
+
+IMPORTANCE: 5
+TITLE: About Box Updates
+AREA: GUI
+AUTHOR: 
+
+Various GUI hackers should be acknowledged in the about box:
+     Siwei Shen, Mike Stepp, Michael Chin
+
+The about box should acknowledged support:
+     Version 0.2, 2.0, and 2.1 supported by the NSF under grant #....
+     Version 3.1 supported by the NSF under grant #....
+     and the AFRL under grant #....
+
+-------------------------------------------------------------
+
+IMPORTANCE: 5
+TITLE: Web Download Page
+AREA: WEB
+AUTHOR: 
+
+Add a web download page with a click-through
+license, and collect information (name, email,
+organization) of those who download. Should be
+easy to do using servlets.
+
+-------------------------------------------------------------
+
+IMPORTANCE: 5
+TITLE: Splitting, Encrypting, Compressing, and Correcting Watermarks
+AREA: WATERMARK, GUI
+AUTHOR: David
+STATUS: DONE
+
+The class sandmark.util.StringInt currently encodes
+a watermark string as an integer. It requires some
+more sophisticated behavior:
+   a) The watermark embedding panes should have two
+      key fields: "CipherKey" and "WatermarkKey". The
+      former is used to encrypt the watermark, the
+      latter to embed it into the program. The
+      recognition panes should therefore also
+      have a "CipherKey" field that decrypts the
+      message. sandmark.util.StringInt could be
+      extended to use the Java crypto classes
+      to encode, compress, and encrypt watermarks.
+
+    b) We need to compress a string before encoding it. 
+       We should implement Huffman compression, at the very least.
+
+    c) We should implement some simple error correcting code.
+
+    d) Several algorithms seem to need to split a watermark in
+       smaller pieces. We should add this to sandmark.util.StringInt. 
+       The encoder should split the mark and add bits at the
+       beginning that indicate the length and the sequence
+       number of the piece. This information is the used by
+       the decoder to stitch the pieces together.
+
+It is an interesting question as to the order in which these
+operations should be performed.
+
+-------------------------------------------------------------
+
+IMPORTANCE: 10
+TITLE: Opaque Predicate Library
+AREA: OBFUSCATION
+AUTHOR: 
+
+Implement a library of all kinds of opaque predicates:
+   * numeric predicates (automatically generated?)
+   * predicates based on aliasing.
+
+-------------------------------------------------------------
+
+IMPORTANCE: 10
+TITLE: Control Obfuscations
+AREA: OBFUSCATION
+AUTHOR: 
+
+Based on the new set of opaque predicates, implement 
+some control obfuscations.
+
+-------------------------------------------------------------
+
+IMPORTANCE: 10
+TITLE: Outlining Obfuscation
+AREA: OBFUSCATION
+AUTHOR: 
+
+Implement the outlining obfuscation.
+
+-------------------------------------------------------------
+IMPORTANCE: 10
+TITLE: Watermarking Inheritance Hierarchy
+AREA: WATERMARKING, GUI
+AUTHOR: 
+
+There are many variants of static watermarking. Only one
+of them is supported by the GUI. We need to somehow 
+implement GUI variants that each algorithm can choose.
+
+Traditionally, we have thought the recognizer (R) should
+have the signature
+   R(watermarked_program, key) --> watermark.
+("give me the watermark/fingerprint for this 
+program, given this key"). Stern's algorithm, however, is 
+described as having the signature
+   R(watermarked_program, watermark) --> boolean
+("does the program contain this watermark?") or even
+   R(watermarked_program, watermark, threshold) --> boolean
+where "threshold" is a fuzz-factor used by the recognizer.
+We're also implementing Stern's algorithm with the
+signature
+   R(watermarked_program, original_program) --> watermark
+where the original program serves as the key or
+baseline against which the watermarked program
+is compared. The signature
+   R(watermarked_program, original_program, watermark) --> boolean
+is, of course, also possible.
+
+Hence, at the very least we need the following signatures:
+       Signature                  Keywords
+       ------------------------------------------------
+  1)   R(P_w,k)->int              Fingerprint, blind
+  2)   R(P_w,P)->int              Fingerprint, informed
+  3)   R(P_w,w,fuzz)->bool        Watermark, blind
+  4)   R(P_w,P,fuzz)->bool        Watermark, informed
+where P_w is the watermarked program, P the original,
+k the key. A fingerprinting algorithm extracts a
+number from P_w, either using k or P 
+as the additional input. A watermarking algorithm
+returns true/false if the watermark is in P_w
+or not. It can take w or P (+ a fuzz-factor)
+as input.
+
+Somehow I would like to build up an inheritance
+hierarchy in sandmark.watermark that reflects this
+and allows the implementer to easily incorporate
+their algorithm into SandMark by extending the
+appropriate class. Keep in mind that we also have
+the static/dynamic classification. So, a mindless
+set of base classes might look like this:
+   1) StaticBlindFingerprinter
+   2) StaticInformedFingerprinter
+   3) StaticBlindWatermarker
+   4) StaticInformedWatermarker
+   5) DynamicBlindFingerprinter
+   6) DynamicInformedFingerprinter
+   7) DynamicBlindWatermarker
+   8) DynamicInformedWatermarker
+Or, maybe it would be possible to have a set of
+interfaces so that one could say
+   class MyWM implements Static, Blind, Fingerprinter {...}
+???
+
+Once we have build up this hierarchy we should fix
+the GUI so that when a user selects a particular
+watermarking algorithm, the correct set of 
+input fields show up. For example, when the
+user selects a StaticInformedWatermarker we get input
+fields for P_w, P, and fuzz, and the output is a
+yes/no.
+
+-------------------------------------------------------------
+
+IMPORTANCE: 7
+TITLE: Regression Tests
+AREA: TESTING
+AUTHOR: 
+
+We should add a set of regression tests, one or more
+tests per SandMark class/package:
+   *) Remove the smark3/test directory. The tests
+      in this directory should be moved into the
+      packages that they test to improve locality.
+   *) Add a 'test' target to all makefiles that
+      runs the tests in the corresponding package.
+   *) Add a file '<class>.std' for each class and a
+      '<package>.std' file for each package that 
+      holds the expected result of the tests in 
+      this class/package.
+   *) Translate the 'tests/runtest.sh' script (which
+      compares the output of each tests with the
+      expected output and reports the result) into
+      sandmark/util/RunTest.java. This will allow
+      clients to run the regression tests in the
+      field, even if they're not running unix.
+Eventually, each class in SandMark should have a 
+'main()' method that performs rudimentary tests of the
+functionality of that class. Each package should
+have a 'Test.java' class that performs package-level
+testing. These regression tests will make it easy to 
+detect obvious bugs after a change to the code.
+
+-------------------------------------------------------------
+
+IMPORTANCE: 10
+TITLE: Version Installation
+AREA: INSTALLATION
+AUTHOR: ecarter
+STATUS: DONE
+
+It should be possible to do
+   > make install VERSION=3.5
+and all relevant files get built and copied into
+the directory
+   /cs/www/sandmark/SandMark3.5
+The directory should contain the files
+   SandMark-source-3.5.zip
+   SandMark-3.5.jar
+   README
+   smark (the script)
+(or something similar). The README file
+should describe installation and execution
+procedures.
+
+-------------------------------------------------------------
+IMPORTANCE: 10
+TITLE: Web-site Update
+AREA: INSTALLATION
+AUTHOR: ecarter
+
+We need to fix up the web-site:
+       There should be a table showing
+       all the previous versions of
+       SandMark, when they were released,
+       what size the jar file is,
+       and what they require (java 1.4,
+       BCEL, BLOAT,...), and direct links
+       to where these libraries can be
+       found.
+
+We should also check the licenses of
+BLOAT, BCEL, etc, to see if we could
+incorporate them directly into the
+jar-file we're distributing. If so,
+the web directory should contain the files
+   SandMark-source-3.5.zip
+   SandMark-3.5.jar
+   SandMark-WithLibraries-3.5.jar
+   README
+   smark (the script)
+or something similar.
+
+-------------------------------------------------------------
+IMPORTANCE: 5
+TITLE: GTW extension
+AREA: WATERMARKING
+AUTHOR: 
+
+Let A, B, and C below be CFGs. a,g,h,i,j,k are marked basic blocks, 
+the rest are unmarked. X is a method call edge from A to B. The
+watermark graph consists of the marked nodes and the edges between
+marked nodes. The result is the watermark graph below, where 
+edges between non-marked basic blocks have been shrunk.
+
+
+  A: a
+    / \
+   /   \
+  b     c
+   \   /
+    \ /      X
+     d------------+
+     |            |
+     e            |
+                  |
+  B: f<-----------+
+     |              
+     g            
+    / ^
+   /   \            
+  h     i
+  |     |            
+  j     |
+   \   /
+    \ /
+     k
+     |
+     l
+
+  C: m
+     |
+     n
+     |
+     o
+
+Watermark graph:
+     a
+     |
+     g
+    / ^
+   /   \            
+  h     i
+  |     |            
+  j     |
+   \   /
+    \ /
+     k
+-------------------------------------------------------------
+
+IMPORTANCE: 7
+TITLE: Bytecode diff
+AREA: WATERMARKING
+AUTHOR: 
+
+We should have a pane, similar to the view pane,
+which takes two jar files as input and displays
+their differences. This could be used to launch
+a collusive attack against fingerprinted code.
+
+An algorithm for diffing Java bytecodes is here:
+   http://cm.bell-labs.com/who/bsb/papers/jvmsim98.ps
+
+More relevant papers:
+   http://citeseer.nj.nec.com/krinke01identifying.html
+   http://citeseer.nj.nec.com/540096.html
+   http://citeseer.nj.nec.com/prechelt00finding.html
+   http://citeseer.nj.nec.com/461331.html
+   http://citeseer.nj.nec.com/verco96software.html
+   http://citeseer.nj.nec.com/wise96yap.html
+   http://citeseer.nj.nec.com/ducasse99language.html
+   http://citeseer.nj.nec.com/546169.html
+   http://citeseer.nj.nec.com/baker92program.html
+
+In many ways this toll will be similar to Moss, the on-line
+plagiarism detector:
+   http://www.cs.berkeley.edu/~aiken/moss.html
+Moss works on source, however. Unfortunately,
+they don't say anything about how their algorithms
+work. Moss generates a very nifty report that ranks
+every pair of input programs according to their
+similarity. Within a pair, similar pieces of code
+are color coded. We should generate similar output.
+
+This tool is also similar to other systems that compare
+structured data. We should look at what type of algorithms
+they use. For example, IBM and GNU have tools for comparing XML:
+   http://www.alphaworks.ibm.com/tech/xmldiffmerge
+   http://diffxml.sourceforge.net/
+
+Our problem, however, is more complicated. Ideally, we'd like
+to be able to compare two jar files after they've been run
+through the obfuscator. So, maybe the simplest approach is
+to do a pair-wise comparison of each of the methods in the
+two jar files.
+
+-------------------------------------------------------------
+IMPORTANCE: 10
+TITLE: Welcome and Logging Messages
+AREA: GUI
+AUTHOR: 
+
+Remove the welcome messages. Go through each algorithm
+and add appropriate logging messages. Each phase of
+an algorithm should generate a log entry. Errors should also
+be logged. We should add some sort of divider (-------)
+between each algorithm in the log. Color coding of the
+messages (red for errors, black for phases, blue for ...)
+would also be nice.
+
+The information pane (at the bottom of the GUI) needs to be
+fixed. Long messages makes the text pane scroll (correct)
+but leaves the pane at the bottom of the text (wrong). We
+should go througn each algorithm and actually generate 
+good information. This includes a short description of what
+the algorithm does and any hints for a novice on how to
+use it. Also, nothing is shown in this pane until one actually
+selects an algorithm. This seems wrong.
+
+-------------------------------------------------------------
+IMPORTANCE: 10
+TITLE: Help Messages
+AREA: GUI
+AUTHOR: 
+
+The help texts are out-of-date or non-existent. They must
+be updated before we release code.
+
+-------------------------------------------------------------
+IMPORTANCE: 10
+TITLE: Application Object Repository
+AREA: OBFUSCATION
+AUTHOR: ???
+
+Add a central repository of "source-code objects". This
+is used by the  top-level obfuscation engine.  This change
+will require changes to *all* the obfuscators and watermarkers.
+
+-------------------------------------------------------------
+IMPORTANCE: 10
+TITLE: Platform Testing
+AREA: TESTING
+AUTHOR: 
+
+Test SandMark on any combination of
+   *) Linux/Solaris/Windows
+   *) Jikes/JDK/Visual J++...
+
+
+-------------------------------------------------------------
+IMPORTANCE: 5
+TITLE: Configuration Tab
+AREA: GUI
+AUTHOR: 
+
+Right now we have two ways of configuring the system.
+There's Edit:Configuration which brings up a pane
+that allows one to set property values for particular
+algorithms. There's also a CONFIGURE button in the
+obfuscation pane that allows us to turn on and off
+algorithms for particular parts of a particular
+application. At the moment no configuration values
+are persistent.
+
+We should probably redesign this system so that
+there is only one place that does all manners
+of configuration. Yet another tab might be a
+good idea. It should be possible to set default
+values (which are maintained across input applications)
+and to set values which pertain only to a particular
+application. All values should be persistent.
+
+So, the following might happen when go to the Configuration 
+Tab pane. There are two buttons "CONFIGURE ALGORITHMS" and 
+"CONFIGURE APPLICATION":
+
+       ___________
+      / Configure \
+   +-/             \----------------------------------------------+
+   |  SandMark 3.1                                                |
+   |                                                              |
+   |                                                              |
+   |        +--------------------+                                |
+   |Enter   |                    |  +----+   +--------+           |
+   |Jar:    |                    |   \  /    | BROWSE |           |
+   |        |                    |    \/     +--------+           |
+   |        +--------------------+                                |
+   |                                                              |
+   |                                                              |
+   |                                                              |
+   |                                                              |
+   |                                                              |
+   |   +------------+   +-------------+                           |
+   |   | CONFIGURE  |   | CONFIGURE   |                           |
+   |   | ALGORITHMS |   | APPLICATION |                           |
+   |   +------------+   +-------------+                           |
+   |                                                              |
+   +--------------------------------------------------------------+
+
+I hit the "CONFIGURE ALGORITHMS" button and another pane pops up 
+(similar to Edit:Configure) that allows me to set various property 
+values. I press "SAVE" and the values are stored in the file 
+"~/.sandmark/defaults" or whatever is appropriate for this particular OS.
+I then press enter "TTT.jar" in the "Enter jar" box, hit "CONFIGURE
+APPLICATION", and another pane pops up (similar to Obfuscation:Configure) 
+allowing me to set various properties for TTT.jar and all its individual
+parts. I press "SAVE" and the information is stores in
+"~/.sandmark/TTT.jar".
+
+The next time I start up SandMark "~/.sandmark/defaults" gets loaded.
+The next time I enter "TTT.jar" in any of the watermarking/obfuscation
+panes, "~/.sandmark/TTT.jar" gets loaded as the set of properties
+that applies to this application only.
+
+-------------------------------------------------------------
+IMPORTANCE: 5
+TITLE: Monden's Algorithm
+AREA: WATERMARKING
+AUTHOR: 
+
+Implement and evaluate Monden's algorithm.
+
+http://citeseer.nj.nec.com/monden00practical.html
+
+-------------------------------------------------------------
+IMPORTANCE: 10
+TITLE: Arboit's Algorithm
+AREA: WATERMARKING
+AUTHOR: 
+
+Implement and evaluate Geneviève Arboit's algorithm.
+
+http://citeseer.nj.nec.com/arboit02method.html
+
+-------------------------------------------------------------
+
+IMPORTANCE: 10
+TITLE: One graph to rule them all
+AREA: UTIL
+AUTHOR: 
+
+At last count, we had about six (6) different graph
+classes in SandMark. This is wrong. We should build
+one (or at most, a few) graph class and use them
+throughout the system. For example, we might have
+
+   /*
+    * Abstract super-class of all graphs.
+    */
+   abstract class sandmark.util.graph.Graph {
+   }
+
+   /*
+    * Represents a node in a graph.
+    */
+   class sandmark.util.graph.Node{
+   }
+
+   /*
+    *  Represents an edge in a graph.
+    */
+   class sandmark.util.graph.Edge{
+   }
+
+   /*
+    * Corresponds to the current implementation of
+    * sandmark.util.graph.Graph. There can be multiple
+    * edges between two nodes, and outgoing edges are
+    * numbered.
+    */
+   sandmark.util.graph.OrientedMultiGraph extends sandmark.util.graph.Graph  {
+   }
+  
+   /*
+    * Directed graph. Only one edge (in each direction) between a pair of nodes. 
+    * Outgoing edges are not numbered.
+    */
+   sandmark.util.graph.SimpleGraph extends sandmark.util.graph.Graph {
+   }
+
+   /*
+    * Undirected graph. 
+    */
+   sandmark.util.graph.UndirectedGraph extends sandmark.util.graph.Graph {
+   }
+
+We should survey exactly what graphs the current system contains
+and what their individual semantics are. We should then work
+out what set of graphs we actually need, implement these, and
+add whatever graph algorithms are spread out over the entire
+system to sandmark.util.graph. This way, these algorithms can be
+used on any type of graph.
+
+-------------------------------------------------------------
+
+IMPORTANCE: 10
+TITLE: CT Algorithm Stealth Improvement
+AREA: WATERMARKING
+AUTHOR: 
+
+The CT algorithm generates a class
+   Watermark extends java.lang.Object {
+      Watermark left;
+      Watermark right;
+   }
+where left and right are the edge pointers in the watermark
+graph. This is obviously unstealthy. We should scan the
+application and look for a class which looks "almost right"
+and which we can hijack for our own purposes. A linked-list
+class, for example, could easily be extended by adding an
+extra link:
+
+   LinkedList extends java.lang.Object {
+      List next;
+   }
+   Watermark extends LinkedList {
+      List right;
+   }
+The Watermark now has two links next and right to be
+used as graph edges.
+
+-------------------------------------------------------------
+
+IMPORTANCE: 10
+TITLE: Obuscation Executive
+AREA: OBFUSCATION
+AUTHOR: ???
+
+Implement a top-level obfuscation engine. 
+-------------------------------------------------------------
+
+IMPORTANCE: 10
+TITLE: Venkie's Algorithm
+AREA: WATERMARKING
+AUTHOR: gmt,ash,ecarter
+
+Implement Venkie's watermarking algorithm. 
+-------------------------------------------------------------
+
+IMPORTANCE: 10
+TITLE: Belgian Algorithm
+AREA: WATERMARKING
+AUTHOR: tapas,balamc
+
+Implement the Belgian watermarking algorithm. 
+-------------------------------------------------------------
+
+IMPORTANCE: 5
+TITLE: DICE Algorithm
+AREA: WATERMARKING
+AUTHOR: kamlesh
+
+Implement the DICE watermarking algorithm. Some old code 
+already exists.
+-------------------------------------------------------------
+
+IMPORTANCE: 10
+TITLE: Array Obfuscation
+AREA: OBFUSCATION
+AUTHOR: ashok, prabhu
+
+Implement the array obfuscations.
+-------------------------------------------------------------
+
+IMPORTANCE: 10
+TITLE: UCLA Algorithm
+AREA: WATERMARKING
+AUTHOR: mylesg, ???
+
+Implement the UCLA watermarking algorithm.
+
+-------------------------------------------------------------
+
+IMPORTANCE: 10
+TITLE: Complexity Metrics
+AREA: OBFUSCATION
+AUTHOR: tapas, balamc, ashok
+
+Viewing software complexity metrics. This will presumably
+be added to the statistics pane where you can view
+individual counts as well as the compounds metrics.
+
+-------------------------------------------------------------
+IMPORTANCE: 10
+TITLE: Viewing Code
+AREA: GUI
+AUTHOR: tapas, balamc, ashok
+
+Sorting methods/classes. The view pane should be extended
+so that we can view the classes and methods sorted in
+various ways. This feature would typically be used by
+an adversary to look for methods that has some feature that
+might indicate that it has been watermarked with a 
+particular algorithm.
+
+-------------------------------------------------------------
+
+IMPORTANCE: 10
+TITLE: CT Algorithm
+AREA: WATERMARKING
+AUTHOR: collberg
+
+Finishing up the Collberg-Thomborson algorithm.
+
+-------------------------------------------------------------
+
+IMPORTANCE: 3
+TITLE: BCEL Update
+AREA: BCEL
+AUTHOR: ash
+
+The "de.fub.bytecode" we've learned to love is now
+changing to "org.apache.bcel":
+   http://jakarta.apache.org/bcel/apidocs/index.html
+At some point we need to make the change, too.
+
+STATUS: DONE
+
+-------------------------------------------------------------
+
+IMPORTANCE: 10
+
+Remove all remaining 'import'-statements.
+
+STATUS: DONE.
+
+-------------------------------------------------------------
+IMPORTANCE: 10
+New GUI layout. In particular, we need to be able to
+handle 
+   * multiple obfuscation algorithms. The user should
+     be able to pick either just one algorithm, or
+     have the obfuscation engine run multiple passes
+     over the code.
+   * both static and dynamic watermarking. The static
+     watermarker only has two panes: 
+        embed-pane: takes an input jar-file, a
+                    watermark, and an output 
+                    jar-file.
+        recognize-pane: takes an input jar-file as input.
+                   output is a list of possible watermarks,
+                   just like the dynamic watermarker.
+   * Again, we should be able to choose between a number of
+     static and dynamic watermarking algorithms.
+
+   * The 'algorithms' pull-down menue should get its values
+     from sandmark.obfuscate.Obfuscator. Also, when we
+     call the obfuscator the algorithm chosen should be
+     passed along in the call.
+DONE.
+
+-------------------------------------------------------------
+                 THE GREAT CODE-MIGRATION
+                 ------------------------
+IMPORTANCE: 10
+
+The current code organization is as follows"
+
+./doc
+./test
+./test/programs
+./sandmark
+./sandmark/embed
+./sandmark/encode
+./sandmark/encode/ir
+./sandmark/encode/java
+./sandmark/encode/ir2ir
+./sandmark/encode/storage
+./sandmark/exec
+./sandmark/graph
+./sandmark/gui
+./sandmark/html
+./sandmark/obfuscate
+./sandmark/obfuscate/setfieldspublic
+./sandmark/obfuscate/splitclass
+./sandmark/obfuscate/util
+./sandmark/recognize
+./sandmark/trace
+./sandmark/util
+./sandmark/codec
+
+We should reorganize so that we can support multiple watermarking
+algorithms:
+./doc
+./test
+./test/programs
+./sandmark
+./sandmark/java
+./sandmark/watermark
+./sandmark/watermark/CT
+./sandmark/watermark/CT/embed
+./sandmark/watermark/CT/encode
+./sandmark/watermark/CT/encode/ir
+./sandmark/watermark/CT/encode/ir2ir
+./sandmark/watermark/CT/encode/storage
+./sandmark/watermark/CT/recognize
+./sandmark/watermark/CT/trace
+./sandmark/watermark/codec
+./sandmark/obfuscate
+./sandmark/obfuscate/setfieldspublic
+./sandmark/obfuscate/splitclass
+./sandmark/obfuscate/util
+./sandmark/exec
+./sandmark/graph
+./sandmark/gui
+./sandmark/html
+./sandmark/util
+./sandmark/statistics
+./sandmark/optimize
+
+There should be classes
+  sandmark.watermark.GeneralWatermark
+  sandmark.watermark.StaticWatermark (extends sandmark.watermark.GeneralWatermark)
+  sandmark.watermark.DynamicWatermark (extends sandmark.watermark.GeneralWatermark)
+  sandmark.watermark.CT.CTWatermark (extends sandmark.watermark.DynamicWatermark)
+
+CT is the Collberg/Thomborson watermarking algorithm.
+
+We will also have to fix up the gui so that several watermarking
+algorithms can be supported. As is the case with obfuscators,
+we should load the currently available watermarkers at runtime.
+
+package sandmark.watermark;
+class GeneralWatermarker {
+
+    private String label;
+
+    public GeneralWatermark (String label) {
+       this.label = label;
+    }
+
+    public String getLabel() {
+       return label;
+    }
+
+}
+
+package sandmark.watermark;
+class StaticWatermarker extends sandmark.watermark.GeneralWatermarker {
+
+    public StaticWatermarker (String label) {
+       this.label = label;
+    }
+
+    abstract public void apply(
+       sandmark.util.ClassFileCollection cfc, 
+       java.math.BigInteger value)
+       throws Exception;
+}
+
+package sandmark.watermark;
+class DynamicWatermarker extends sandmark.watermark.GeneralWatermarker {
+
+    public DynamicWatermarker (String label) {
+       this.label = label;
+    }
+
+    abstract public void apply(
+       sandmark.util.ClassFileCollection cfc, 
+       java.math.BigInteger value)
+       throws Exception;
+}
+
+The package
+   ./sandmark/encode/java
+should be moved up one step to
+  ./sandmark/java
+The only references to this package is in sandmark/encode/ir,
+I think.
+DONE.
+
+-------------------------------------------------------------
+IMPORTANCE: 2
+
+Add a preferences box under the Edit menu. Each obfuscation
+and watermarking algorithm should have a method 
+'getDefaultProperties()' which returns the default
+properties for that algorithm. The preferences box uses
+these to lay out its pane. Each algorithm can ask the
+gui for the values of its default properties.
+
+This will get rid of the CONFIGURE button for each pane.
+DONE.
+
+-------------------------------------------------------------
+IMPORTANCE: 5
+Create a statistics directory in the same way as 
+obfuscate, etc. Move the stat code there. Check 
+with Sean Devine where the code really is...
+
+STATUS: DONE
+-------------------------------------------------------------
+IMPORTANCE: 5
+Add a README file to each directory.
+
+Add JavaDoc comments to every class and every method.
+Add html formating text (such as <PRE>... </PRE>) 
+to the existing code, when necessary.
+STATUS: DONE
+-------------------------------------------------------------
+IMPORTANCE: 5
+
+The package
+   ./sandmark/util/javagen
+should be generalized. What I would like to do is
+to allow the user to build Java ASTs, and then
+being able to generate bytecode from these, using
+JavaClass. This is kind-of what this package does
+already, although it's very specialized to the
+kinds of Java code that we're currently generating.
+In particular, assignment and expressions need to
+be generalized to more natural AST nodes. Right 
+now, for example, there are no arithmetic expressions.
+
+We shouldn't go overboard with this - clean
+up the code, add some more stuff, but don't
+add all of Java.
+
+See sandmark.util.javagen/Test.java for some examples.
+
+STATUS: DONE
+
+-------------------------------------------------------------
+Fix documentation in smark/docs. Add sections on
+   * Coding conventions:
+      * No tabs! 
+      * Left brace ('{') on
+        same line as preceding statement (i.e. 
+        if () {
+           ...
+        }
+        not 
+        if ()
+        {
+        }
+      * No "import" statements. Always use fully qualified names.
+
+STATUS: DONE
+
+-------------------------------------------------------------
+IMPORTANCE: 5
+
+BCEL's Justice now allows you to build control flow graphs.
+Examine this, and add some examples to the documentation.
+See http://bcel.sourceforge.net/justice/JustIce.ps.gz.
+Also in smextern/JustIce.ps.gz.
+
+STATUS: OBSOLETE
+
+-------------------------------------------------------------
+Fix documentation in smark/docs. Add sections on
+   * JavaClass
+   * BCEL
+   * Using cck to view classfiles.
+   * Using BCEL's listclass
+       java -classpath smextern/BCEL.jar listclass -code TTTApplication
+    java listclass [-constants] [-code] [-brief] [-dependencies] [-nocontents] \
+         [-recurse] class... [-exclude <list>]
+       * -code List byte code of methods</li>
+       * -brief List byte codes briefly</li>
+       * -constants Print constants table (constant pool)</li>
+       * -recurse>  Usually intended to be used along with
+       * -dependencies  When this flag is set, listclass will also print i
+
+STATUS: DONE
+-------------------------------------------------------------
+Documentation:
+   * Add a section that shows template code for adding
+     watermarking and obfuscation algorithms.
+STATUS: DONE
+
+-------------------------------------------------------------
+IMPORTANCE: 1
+
+Write a script that takes a java jar-file as input
+and runs javap on all the classfiles in this jar.
+There is some stuff to this effect in smapps already.
+Add a directory smbin to cvs to store such scripts.
+
+STATUS: OBSOLETE
+
+-------------------------------------------------------------
+Create LaTeX/JavaDoc documentation of the API to be
+used for printing. Add this to the makefile.
+
+STATUS: DONE
+-------------------------------------------------------------
+Check that Ashok's code for loading files on the fly
+(in ./sandmark/codec and ./sandmark/obfuscate) work.
+
+STATUS: DONE
+-------------------------------------------------------------
+Clean up the GUI code so that it is easier to modify.
+
+
+-------------------------------------------------------------
+Look for other Java optimizers than BLOAT. Can we integrate
+them?
+
+-------------------------------------------------------------
+When we write trace points out to a file we also need to
+write the stack traces. And read them in. It would be 
+good to have a general Java "serializer" for reading and
+writing data structures.
+
+STATUS: DONE
+-------------------------------------------------------------
+
+   There is one big problem left to solve in SandMark.
+   I've been thinking about this since the summer, 
+   but only just came up with a solution (I think).
+
+   The problem is that we break up the WM graph in 
+   sections which we spread throughout the program.
+   To be able to reassemble the complete graph we 
+   have global variables holding the roots of each
+   graph piece:
+
+   class P {
+      Watermark piece1;
+      Watermark piece2;
+
+      P() {
+         piece1 = build1();      
+      }
+
+      Q() {
+         piece2 = build2(piece1);      
+      }
+
+      main() {
+         P();
+         Q();
+      }
+   }
+
+   This is obviously extremely unstealthy. We would rather
+   something like this:
+
+   class P {
+      Watermark P() {
+         return build1();      
+      }
+
+      Q(Watermark piece1) {
+         piece2 = build2(piece1);      
+      }
+
+      main() {
+         Watermark piece1 = P();
+         Q(piece1);
+      }
+   }
+
+   That is, we need to be able to pass references to graph 
+   roots around to the program, from one graph-building site
+   to the next. In order to do this, we need to know
+   whether there's a communications channel between two
+   annotation points. This channel would consist of a 
+   path between the two points through activation records
+   on the stack.
+
+   So, how do we find these communications channels?
+
+   Well, when an annotation point is hit at tracing time we
+   should walk and save the stack. Assume that each stack frame
+   has its own unique sequence number. 
+   Assume the following set of methods:
+
+   void R() {
+      S();
+      T();
+   }
+
+   void S() {
+      U();
+   }
+
+   void T() {
+      V();
+   }
+
+   void U() {
+      mark();   // annotation point u
+   }
+
+   void V() {
+      mark();  // annotation point v
+   }
+
+   U and V have annotation points u and v, and we would
+   like to find out if there's a communications path
+   from U to V. 
+
+   During tracing we would get a We might get a run-time 
+   call-graph like this:
+
+      U:5   V:7
+      |     |
+      S:4   T:6
+      |     |
+       \   /
+        \ /
+         R:3
+         |
+         Q:2
+         |
+         P:1
+
+
+   In other words, there's a path from U to V that goes
+   through S, R, and T. If we could figure this out we
+   could mark the program like this:
+
+   void R() {
+      Watermark x = S();
+      T(x);
+   }
+
+   Watermark S() {
+      return U();
+   }
+
+   Watermark T(Watermark x) {
+      return V(x);
+   }
+
+   Watermark U() {
+      return build1();
+   }
+
+   Watermark V(Watermark x) {
+      return build2(x);
+   }
+
+   That is, we are able to pass the result of building graph
+   segment 1 to the routine that builds graph segment 2
+   without going through global storage.
+
+   This is how far I got thinking about this last summer.
+   I even wrote some code which would build this graph
+   at trace time.
+
+   However, I was stumped by the fact that I could not
+   uniquely identify each stack frame. Consider, for example,
+
+   void R() {
+      for(int i=0;i<3;i++)
+         S();
+   }
+
+   void S() {
+      mark();
+   }
+
+   This should yield the call graph
+
+   S  S  S
+   |  |  |
+   \  |  /
+    \ | /
+      R
+
+   allowing us to generate 
+
+   void R() {
+      Watermark[] pieces = new Watermark[3];
+      for(int i=0;i<3;i++)
+          pieces[i] = S(pieces);
+   }
+
+   void S(Watermark[] pieces) {
+      return build(pieces);
+   }
+
+   Unfortunately, JDI lacks the functionality to uniquely
+   identify stack frames. This is necessary in order to
+   be able to notice that R calls S more than once. (Each
+   invokation of S will yield an identical call stack,
+   R->S). I asked Sun to add this to the next release, but, 
+   alas, I've received no response. (Every other type of object 
+   that JDI manipulates has a unique identifier associated with 
+   it, so it's not unreasonable that stack frames should too...)
+
+   The only way I can think of solving this problem is the
+   following:
+   a) Add the following to sandmark.trace.Annotator:
+         public class Annotator {
+             public static long stackID = 0;
+             ....
+         }
+
+   b) Before we start to trace the program we edit 
+      *every* user method, adding the following code
+      to its very beginning:
+         void M(...) {
+            long myStackID = sandmark.trace.Annotator.stackID++;
+            ...
+         }
+
+   At trace-time, when a mark() method is hit we:
+     * Walk the stack (using JDI) and print out
+       a tuple (threadID, method-name, method-sig, myStackID).
+
+   For example, when the mark() method in U in the example
+   above is reached we print
+
+   (1, P, ()V, 1)
+   (1, Q, ()V, 2)
+   (1, R, ()V, 3)
+   (1, S, ()V, 4)
+   (1, U, ()V, 5)
+
+   and when the mark() method in V is reached we print
+
+   (1, P, ()V, 1)
+   (1, Q, ()V, 2)
+   (1, R, ()V, 3)
+   (1, T, ()V, 6)
+   (1, V, ()V, 7)
+
+   During watermark embedding we can then recreate the 
+   call graph, exactly the way it was when the two
+   mark methods were reached:
+
+      U:5   V:7
+      |     |
+      S:4   T:6
+      |     |
+       \   /
+        \ /
+         R:3
+         |
+         Q:2
+         |
+         P:1
+
+   and we can discover that there is a path from U to V
+   through U->S->R->T->V.
+
+   Recursion and thread-switching make things more complex,
+   of course, but having complete run-time information
+   (stackID and threadID) simplifies things considerably.
+
+STATUS: DONE
+-------------------------------------------------------------

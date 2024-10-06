@@ -1,0 +1,526 @@
+\section{BCEL}
+\SM\ reads Java classfiles, modifies them, and
+writes out the modified classfiles. There are
+a number of free packages available to parse,
+modify, and unparse classfiles. We are currently
+using two such packages, namely {\tt BCEL} and
+{\tt BLOAT}. Generally, {\tt BLOAT} is comprehensive
+and hard to use, {\tt BCEL} is simpler to use but
+not as complete.
+
+\BCEL\ (formerly {\tt JavaClass}) allows you to load a class,
+iterate through the methods and fields, change
+methods, add new methods and fields, etc. \BCEL\
+also makes it easy to create new classes from
+scratch.
+
+\BCEL\ is here:
+\url{http://jakarta.apache.org/bcel/index.html}.
+There is a manual, and an on-line API description
+at \url{http://bcel.sourceforge.net/docs/index.html}.
+Unfortunately, neither are particularly informative.
+
+\SM\ contains a lot of \BCEL\ code that might be
+worth studying:
+\begin{itemize}
+   \item \url{sandmark.util.javagen} is a package
+         for building up bytecode classes from
+         scratch. Essentially, it allows you to
+         build a Java AST (abstract syntax tree)
+         and compile it down to bytecode. \url{javagen}
+         is built on top of \BCEL.
+   \item \url{sandmark.util.BCEL} contains \BCEL\
+         utility routines. The intention is that
+         this class should grow in the future.
+   \item The package \url{sandmark.watermark.CT.embed}
+         contains several classes that manipulate 
+         Java classfiles using \BCEL.
+\end{itemize}
+
+\subsection{Getting started}
+To open a class file for editing you do the following:
+\begin{listing}{1}
+   sandmark.util.ClassFileCollection cfc = ...;
+
+   cfc = new sandmark.util.ClassFileCollection(jarFile);
+   org.apache.bcel.classfile.JavaClass jc = cfc.getClass(className);
+   org.apache.bcel.generic.ClassGen cg = new org.apache.bcel.generic.ClassGen(jc);
+   org.apache.bcel.generic.ConstantPoolGen cp = 
+      new org.apache.bcel.generic.ConstantPoolGen(jc.getConstantPool());
+\end{listing}
+{\tt jarFile} is the jar-file that contains the class
+file and {\tt className} is the name of the class
+(possibly with a package prefix). 
+\url{sandmark.util.ClassFileCollection} is the
+repository used within \SM\ for loading and
+saving class files.
+
+A \url{org.apache.bcel.classfile.JavaClass}-object
+represents the parsed class file. You can query this
+object to get any information you need about the
+class, for example its methods, fields, code, super-class, etc.
+
+A \url{org.apache.bcel.generic.ClassGen}-object represents
+a class that can be edited. You can add methods and fields,
+you can modify existing methods, etc.
+
+A \url{org.apache.bcel.generic.ConstantPoolGen}-object
+represents a constant pool to which new constants can
+be added.
+
+When you are finished editing the class you must close
+it and return it to the repository maintained by
+\url{sandmark.util.ClassFileCollection}:
+\begin{listingcont}
+   org.apache.bcel.classfile.JavaClass jc1 = cg.getJavaClass();
+   jc1.setConstantPool(cp.getFinalConstantPool());
+   cfc.addClass(jc1);
+\end{listingcont}
+
+
+\subsection{Editing a Method}
+\url{org.apache.bcel.classfile.Method} represents a 
+method that has been read from a class file, while
+\url{org.apache.bcel.generic.MethodGen} is the \BCEL\ class
+that represents a method being edited:
+\begin{listing}{1}
+   org.apache.bcel.generic.ConstantPoolGen cp = ...;
+   org.apache.bcel.generic.ClassGen cg = ...;
+
+   org.apache.bcel.classfile.Method method = 
+      cg.containsMethod(methodName, methodSignature);
+   org.apache.bcel.generic.MethodGen mg = 
+      new org.apache.bcel.generic.MethodGen(method, className, cp);
+\end{listing}
+Note that to open a method with {\tt containsMethod}
+you need to know the class in which it is declared, 
+as well as its name as well as its signature.
+The reason is that a Java class can have several methods
+with the same name (they're overloaded).
+
+
+Alternatively, \SM\ also provides a class 
+\url{sandmark.util.EditedClass.open} than 
+can be used to maintain a cache of classes
+and methods that have been opened by \BCEL:
+\begin{listing}{1}
+    sandmark.util.ClassFileCollection cfc = ...;
+    sandmark.util.EditedClass ec = sandmark.util.EditedClass.open(cfc, className);
+   java.util.Iterator methods = ec.methods();
+   while (methods.hasNext()){
+       sandmark.util.MethodID m = (sandmark.util.MethodID) methods.next();
+       org.apache.bcel.generic.MethodGen mg = ec.openMethod(m);
+       ....
+   }
+\end{listing}
+A \url{sandmark.util.MethodID}-object represents a 
+method within a Java application. It is essentially a tuple 
+   $$\langle {\tt name}, {\tt signature}, {\tt className}\rangle.$$
+
+
+
+\subsection{Editing Instructions}
+Once you have opened a method for editing you can
+get its list of instructions:
+\begin{listing}{1}
+   org.apache.bcel.generic.MethodGen mg = ...;
+
+   org.apache.bcel.generic.InstructionList il = mg.getInstructionList();
+   org.apache.bcel.generic.InstructionHandle[] ihs = il.getInstructionHandles();
+   for(int i=0; i < ihs.length; i++) {
+      org.apache.bcel.generic.InstructionHandle ih = ihs[i];
+      org.apache.bcel.generic.Instruction instr = ih.getInstruction();
+         ....
+   }
+\end{listing}
+\url{org.apache.bcel.generic.InstructionList}s can be manipulated 
+by appending or inserting new instruction, deleting instructions, 
+etc.
+
+All bytecode instructions in \BCEL\ are represented by their
+own class. \url{org.apache.bcel.generic.IADD} is the class
+that represents integer addition, for example. This allows
+us to use {\tt instanceof} to classify instructions:
+\begin{listing}{1}
+   org.apache.bcel.generic.Instruction instr = ...;
+   org.apache.bcel.generic.InstructionHandle ih = ...;
+
+   if (instr instanceof org.apache.bcel.generic.INVOKESTATIC) {
+      org.apache.bcel.generic.INVOKESTATIC call =
+        (org.apache.bcel.generic.INVOKESTATIC) instr;
+      String className  = call.getClassName(ec.cp);
+      String methodName = call.getMethodName(ec.cp);
+      String methodSig  = call.getSignature(ec.cp);
+
+      ih.setInstruction(new org.apache.bcel.generic.NOP());
+   }
+\end{listing}
+\url{setInstruction} is used to replace an original 
+instruction with a new one.
+
+\subsection{Local variables}
+Local variables are quite complicated in Java bytecode.
+A Java method can have a maximum of 256 local variables.
+Note, however, that
+\begin{itemize}
+   \item In a virtual (non-static) method local variable
+         zero (``slot \#0'') is {\tt this}.
+   \item Formal arguments take up the first slots.
+         In other words, in a virtual method with
+         2 formal parameters, slot \#0 is {\tt this},
+         slot \#1 is the first formal, 
+         slot \#2 is the second formal, and
+         any local variables are slots \#3,\#4,\ldots,\#255.
+   \item Local variables can be reused within a method.
+         For example, consider the following method:
+\begin{verbatim}
+   void P() {
+      int x= 5;
+      System.out.println(x);
+      float y=5.6;
+      System.out.println(y);
+   }
+\end{verbatim}
+   A clever compiler will allocate both {\tt x} and {\tt y}
+   to the same slot, since they have non-overlapping lifetimes.
+\end{itemize}
+
+For this reason, \BCEL\ requires that we indicate where
+a new local variable is accessible:
+\begin{listing}{1}
+   org.apache.bcel.generic.Type T = ...;
+
+   org.apache.bcel.generic.LocalVariableGen lg = 
+      mg.addLocalVariable(localName, T, null, null);
+   int localIndex = lg.getIndex();
+
+   // push something here
+   org.apache.bcel.generic.Instruction store = 
+      new org.apache.bcel.generic.ASTORE(localIndex);
+
+   org.apache.bcel.generic.InstructionHandle start = ...;
+   lg.setStart(start);
+\end{listing}
+\url{org.apache.bcel.generic.LocalVariableGen} creates
+a new local variable. The two {\tt null} arguments are
+the locations within the method where we want the
+variable to be visible. We start these locations 
+out as {\tt null} (unknown) and fill them in using
+the \url{setStart} method. It takes an
+\url{org.apache.bcel.generic.InstructionHandle} as
+input, namely the first instruction where the 
+variable should be visible.
+
+
+\subsection{Example 1: Creating a New Class}
+Here's a longer example that shows how you create
+a class from scratch.
+
+We start by creating a new \url{org.apache.bcel.generic.ClassGen}
+object representing the class. We provide the name of the class,
+the name of the parent class, the interfaces it implements,
+and its access flags:
+\begin{listing}{1}
+   int access_flags = org.apache.bcel.Constants.ACC_PUBLIC;
+   String class_name = "MyClass";
+   String file_name = "MyClass.java";
+   String super_class_name = "java.lang.Object";
+   String[] interfaces = {};
+
+   org.apache.bcel.generic.ClassGen cg = 
+      new org.apache.bcel.generic.ClassGen(
+         class_name, super_class_name, file_name,
+         access_flags, interfaces);
+   org.apache.bcel.generic.ConstantPoolGen cp = cg.getConstantPool();
+\end{listing}
+
+We can then add a field {\tt field1} of type {\tt int}
+to the new class:
+\begin{listingcont}
+   org.apache.bcel.generic.Type field_type = 
+      org.apache.bcel.generic.Type.INT;
+   String field_name = "field1"; 
+
+   org.apache.bcel.generic.FieldGen fg =
+      new org.apache.bcel.generic.FieldGen(
+         access_flags, field_type, field_name, cp);
+   cg.addField(fg.getField());
+\end{listingcont}
+
+Next, we create a method {\tt method1}:
+\begin{listingcont}
+   int method_access_flags = 
+      org.apache.bcel.Constants.ACC_PUBLIC | 
+      org.apache.bcel.Constants.ACC_STATIC;
+
+   org.apache.bcel.generic.Type return_type = 
+      org.apache.bcel.generic.Type.VOID;
+
+   org.apache.bcel.generic.Type[] arg_types = 
+      org.apache.bcel.generic.Type.NO_ARGS;
+   String[] arg_names = {};
+
+   String method_name = "method1";
+   String class_name = "MyClass";
+
+   org.apache.bcel.generic.InstructionList il = 
+      new org.apache.bcel.generic.InstructionList();
+   il.append(org.apache.bcel.generic.InstructionConstants.RETURN);
+
+   org.apache.bcel.generic.MethodGen mg = 
+      new org.apache.bcel.generic.MethodGen(
+         method_access_flags, return_type,  arg_types,
+         arg_names, method_name, class_name, il, cp);
+
+   mg.setMaxStack();
+   cg.addMethod(mg.getMethod());
+\end{listingcont}
+The method has no arguments, returns {\tt void}, and contains
+only one instruction, a {\tt return}.
+
+Note the call to {\tt mg.setMaxStack()}. With every method in a
+class file is stored the maximum stack-size is needed to execute
+the method. For example, a method whose body consists of the
+instructions $\langle${\tt iconst\_1}, {\tt iconst\_2}, {\tt iadd},
+{\tt pop}$\rangle$ (i.e. compute $1+2$ and throw away the result)
+will have max-stack set to two. We can either compute this ourselves
+or let \BCEL's {\tt mg.setMaxStack()} do it for us.
+
+\subsection{Branches}
+As is always the case with branches, we need to be able
+to handle forward jumps. The typical way of accomplishing
+this is to create a branch with unspecified target:
+\begin{listing}{1}
+   org.apache.bcel.generic.InstructionList il = ...;
+ 
+   org.apache.bcel.generic.IFNULL branch = 
+      new org.apache.bcel.generic.IFNULL(null);
+   il.append(branch);
+   ...
+\end{listing}
+When we have gotten to the location we want to
+jump to we add a (bogus) {\tt NOP} instruction
+which will serve as our branch target.
+The \url{append} instruction returns a handle
+to the {\tt NOP} and we use this handle to
+set the target of the branch instruction:
+\begin{listingcont}
+   org.apache.bcel.generic.InstructionHandle h = 
+      il.append(new org.apache.bcel.generic.NOP());
+   branch.setTarget(h);
+\end{listingcont}
+
+\subsection{Exceptions}
+Here is the generic code for building a {\tt try-catch}-block:
+\begin{listing}{1}
+   org.apache.bcel.generic.InstructionList il = ...;
+   org.apache.bcel.generic.MethodGen mg = ...;
+   String exception = "java.lang.Exception";
+
+   org.apache.bcel.generic.InstructionHandle start_pc =
+      il.append(new org.apache.bcel.generic.NOP());
+
+   // The code that builds the try-body goes here.
+
+   // Add code to jump out of the try-block when
+   // no exception was thrown.
+   org.apache.bcel.generic.GOTO branch = 
+      new org.apache.bcel.generic.GOTO(null);
+   org.apache.bcel.generic.InstructionHandle end_pc =
+        il.append(branch);
+
+   // Pop the exception off the stack when entering the catch block.
+   org.apache.bcel.generic.InstructionHandle handler_pc =
+       il.append(new org.apache.bcel.generic.POP());
+
+   // The code that builds the catch-body goes here.
+
+   // Add a NOP after the exception handler. This is 
+   // where we will jump after we're through with the
+   // try-block.
+   org.apache.bcel.generic.InstructionHandle next_pc =
+       il.append(new org.apache.bcel.generic.NOP());
+   branch.setTarget(next_pc);
+
+   org.apache.bcel.generic.ObjectType catch_type =
+      new org.apache.bcel.generic.ObjectType(exception);
+
+   org.apache.bcel.generic.CodeExceptionGen eg =
+      mg.addExceptionHandler(start_pc, end_pc, handler_pc, catch_type);
+\end{listing}
+{\tt start\_pc} and {\tt end\_pc} hold the beginning and the
+end of the {\tt try}-body, respectively. {\tt handler\_pc}
+holds the address of the beginning of the {\tt catch}-block.
+
+\subsection{Types}
+Types (such as method signatures) are defined by the
+class \url{org.apache.bcel.generic.Type}:
+\begin{listing}{1}
+   org.apache.bcel.generic.Type return_type = 
+      org.apache.bcel.generic.Type.VOID;
+   org.apache.bcel.generic.Type[] arg_types   = 
+      new org.apache.bcel.generic.Type[] { 
+         new org.apache.bcel.generic.ArrayType(
+            org.apache.bcel.generic.Type.STRING, 1)
+      };
+\end{listing}
+
+A source-level Java type is encoded into a classfile
+type descriptor using the following definitions:
+\begin{center}
+\begin{tabular}{|l|l|l|}\hline
+BaseType & Type & Interpretation \\\hline\hline
+\bf B & byte & signed 8-bit integer \\\hline
+\bf C & char & Unicode character\\\hline
+\bf D & double & 64-bit floating point value \\\hline
+\bf F & float & 32-bit floating point value\\\hline
+\bf I & int &  32-bit integer \\\hline
+\bf J & long & 64-bit integer\\\hline
+\bf L{\tt <}{\em classname}{\tt >}; & reference & an instance of class {\tt <}{\em classname}{\tt >} \\\hline
+\bf S & short & signed 16-bit integer\\\hline
+\bf Z& boolean & {\tt true} pr {\tt false}\\\hline
+\bf [ & reference & one array dimension\\\hline
+\bf V &  & void\\\hline
+\bf ({\em BaseType}*){\em BaseType} &  & method descriptor\\\hline
+\end{tabular}
+\end{center}
+
+\BCEL\ has quite a number of methods that convert back
+and forth between Java source format (such as {\tt "java.lang.Object[]"}),
+bytecode format (such as {\tt "[Ljava/lang/Object;"}), and 
+\BCEL's internal format (\url{org.apache.bcel.generic.Type}).
+Unfortunately, these are by and large poorly documented.
+We will describe some of the more common methods here.
+
+\url{org.apache.bcel.generic.Type.getType} converts
+from Java bytecode format to Java source format.
+In other words, the following code
+\begin{listing}{1}
+    String S = "[Ljava/lang/Object;";
+    org.apache.bcel.generic.Type T =
+       org.apache.bcel.generic.Type.getType(S);
+    System.out.println(T);
+\end{listing}
+prints out \CC{java.lang.Object[]}.
+
+The method \url{org.apache.bcel.classfile.Utility.getSignature}
+converts a type in Java bytecode format to Java source format.
+The code
+\begin{listing}{1}
+    String type = "java.lang.Object[]";
+    String S = org.apache.bcel.classfile.Utility.getSignature(type);
+    System.out.println(S);
+\end{listing}
+prints \CC{[Ljava/lang/Object;}.
+
+The methods \url{org.apache.bcel.generic.Type.getArgumentTypes}
+and \url{org.apache.bcel.generic.Type.getReturnType} take
+a type in Java bytecode format as argument and extract the
+array of argument types and the return type, respectively:
+\begin{listing}{1}
+    String S = "(Ljava/lang/String;I)V;";
+    org.apache.bcel.generic.Type[] arg_types =
+       org.apache.bcel.generic.Type.getArgumentTypes(S);
+    org.apache.bcel.generic.Type return_type =
+       org.apache.bcel.generic.Type.getReturnType(S);
+    String M = org.apache.bcel.generic.Type.getMethodSignature(return_type, arg_types);
+    System.out.println(M);
+\end{listing}
+\url{org.apache.bcel.generic.Type.getMethodSignature} converts
+the return and argument types back to a Java bytecode type string.
+
+The method \url{org.apache.bcel.generic.Type.getSignature}
+converts a \BCEL\ type to the equivalent Java bytecode 
+signature. This code
+\begin{listing}{1}
+    org.apache.bcel.generic.Type T =
+       org.apache.bcel.generic.Type.STRINGBUFFER;
+    String M = T.getSignature();
+    System.out.println(M);
+\end{listing}
+will print out \CC{Ljava/lang/StringBuffer;}.
+
+As a convenience, \SM\ provides the method
+\url{sandmark.util.javagen.Java.typeToByteCode},
+that converts a {\tt type} in Java source format
+to a \BCEL\ \url{org.apache.bcel.generic.Type}:
+\begin{listing}{1}
+   String S = org.apache.bcel.classfile.Utility.getSignature(type);
+   return org.apache.bcel.generic.Type.getType(S);
+\end{listing}
+
+
+\subsection{Method Calls}
+To make a static method call we push the arguments 
+on the stack, create a constant pool reference to
+the method, and then generate an \url{INVOKESTATIC}
+opcode that performs the actual call:
+\begin{listing}{1}
+   String className  = ...;
+   String methodName = ...;
+   String signature  = ...;
+
+   org.apache.bcel.generic.InstructionList il = ...;
+   org.apache.bcel.generic.ConstantPoolGen cp = ...;
+
+   // Generate code that pushes the actual arguments of the call.
+
+   int index = cp.addMethodref(className,methodName,signature);
+   org.apache.bcel.generic.INVOKESTATIC call = 
+       new org.apache.bcel.generic.INVOKESTATIC(index);
+   il.append(call);
+\end{listing}
+
+Making a virtual call is similar, except that we
+need an object to make the call through. This
+object reference is pushed on the stack prior
+to the arguments:
+\begin{listing}{1}
+   String className  = ...;
+   String methodName = ...;
+   String signature  = ...;
+
+   org.apache.bcel.generic.InstructionList il = ...;
+   org.apache.bcel.generic.ConstantPoolGen cp = ...;
+
+   // Generate code that pushes the object on the stack.
+
+   // Generate code that pushes the actual arguments of the call.
+
+   int index = cp.addMethodref(className,methodName,signature);
+   org.apache.bcel.generic.INVOKEVIRTUAL s = 
+       new org.apache.bcel.generic.INVOKEVIRTUAL(index);
+   il.append(call);
+\end{listing}
+
+
+\subsection{Example 2: Modifying an Existing Program}
+Consider the following program:
+\begin{listing}{1}
+   public class C {
+      public static void main(String args[]) {
+         int a = 5;
+         int b = 6;
+         int c = a + b;
+         System.out.println(c);
+      }
+   }
+\end{listing}
+
+
+\subsection{Control Flow Graphs}
+The {\tt JustIce} verifier that is built on top of
+\BCEL\ has functions that construct control flow
+graphs for methods. Unfortunately, they don't 
+construct real basic blocks: each instruction is
+in a block by itself.
+
+\subsection{Miscellaneous}
+\url{sandmark.util.javagen.Java.accessFlagsToByteCode}
+takes a list of string modifiers
+as argument and returns the corresponding access flag:
+\begin{listing}{1}
+   String[] attributes = {"public","static"};
+   int access_flags = 
+      sandmark.util.javagen.Java.accessFlagsToByteCode(attributes);
+\end{listing}

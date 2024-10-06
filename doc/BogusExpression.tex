@@ -1,0 +1,51 @@
+\algorithm{Project VIII: Class-Splitting Obfuscations}%
+	  {Team : Ashok Purushotham and RathnaPrabhu Rajendran}
+
+\section{Mission Document}
+	For our final project we would like to implement a class-splitting
+obfuscator for Java . 
+
+\section{Basic Idea}
+The basic idea behind the project is that
+there are two important object  splitting techniques. The first
+splits each object into two, such that some fields belong to the
+first subpart, the remainder to the second subpart.
+
+
+\section{How we plan to implement}
+        In the bytecode every "new"-operation turns into two "new"s
+and every pointer operation (getfield and setfield) turns into two
+pointer operations. The second splitting technique splits at the
+class level. A class C is broken into two classes C 1 and C 2 ,
+such that C 2 inherits from C 1 . C 1 has fields and methods that
+only refer to themselves, whereas C 2 has fields and methods that
+can refer to themselves as well as fields and methods in C1 .
+Bytecode references to C will have to be replaced with references
+to C 2 .
+
+        The reason we want to implement this algorithm is that, to
+the best of our knowledge, it hasn't been implemented before. We
+would like to prove this by implementing and evaluating it. The
+implementation will be done within the SandMark framework. This will
+allow us to take advantage of the many excellent, well-documented
+libraries that are available within this tool.
+
+\section {Project Tasks}
+        We believe this will be a difficult project with many potential
+pitfalls. First of all, the paper talks shallowly about our project and
+nothing else ,so we need to work out a reasonable algorithm. Second we
+can't simply split classes ,but splitting should be based on inheritance
+principles and understanding all of them and implementing them as a single
+task will be an uphill task .We therefore identify the following subtasks:
+1. Understanding of concepts of splitting classes,going thourgh all
+   relevant material in Sandmark and Collberg's paper.
+2. Design
+3. Discussing our design and implementation algorithms with Prof.Collberg
+   and Coding
+4. Testing and evaluation.
+5. Documentation.
+
+\section{Reference}
+        The reference for this project will be Collberg: Breaking
+Abstractions and Unstructuring Data Structures.
+

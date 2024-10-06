@@ -1,0 +1,258 @@
+package sandmark.watermark.execpath;
+
+/** This class can do some analysis on the trace list made by 
+ *  a program that has run through Tracer.
+ */
+public class Analyzer {
+    private static class Method {
+	String methodName;
+	String className;
+	String methodSig;
+	public int hashCode() { 
+	    return methodName.hashCode() +
+		methodSig.hashCode() +
+		className.hashCode(); 
+	}
+	public boolean equals(Object o) {
+	    Method mn = (Method)o;
+	    return mn.methodName.equals(methodName) && 
+		mn.methodSig.equals(methodSig) &&
+		mn.className.equals(className);
+	}
+	Method(String m,String s,String c) { 
+	    methodName = m ; methodSig = s; className = c; 
+	}
+    }
+    private static class Instruction {
+	int offset;
+	Method method;
+	Instruction(String m,String s,String c,int o) {
+	    method = new Method(m,s,c);
+	    offset = o;
+	}
+	public int hashCode() { return method.hashCode() + offset; }
+	public boolean equals(Object o) {
+	    Instruction i = (Instruction)o;
+	    return i.method.equals(method) && i.offset == offset;
+	}
+    }
+    private static class InstructionInfo {
+	int count;
+	int numsuccs;
+	boolean isIfSwitch;
+	java.util.List succs = new java.util.ArrayList();
+	InstructionInfo(int succs,boolean iis) {
+	    numsuccs = succs; isIfSwitch = iis;
+	}
+    }
+    private static class ThreadInfo {
+	java.util.Hashtable instructionInfo = new java.util.Hashtable();
+	Instruction lastInstruction;
+	InstructionInfo lastInstructionInfo;
+	String threadName;
+	java.util.ArrayList nodeList = new java.util.ArrayList();
+	TraceNode nodes[];
+	ThreadInfo(String name) { threadName = name; }
+    }
+    private java.util.Hashtable threadInfo = new java.util.Hashtable();
+    public Analyzer(java.util.Iterator output) {
+	parse(output);
+    }
+    public TraceNode[] getTrace(String threadName) {
+	ThreadInfo ti = (ThreadInfo)threadInfo.get(threadName);
+	if(ti == null)
+	    return null;
+
+	if(ti.nodes == null && ti.nodeList != null && ti.nodeList.size() != 0) {
+	    ti.nodes = (TraceNode [])ti.nodeList.toArray(new TraceNode[0]);
+	    ti.nodeList = null;
+	}
+	return ti.nodes;
+    }
+
+    /** Returns the bit sequence represented by the given list of TraceNodes.
+     *  The output of getTrace is the preferred input to this method.
+     */
+    public static String getBitSequence(TraceIndexer index,String mainThread,
+					java.util.Iterator it){
+	int traceLength = 0;
+	java.util.List tracePoints = index.getTracePoints(mainThread);
+	for(int i = 0,size = tracePoints.size() ; i < size ; i++)
+	    traceLength += index.getOffsetList
+		((TraceIndexer.TracePoint)tracePoints.get(i)).size();
+
+	if (traceLength == 0)
+	    return "";
+
+	char bits[] = new char[traceLength * 2];
+	int curIndex = 0;
+
+	java.util.Hashtable nodeSuccs = new java.util.Hashtable();
+	TraceIndexer.TracePoint prevPoint = null;
+	int numsuccs = 0;
+	while(it.hasNext()) {
+	    TraceNode node = (TraceNode)it.next();
+	    TraceIndexer.TracePoint point = 
+		new TraceIndexer.TracePoint(node);
+	    if(prevPoint != null) {
+		java.util.List succs = (java.util.List)nodeSuccs.get(prevPoint);
+		if(succs == null) {
+		    succs = new java.util.LinkedList();
+		    nodeSuccs.put(prevPoint,succs);
+		}
+		boolean firstEdge = succs.size() == 0;
+		int pointIndex = succs.indexOf(point);
+		if(pointIndex == -1) {
+		    pointIndex = succs.size();
+		    succs.add(point);
+		}
+		if(!firstEdge && 
+		   point.threadname.equals(prevPoint.threadname) &&
+		   point.classname.equals(prevPoint.classname) &&
+		   point.methodname.equals(prevPoint.methodname) &&
+		   point.offset > prevPoint.offset) {
+		    char curBits[] = pad(numsuccs,Integer.toBinaryString
+					 (pointIndex)).toCharArray();
+		    while(curIndex + curBits.length > bits.length) {
+			char tmp[] = new char[bits.length * 2];
+			System.arraycopy(bits,0,tmp,0,curIndex);
+			bits = tmp;
+		    }
+		    System.arraycopy(curBits,0,bits,curIndex,curBits.length);
+		    curIndex += curBits.length;
+		}
+	    }
+	    if(node.getNodeType() == TraceNode.TYPE_IF ||
+	       node.getNodeType() == TraceNode.TYPE_SWITCH) {
+		prevPoint = point;
+		numsuccs = node.getNumSuccessors();
+	    } else
+		prevPoint = null;
+	}
+	return new String(bits,0,curIndex);
+    }
+    public static TraceNode [] getLocationOccurrences(TraceNode node,
+						      TraceNode nodes[]) {
+	java.util.List list = new java.util.LinkedList();
+	for(int i = 0 ; i < nodes.length ; i++)
+	    if(nodes[i].getOffset() == node.getOffset() &&
+	       nodes[i].getClassName().equals(node.getClassName()) &&
+	       nodes[i].getMethodName().equals(node.getMethodName()) &&
+	       nodes[i].getMethodSignature().equals(node.getMethodSignature()))
+		list.add(nodes[i]);
+	return (TraceNode [])list.toArray(new TraceNode[0]);
+    }
+    
+    /** Takes in a raw trace list and the name of the thread to trace and produces
+     *	 a list of TraceNodes that characterize the program execution.
+     *  @param output the static list variable generated by a Traced program.
+     *  @param thread the name of the thread to trace (i.e. "main")
+     */
+    private void parse(java.util.Iterator output) {
+	while(output.hasNext()) {
+	    String line = (String)output.next();
+	    String tokens[] = line.split(":");
+	    int nextToken = 0;
+
+	    String blocktype = tokens[nextToken++];
+
+	    String threadName = tokens[nextToken++].intern();
+	    String classname = tokens[nextToken++].intern();
+	    String methodNameAndSig = tokens[nextToken++];
+	    int offset = Integer.parseInt(tokens[nextToken++]);
+	    int numsuccs = Integer.parseInt(tokens[nextToken++]);
+
+	    int sigStart = methodNameAndSig.indexOf("(");
+	    String methodName = methodNameAndSig.substring(0,sigStart).intern();
+	    String methodSig = methodNameAndSig.substring(sigStart).intern();
+	    int nodetype = 0;
+	    if (blocktype.equals("{if}"))
+		nodetype = TraceNode.TYPE_IF;
+	    else if (blocktype.equals("{switch}"))
+		nodetype = TraceNode.TYPE_SWITCH;
+	    else
+		nodetype = TraceNode.TYPE_OTHER;
+
+	    {
+		String vars[] = new String[tokens.length - nextToken];
+		System.arraycopy(tokens,nextToken,vars,0,vars.length);
+		tokens = vars;
+	    }
+
+	    ThreadInfo ts = (ThreadInfo)threadInfo.get(threadName);
+	    if(ts == null) {
+		ts = new ThreadInfo(threadName);
+		threadInfo.put(threadName,ts);
+	    }
+
+	    Instruction instr = 
+		new Instruction(methodName,methodSig,classname,offset);
+	    InstructionInfo info = 
+		(InstructionInfo)ts.instructionInfo.get(instr);
+	    if(info == null) {
+		info = new InstructionInfo
+		    (numsuccs,nodetype == TraceNode.TYPE_IF ||
+		     nodetype == TraceNode.TYPE_SWITCH);
+		ts.instructionInfo.put(instr,info);
+	    }
+
+	    String blockBits = "";
+	    if (ts.lastInstruction != null && 
+		instr.method.equals(ts.lastInstruction.method)){
+		int index;
+		boolean addedFirstEdge = false;
+		if((index = ts.lastInstructionInfo.succs.indexOf(instr)) == -1) {
+		    index = ts.lastInstructionInfo.succs.size();
+		    ts.lastInstructionInfo.succs.add(instr);
+		    addedFirstEdge = index == 0;
+		}
+                if (ts.lastInstructionInfo.isIfSwitch){
+		    if (!addedFirstEdge && 
+			ts.lastInstruction.offset < instr.offset)
+			blockBits = pad
+			    (ts.lastInstructionInfo.numsuccs, Integer.toBinaryString
+			     (ts.lastInstructionInfo.succs.indexOf(instr)));
+		}
+				
+	    }
+
+	    ts.nodeList.add
+		(new TraceNode(line,blockBits));
+	    ts.lastInstruction = instr;
+	    ts.lastInstructionInfo = info;
+	}
+    }
+	
+    private static String pad(int numsuccs, String str){
+	if(Integer.valueOf(str,2).intValue() < 0)
+	    throw new RuntimeException();
+	if (numsuccs<=0)
+	    return str;
+	numsuccs-=1;
+	int bits=1;
+	numsuccs >>= 1;
+	while(numsuccs>0){
+	    bits++;
+	    numsuccs>>=1;
+	}
+	
+	while(str.length()<bits)
+	    str = "0"+str;
+	return str;
+    }
+
+    public java.util.Set getThreadNames() {
+	return threadInfo.keySet();
+    }
+
+    public static void main(String args[]) throws Exception{
+	if (args.length<1)
+	    return;
+	java.util.Iterator it = new TraceReader(new java.io.File(args[0]));
+	Analyzer analyzer = new Analyzer(it);
+	java.util.Set threadNames = analyzer.getThreadNames();
+	TraceNode[] nodes = threadNames.size() == 0 ? null : 
+	    analyzer.getTrace((String)threadNames.iterator().next());
+	//System.out.println("\n"+nodes == null ? null : getBitSequence(nodes));
+    }
+}

@@ -1,0 +1,72 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Bogus Switch Static Watermarking Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Bogus Switch Static Watermarking Algorithm</H1>
+    <H2>Authors</H2>
+    <P>
+      Andrew Huntwork
+      (<A HREF="mailto:ash@cs.arizona.edu">ash@cs.arizona.edu</A>)<BR>
+      Xiangyu Zhang
+      (<A HREF="mailto:xyzhang@cs.arizona.edu">xyzhang@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>This algorithm embeds the watermark into the case values of a switch
+      statement.
+    </P>
+    <P>
+      <B>Embedding</B><BR>
+      To embed the watermark we insert a lookup switch at the beginning of the
+      instruction stream for a randomly chosen method.
+    </P>
+    <P>
+      <B>Recognition</B><BR>
+      During recognition we find the switch we inserted, and decode its 'case'
+      statements.
+    </P>
+    <H2>Example</H2>
+    <P>
+      For example, the following code is inserted somewhere:
+    </P>
+    <PRE>
+        switch (sm$switch) {
+           case 'h' : {...}
+           case 'e' : {...}
+           case 'l' : {...}
+           case 'l' : {...}
+           case 'o' : {...}
+        }</PRE>
+    <P>
+    The watermark of "hello" is embedded into the class file.<BR>
+    The duplicated 'l' in the example will fail the verifier. We have some
+    encoding scheme to distinguish duplicated charaters.
+    </P>
+    <H2>Configuration</H2>
+    <UL>
+      <LI> 
+	<CODE>SWM_SWITCH_ID</CODE>:
+	This property is the identifier of the switch variable. The default
+	value is sm$switch.
+      </LI>
+    </UL>
+    <H2>References</H2>
+    <P>None<BR></P>
+  </BODY>
+</HTML>

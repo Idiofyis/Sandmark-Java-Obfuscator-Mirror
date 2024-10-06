@@ -1,0 +1,39 @@
+\documentclass{book}
+\usepackage{url}
+\usepackage{graphics}
+\usepackage{fullpage}
+\usepackage{epic}
+\usepackage{eepic}
+\usepackage{amsfonts}
+\usepackage{fancyheadings}
+\usepackage{moreverb}
+
+\title{Hacking \SM}
+\author{Christian Collberg}
+
+\input{definitions}
+
+\begin{document}
+\hacker{Christian Collberg}
+\maketitle
+
+\setcounter{secnumdepth}{1}
+\tableofcontents
+
+\chapter{Extending \SM}
+\input{obfuscation}
+\input{watermarking}
+\input{codec}
+\input{documentation}
+
+\chapter{Working with the \SM\ Code-base}
+\input{codingStandard}
+\input{usingCVS}
+
+\chapter{Useful Tools}
+\input{tools}
+\input{BCEL}
+\hacker{Richard Smith}
+\input{BLOAT}
+
+\end{document}

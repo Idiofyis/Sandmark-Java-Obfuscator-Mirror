@@ -1,0 +1,18 @@
+
+Authors: Tapas Ranjan Sahoo ( tapas@cs.arizona.edu )
+         Kelly Heffner ( kheffner@cs.arizona.edu )
+
+
+ This directory contains modules that have been designed to obtain various 
+ complexity measures of the target code. In addition to all these complexity 
+ measures, several other modules have been implemented. 
+
+
+The directory contains the following files:
+
+   package.html
+   Makefile
+   README
+
+   doc directory: help.html file
+

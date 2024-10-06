@@ -1,0 +1,58 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Execution Path Watermark Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Execution Path Watermark Algorithm</H1>
+    <H2>Author</H2>
+    <P>
+      Andrew Huntwork
+      (<A HREF="mailto:ash@huntwork.net">ash@huntwork.net</A>)
+      <BR>
+      Michael Stepp 
+      (<A HREF="mailto:steppm@cs.arizona.edu">steppm@cs.arizona.edu</A>)
+      <BR>
+      Edward Carter
+      (<A HREF="mailto:ecarter@cs.arizona.edu">ecarter@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      The Execution Path Watermark is a dynamic watermark that embeds a 
+      bit string in the forward jump patterns of a program. Each conditional
+      forward branch embeds one bit of the watermark message. A secret input 
+      sequence is chosen, and the (presumably deterministic) execution path of the 
+      program given that input sequence is traced. Then branches are inserted 
+      into the program along the traced path so that the path will now expose
+      the watermark bit string when executed again. The branches 
+      are constructed using opaque predicates, so that the runtime branch 
+      behavior cannot be determined statically. 
+    </P>
+    <H2>Example</H2>
+    <H2>Configuration</H2>
+    <P>
+      There are no extra configuration parameters necessary to run this
+      obfuscator.
+    </P>
+    <H2>References</H2>
+    <P>
+      Collberg et al, "Dynamic Path-Based Software Watermarking", PLDI 2004
+    </P>
+    <BR>
+  </BODY>
+</HTML>

@@ -1,0 +1,14 @@
+\algorithm{The Bogus Switch Watermarking Algorithm}%
+          {Andrew Huntwork and Xiangyu Zhang}
+
+\section{Introduction}
+This is an algorithm that embeds a watermark in the 'case' statements of a switch block.
+The code of this algorithm
+resides in \url{sandmark.watermark.bogus_switch}.
+
+
+\section{Embedding}
+To embed the watermark we insert a lookup switch at the beginning of the instruction stream for a randomly chosen method:
+
+\section{Recognition}
+During recognition we find the switch we inserted, and decode its 'case' statements

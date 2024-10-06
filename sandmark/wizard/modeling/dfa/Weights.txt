@@ -1,0 +1,35 @@
+Method Merger:1.5808328E-4:1.0
+NodeSplitter:0.2709821:0.9907426
+Class Splitter:0.33141893:1.0
+Static Method Bodies:0.15179095:1.0
+SetFieldsPublic:3.483202E-5:0.970002
+Bogus Predicates:0.16713777:1.0
+AddBogusFields:0.019982424:0.99797654
+ConstantPool Reorderer:0.02616787:1.0
+Inliner:0.13686001:0.9983306
+InterleaveMethods:0.9248189:0.43464184
+LocalVariable Reorderer:0.002522537:0.99701536
+Class Encrypter:1.0:1.0
+BlockMarker:0.001707384:0.9987859
+IntArraySplitter:0.0013311818:0.97055846
+ParamAlias:0.0033400436:0.99787533
+String Encoder:0.07894092:0.5
+Name Overload:0.0051728967:1.0
+FalseRefactor:0.001707384:0.9981789
+OpaqueBranch:0.34173834:0.0
+Rename Locals:0.0:1.0
+OpaqueBranchWithInterproceduralOP:0.23525843:0.99833065
+DynamicInliner:0.60853887:0.9924626
+ParamReorder:0.03236188:0.99327195
+AppendBogusCode:0.05483474:0.9667139
+InstructionOrdering:8.7390996E-5:0.9710643
+ModifyIfElse:0.0026785217:0.99893767
+Signature Bludgeoner:0.023613248:0.5
+Empty If Insertion:0.14675842:0.9
+Buggy Code:0.36096686:1.0
+PromoteLocals:0.06220069:0.41602588
+Variable Reassigner:0.24291399:1.0
+VarSplitter:9.5429603E-4:0.9991906
+Irreducibility:0.08831912:0.90322745
+Primitive Promoter:0.10062374:0.3
+Scalar Merger:0.02132997:1.0

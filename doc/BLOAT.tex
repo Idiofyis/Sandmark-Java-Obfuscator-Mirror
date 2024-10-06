@@ -1,0 +1,723 @@
+\documentclass{article}
+\usepackage{url}
+\usepackage{graphics}
+\usepackage{fullpage}
+\usepackage{epic}
+\usepackage{eepic}
+\usepackage{amsfonts}
+\usepackage{fancyheadings}
+\usepackage{moreverb}
+
+\author{Richard Smith}
+\title{A BLOAT Primer}
+
+\begin{document}
+\maketitle
+\section{Introduction}
+
+\subsection{What is BLOAT?}
+      
+BLOAT is a Java optimizer written entirely in Java. By
+optimizing Java byte code, code improvements can occur
+regardless of the compiler that compiled the byte code or the
+virtual machine on which the byte code is run.  BLOAT performs
+many traditional program optimizations such as constant/copy
+propagation, constant folding and algebraic simplification,
+dead code elimination, and peephole
+optimizations. Additionally, it performs partial redundancy
+elimination of arithmetic and field access paths.
+
+Beyond this BLOAT can also be used for class creation as well
+as method creation. In combination with byte code level
+editing BLOAT is can also be used as a framework for Java
+Class File obfuscation.
+      
+\subsection{What to expect?}
+
+This how-to is in no way related to the creators of BLOAT. It
+was written by Richard Smith, a computer science undergraduate
+at the University of Arizona, to aid in research efforts by
+Christian Collberg. This guide does not demonstrate the
+optimization capabilities of BLOAT, but does demonstrate its
+ability to be used as a framework for byte code
+obfuscation. From this knowledge you can easily infer how to
+do optimizations. For further questions about this how-to
+email: \url{rsmith@cs.arionza.edu}.  You may also look at The BLOAT
+Book which can be found at
+\url{http://www.cs.purdue.edu/s3/projects/bloat}. At the time
+of writing this how-to this book referred to BLOAT-0.8a which
+lacks many of the features of BLOAT-1.0.
+
+A number of examples of how BLOAT is used can be found
+in the cvs directory \url{smbloat2}. 
+
+\section{The Basics}
+
+\subsection{Architecture}
+
+ BLOAT is a very complicated beast. This will be a brief
+overview, but will be enough to begin with. The first you
+must understand is the concept of a context. A context
+supplies a means of loading and editing classes. All contexts
+implement the \url{EditorContext}. This interface supplies the
+generic means of committing edits, editing classes, and a
+utility to load classes. There are five major contexts:
+\begin{enumerate}
+  \item \url{BloatContext}, 
+  \item \url{InlineContext}, 
+  \item \url{EditorContext},
+  \item \url{PersistentBloatContext}, and 
+  \item \url{CachingBloatContext}. 
+\end{enumerate}
+The \url{InlineContext} and the \url{EditorContext} are both interfaces.  The
+\url{InlineContext} and the \url{EditorClass} are both implemented by the
+abstract class \url{BloatContext}. The \url{PersistentBloatContext} and
+the \url{CachingBloatContext} are both subclasses of the
+\url{BloatContext}. The two contexts that you should worry about are
+the \url{PersistentBloatContext} and the \url{CachingBloatContext}. These
+contexts are used for the same purpose, which is to act as a
+repository for all of the edits made to java class files. The
+difference between the two contexts is that the
+\url{PersistentBloatContext} keeps every piece of data relevant to
+your work, the \url{CachingBloatContext} on the other hand manages
+your edits so that when a editor is no longer dirty it drops
+the instance of the editor.
+
+
+Editors consist of the \url{ClassEditor}, \url{MethodEditor}, and
+\url{FieldEditor}. The names of these class should give evidence
+enough of their subjects of manipulation.  It is through these
+editors that you will make actual changes to byte code. It
+should be noted that the \url{ClassEditor} constructor takes a
+\url{BloatContext} and all other editors accepts a \url{ClassEditor}. In
+some ways this is the use of a decorator pattern or wrapper
+methodology.
+
+\section{Editing Class Files}
+
+\subsection{Where to Start?}
+
+   BLOAT seems to have endless constructors that depend on other
+objects which in turn depend on other objects. In truth unless
+you know where to begin you will wrap yourself around the API
+for a few hours trying to find the object you need create in
+order to create the object you want to create.
+   
+
+The first thing that you need in BLOAT is a
+\url{ClassFileLoader}. Unlike most classes in BLOAT the constructor
+for this class takes no arguments. The \url{ClassFileLoader}
+provides you with tools to manipulate the system CLASSPATH,
+open zip/jar archives, and create new classes.  Overall these
+tools will not be useful to you. They can be used as opposed
+to the process I am about to demonstrate to you. However, if
+you chose to do so you will not be using contexts as the
+central point of your BLOAT manipulations which was fore
+mentioned as the core of the BLOAT architecture.
+   
+
+After creating a \url{ClassFileLoader} the next step is to create
+either a \url{PersistentBloatContext} or a \url{CachingBloatContext}. The
+choice between these two contexts depends on the resources
+available to you. In most case you should chose the
+\url{PersistentBloatContext} as memory is cheap.
+
+
+   Once you have a BLOAT context you can load the class files you
+wish to edit. This is done by using the \url{loadClass} method of
+the BLOAT context. You could also use the same method in the
+\url{ClassFileLoader}, however again this does not take advantage of
+the context architecture.
+
+
+After loading the class file the \url{loadClass} method returns a
+\url{ClassInfo} object. This is really an interface implemented by
+the \url{ClassFile} object so you will want to cast the \url{ClassInfo}
+object to a \url{ClassFile} to take advantage of some more advanced
+features found in the \url{ClassFile} object. The \url{ClassFile} object,
+as one might think, contains all of the relevant information
+about the class you load. This includes information pertaining
+to fields and methods as well as more byte code specific
+information. Figure~\ref{BLOAT-fig1} will illustrate this process so far.
+
+\begin{figure}
+\begin{listing}{1}
+EDU.purdue.cs.bloat.file.ClassFileLoader classFileLoader = new
+   EDU.purdue.cs.bloat.file.ClassFileLoader();
+
+EDU.purdue.cs.bloat.context.PersistentBloatContext bloatContext = 
+   new EDU.purdue.cs.bloat.context.PersistentBloatContext(
+       classFile.loader());
+
+String className = "ClassFileToTest";
+EDU.purdue.cs.bloat.reflect.ClassInfo info = null;
+
+try { 
+   info = bloatContext.loadClass(className); 
+} catch (ClassNotFoundException ex) {
+   System.err.println("Couldn't find class: " +ex.getMessage()); 
+   System.exit(1); 
+}
+
+EDU.purdue.cs.bloat.file.ClassFile classFile =
+      (EDU.purdue.cs.bloat.file.ClassFile)info;
+\end{listing}
+\caption{Loading a class file.}
+\label{BLOAT-fig1}
+\end{figure}
+
+\subsection{The \protect\url{ClassEditor}}
+   
+Once you created a \url{ClassFile} object you can begin byte-code
+manipulation. The next step is to create a \url{ClassEditor}. There
+are two ways to go about this, create a \url{ClassEditor} from
+scratch or create a \url{ClassEditor} from an existing \url{ClassFile}.
+   
+
+To create a \url{ClassEditor} from an existing \url{ClassFile} simply use
+the method \url{editClass} supplied by the \url{BloatContext}. This method
+returns a \url{ClassEditor} for the \url{ClassFile} passed as a
+parameter:
+\begin{listing}{1}
+EDU.purdue.cs.bloat.editor.ClassEditor classEditor =
+              bloatContext.editClass(classFile);
+\end{listing}
+
+To create a \url{ClassEditor} from scratch is a little
+different. BLOAT supplies a constructor for the \url{ClassEditor} to
+do so however the API advises you not to use this.  Instead
+you should use the method \url{newClass} provided by the
+\url{BloatContext}:
+\begin{verbatim}
+newClass(
+   int modifiers, 
+   java.lang.String className,
+   Type superType, 
+   Type[] interfaces);
+\end{verbatim}
+
+The \url{newClass} method takes a modifier, a String, a Type, and a
+Type array. The modifier specifies whether the class will be
+public, private, or protected. The correct parameter to use
+for the modifier is a constant from the modifier interface
+found in the \url{EDU.purdue.cs.bloat.reflect} package:
+\begin{verbatim}
+EDU.purdue.cs.bloat.reflect.Modifier.PUBLIC
+EDU.purdue.cs.bloat.reflect.Modifier.PRIVATE
+EDU.purdue.cs.bloat.reflect.Modifier.PROTECTED
+\end{verbatim}
+
+The String parameter specifies the name of the class being
+created. The Type passed to the constructor indicates from
+where the class extends i.e. java.lang.Object. Again this is
+specified by a constant from the \url{EDU.purdue.cs.bloat.editor}
+package:
+\begin{verbatim}
+EDU.purdue.cs.bloat.editor.Type.OBJECT
+\end{verbatim}
+
+The Type array specifies all of the interfaces that the class
+is to implement. Again these can be found in the
+\url{EDU.purdue.cs.bloat.editor} package and include interface such
+as Serializable and Comparable. Here's a complete
+example of the use of this method:
+\begin{listing}{1}
+EDU.purdue.cs.bloat.editor.ClassEditor classEditor =
+   bloatContext.newClass(
+      EDU.purdue.cs.bloat.reflect.Modifiers.SUPER,
+      "MyNewClass",
+      EDU.purdue.cs.bloat.editor.Type.OBJECT, 
+      null);
+\end{listing}
+
+Note that if you intend to implement an interface or override
+a method that is inherited you will have to create those
+methods from scratch as well. The section on the method editor
+will demonstrate method creation from scratch.
+
+
+The \url{ClassEditor} provides manipulation of data such as the
+class modifiers, the constant pool, and the interfaces
+implemented by the class. All of these uses are pretty
+intuitive with the exception of constant pool
+manipulation. You should refer to \url{ChangeFieldNames.java},
+provided in the directory examples-1.0, for an example of
+constant pool manipulation.
+
+\subsection{The \protect\url{MethodEditor}}
+   
+If you wish to edit a method in an existing class you will
+again need to refer to the \url{BloatContext}. The \url{BloatContext}
+provides a method, \url{editMethod}, to modify methods. The
+\url{editMethod} method takes a \url{MethodInfo} object as a
+parameter. You can retrieve this information from a
+\url{ClassEditor} with the method,\url{methods}, that returns an array of
+\url{MethodInfo} objects:
+\begin{listing}{1}
+EDU.purdue.cs.bloat.reflect.MethodInfo[] methods =
+   classEditor.methods();
+EDU.purdue.cs.editor.MethodEditor methodEditor =
+   bloatContext.editMethod(methods[0]);
+\end{listing}
+This array contains the method information
+for all of the methods contained in the \url{ClassFile} related to
+the class editor including the constructor. Note that a
+\url{MethodInfo} object is really an interfaced used by a \url{Method}
+object and therefore you can cast a \url{MethodInfo} object to a
+\url{Method} object.
+
+   There is most likely a specific method that you wish to
+edit. You can retrieve a specific method by obtaining its name
+with the name method in the \url{MethodEditor} object. To create a
+new method for an existing class or a class you creating from
+scratch you must create a new \url{MethodEditor} object.  Note that
+unlike creating a \url{ClassEditor} from scratch this is not done
+through the BLOAT context.  To create a new \url{MethodEditor} use
+the constructor provided below:
+\begin{verbatim}
+MethodEditor(
+   ClassEditor editor, 
+   int modifiers,
+   Type returnType, 
+   java.lang.String methodName,
+   Type[] paramTypes, 
+   Type[] exceptionTypes);
+\end{verbatim}
+
+The constructor first takes a \url{ClassEditor} for the class you
+wish to create a new method in.  Then you must provide a
+modifier such as public, private, or protected. This can be
+specified by a constant in the \url{EDU.purdue.cs.reflect.Modifier}
+interface. The next parameter specifies the return type of the
+method. This can be specified using a constant from the
+\url{EDU.purdue.cs.editor.Type} interface. The String parameter is
+used to name the method you have chosen to create. Then the
+parameters of the method are specified by constants from the
+Type interface. The final parameter of the constructor
+specifies exceptions thrown by the method. Again this can be
+specified using constants found in the Type interface.
+
+Once you have created a method you can begin adding
+instructions to the method. This done by calling the method
+\url{addInstruction} in the \url{MethodEditor}. The method takes an opcode
+constant as a parameter. These constants can be found in the
+\url{EDU.purdue.cs.bloat.editor.Opcode} interface.  There is an
+opcode in this interface corresponding to each opcode in Java
+byte-code.  It should be noted that valid Java byte-code must
+be entered or you will receive a Java runtime error.
+
+\subsection{The \protect\url{FieldEditor}}
+   
+The \url{FieldEditor} is used to edit attributes of a class. To edit
+fields of an existing class simply call the \url{editField} method
+of the \url{BloatContext}. This method takes a \url{FieldInfo}
+object. This object can be obtained from the \url{ClassEditor} by
+calling the fields method. This method returns an array of
+\url{FieldInfo} objects. This example demonstrates how to put these
+things together to create a \url{FieldEditor}:
+\begin{listing}{1}
+EDU.purdue.cs.bloat.editor.FieldInfo[] fieldInfo =
+   classEditor.fields();
+EDU.purdue.cs.bloat.editor.FieldEditor fieldEditor = 
+   bloatContext.editField(fieldInfo[0]);
+\end{listing}
+
+To create a new field you must use a constructor found in the
+\url{FieldEditor} class.  The constructor is illustrated below:
+\begin{verbatim}
+FieldEditor(
+   ClassEditor editor, 
+   int modifiers,
+   java.lang.Class type, 
+   java.lang.String name);
+\end{verbatim}
+
+
+The constructor takes the \url{ClassEditor} for the class you wish to
+add an attribute to. Like the constructor to create a new
+method the constructor for the \url{FieldEditor} also takes a
+constant to specify a Modifier to specify whether the
+attribute is public, private, or protected. The constructor
+also takes a Type constant to indicate whether the attribute
+is an int, String, or other possibility. Finally the
+constructor accepts a String to name the attribute.
+
+\section{Committing Edits}
+
+\subsection{One Rule To Follow}
+   
+There is one rule to follow in BLOAT that will save you a lot
+of pain, after you edit commit.  This seems pretty obvious but
+there are al lot of methods to \url{commit} edits in BLOAT. For
+instance the \url{ClassEditor}, \url{FieldEditor}, \url{MethodEditor}, and the
+\url{BloatContext} all have several commit methods. The rule can be
+applied as followed. If you make an edit with a \url{FieldEditor},
+or any other editor, call the \url{commit} method of the editor when
+you have completed editing with that specific editor. The
+\url{BloatContext}'s  \url{commit} method can be used to commit all
+edits to all class files the \url{BloatContext} has knowledge of,
+i.e. any class that you have loaded or created through the
+\url{BloatContext}.
+
+
+\section{Instruction Representation}
+
+\subsection{Opcodes}
+The folks who created BLOAT were nice enough to create a constant to
+represent every opcode in the Java byte-code language. These opcodes
+can be found in the \url{EDU.purdue.cs.bloat.editor.Opcode} interface.
+
+\subsection{Instructions}
+You can create an instruction by simply passing an Instruction object
+an opcode constant form the \url{EDU.purdue.cs.bloat.editor.Opcode}
+interface.
+
+\begin{listing}{1}
+EDU.purdue.cs.bloat.editor.Instruction instruction = 
+   new EDU.purdue.cs.bloat.editor.Instruction(
+       EDU.purdue.cs.bloat.editor.Opcode.opc_astore);
+\end{listing}
+
+There are several methods in the Instruction class that test whether
+the instruction the class represents is a jump or a switch as well as
+many other things. Each of these methods returns a boolean value based
+on their validity.
+
+Each instruction can be add to a method or block in a control flow
+graph. You can do this by calling the \url{addInstruction} method for either
+of these objects and passing it an Instruction object.
+
+\section{Advanced Features}
+\subsection{Inlining}
+Inlining is a fairly straight forward process. Simply create a
+\url{BloatContext} and load your classes as usual. You will now need to
+create an \url{Inline} object. The constructor for the object takes a
+\url{InlineContext} and an integer as a parameter. There are no special
+steps for obtaining an \url{InlineContext} the \url{BloatContext} already
+implements this interface. The integer determines the maximum number
+of instructions a method can grow to.
+
+\begin{listing}{1}
+EDU.purdue.cs.bloat.inline.Inline inline = 
+   new EDU.purdue.cs.bloat.inline.Inline(bloatContext,20);
+\end{listing}
+
+To actually inline a method you must call the \url{inline} method of the
+Inline class. This method takes a \url{MethodEditor} as a parameter. Refer
+to the section on \url{MethodEditor}s if you do not already know how to
+create one. Once the method is called the inlining is complete:
+
+\begin{listing}{1}
+EDU.purdue.cs.bloat.inline.Inline inline = 
+   new EDU.purdue.cs.bloat.inline.Inline(bloatContext,20);
+inline.inline(methodEditor);
+\end{listing}
+
+ 
+There are some extra features that can be used during inlining. Using
+the method \url{maxCallDepth} you can specify with an integer the maximum
+number of nested method calls inlined. The inlining process can be
+rather time consuming. Bloat attempts to remedy this by providing a
+method, \url{setMaxInlineSize}, that sets the maximum size method that will
+be inlined. This size is set by passing an integer to the
+\url{setMaxInlineSize} method.You may also specify whether to inline methods
+that throw exceptions or not. This is simply set passing a boolean
+value to the method \url{setInlineExceptions}. Note that if you need to use
+one these features you must call one of these methods prior to calling
+the \url{inline} method.
+
+\begin{listing}{1}
+int size = 25; 
+int depth = 3; 
+boolean flag = true;
+inline.setMaxInlineSize(size); 
+inline.setMaxCallDepth(depth);
+inline.setInlineExceptions(flag); 
+inline.inline(methodEditor);
+\end{listing}
+
+
+\subsection{Class Hierarchy}
+It maybe of some interest to understand or manipulate the class
+hierarchy of a class. The first step in this process is to load all
+classes in the hierarchy using your current \url{BloatContext}. The
+\url{BloatContext} must first have knowledge of all of the class relevant to
+the hierarchy. Once the classes are load you can extract information
+on the hierarchy by calling \url{getHierarchy} method found in the
+\url{BloatContext}. The method returns a \url{ClassHierarchy} object. The
+\url{ClassHierarchy} object allows you to view all of the classes and
+interfaces in a hierarchy as well as edit the hierarchy by adding or
+removing classes an interfaces.
+
+\begin{listing}{1}
+// Add a class 
+EDU.purdue.cs.bloat.editor.ClassHierarchy classHierarchy =
+   bloatContext.getHeirarchy(); 
+String className = "Test"; 
+classHierarchy.addClassNamed(Test);  
+// extract the Type of classes in the hierarchy:
+Collection classes = 
+   classHierarchy.classes(); 
+// extract Type of classes that implement a specific interface:
+Collection classes = 
+   classHierarchy.implementors(
+      EDU.purdue.cs.bloat.editor.Type.SERIALIZABLE);
+// find interfaces a Type of object implements 
+Collection interfaces = 
+   classHierarchy.interfaces(
+      EDU.purdue.cs.bloat.editor.Type.CLASS); 
+// extract subclasses of a Type of object 
+Collection subclasses = 
+   classHierarchy.subclasses(EDU.purdue.cs.bloat.editor.Type.OBJECT);
+\end{listing}
+
+
+The \url{ClassHierarchy} may also be used to determine what method will be
+invoked at any depth in the hierarchy. Therefore you can determine
+from where a method is inherited or overwritten.
+
+\begin{verbatim}
+// simulates dynamic dispatching: 
+MemberRef methodInvoked(
+   Type receiver, 
+   NameAndType method);
+\end{verbatim}
+
+The method takes two arguments a Type, which we are already familiar
+with from previous examples, and a \url{NameAndType}. The Type argument
+determines the receiver of the call. The \url{NameAndType} class simply
+describes an a method by its name and descriptor. The name is simply a
+String and the descriptor describes the return type of the method
+using the Type class.
+
+\begin{verbatim}
+EDU.purdue.cs.bloat.editor.NameAndType(
+   java.lang.String name, 
+   Type type);
+\end{verbatim}
+
+The \url{MemberRef} returned by \url{methodInvoked} represents the method you are
+interested in and class from where it was invoked.
+
+\begin{listing}{1}
+//Putting it all together:
+EDU.purdue.cs.bloat.editor.ClassHierarchy classHierarchy = 
+   bloatContext.getHeirarchy();
+EDU.purdue.cs.bloat.editor.NameAndType nameAndType = 
+   new EDU.purdue.cs.bloat.editor.NameAndType(
+      "test",
+      EDU.purdue.cs.bloat.editor.Type.STRING);
+MemberRef memRef =
+   classHeirarchy.methodInvoked(
+      EDU.purdue.cs.bloat.editor.Type.OBJECT,
+      nameAndType);
+System.out.println(memRef);
+\end{listing}
+
+Using the \url{ClassHierarchy} you may also determine if a method has been
+overwritten. Note the previous example could be used to determine
+where it was overwritten. In order to determine if a method has been
+overwritten you must call the \url{methodIsOverridden} method:
+
+\begin{verbatim}
+boolean methodIsOverridden(
+   Type classType, 
+   NameAndType method);
+\end{verbatim}
+
+To use this method you must pass it the class Type of where the method
+resides and a \url{NameAndType} that identifies the method and its return
+type. The method will return a boolean value based on whether the
+method has been overwritten for that class Type.
+
+\begin{listing}{1}
+//Putting it all together 
+EDU.purdue.cs.bloat.editor.ClassHierarchy classHierarchy = 
+   bloatContext.getHeirarchy();
+EDU.purdue.cs.bloat.editor.NameAndType nameAndType = 
+   new EDU.purdue.cs.bloat.editor.NameAndType(
+      "test",
+      EDU.purdue.cs.bloat.editor.Type.STRING);
+boolean value =
+   classHeirarchy.methodIsoverridden(
+      EDU.purdue.cs.bloat.editor.Type.OBJECT,
+      nameAndType);
+\end{listing}
+
+\subsection{Control Flow Graph (CFG)}
+Bloat allows a developer to create a control flow graph for any given
+method. To do so you simply need to construct a \url{FlowGraph} object. To
+create a \url{FlowGraph} you must provide a \url{MethodEditor} for the constructor
+the \url{FlowGraph}.
+
+\begin{verbatim}
+EDU.purdue.cs.bloat.cfg.FlowGraph(
+   MethodEditor method);
+\end{verbatim}
+
+To construct the \url{FlowGraph} object does not setup the cfg. You must
+call the initialize method of the \url{FlowGraph} object to create the
+graph. Once the graph is created you can extract the basic blocks
+using a variety of methods. Most of these methods produce a \url{List} or
+\url{Collection} of blocks that can be iterated across. There also several
+\url{print} methods to print the CFG in various orderings.
+
+\begin{listing}{1}
+// printing cfg in different orders 
+EDU.purdue.cs.bloat.cfg.FlowGraph cfg = 
+   new EDU.purdue.cs.bloat.cfg.FlowGraph(methodEditor);
+cfg.preOrder(); 
+cfg.postOrder(); 
+cfg.print(); 
+cfg.printGraph();
+\end{listing}
+
+
+\begin{listing}{1}
+// extracting blocks and manipulating blocks:
+EDU.purdue.cs.bloat.cfg.FlowGraph cfg = 
+   new EDU.purdue.cs.bloat.cfg.FlowGraph(methodEditor);
+//Blocks returned in trace order:
+java.util.List list =
+   cfg.trace(); 
+for(int i=0;i<list.size();i++){ 
+   EDU.purdue.cs.bloat.tree.Tree tree =
+      list.tree(); 
+   EDU.purdue.cs.bloat.editor.Instruction instruction = 
+      new EDU.purdue.cs.bloat.editor.Instruction(
+         EDU.purdue.cs.bloat.editor.Opcode.ops_aaload);
+   tree.addInstruction(instruction); 
+}
+\end{listing}
+ 
+The above example extracts the blocks from a cfg. It then accesses the
+Tree for each Block. A Tree represents the expression tree for each
+block. Using the tree you can view the instructions contained with in
+a Block as well as edit them by adding and deleting instructions. The
+example above demonstrates how to add an instruction.
+
+\subsection{Trees}
+Trees were previously introduced in the section on \url{FlowGraph}. \url{Tree} 
+represents the expression tree of a basic block. It consists of an operand 
+(expression) stack comprised of expressions and a list of statements contained 
+in the block. The blocks, as previously mentioned, can be obtained from the 
+\url{FlowGraph}. \url{Block} contains a method called \url{tree} that takes no arguments
+and returns a \url{Tree}. \url{Tree} allows you to manipulate the expression 
+tree for the from which obtain \url{Tree}. Instructions maybe added with methods
+below.
+
+\begin{listing}{1}
+// adds an instruction that does not change control flow
+addInstruction(Instruction inst) 
+// adds an instruction to jump to another Block in the FlowGraph
+addInstruction(Instruction inst, Block next)
+// add an instruction such as ret or astore to invoke a subroutine
+addInstruction(Instruction inst, Subroutine sub) 
+\end{listing}
+ 
+A branch in the cfg maybe labeled using that {\tt addLabel(Label method)}. To create a 
+label follow the example below. The index used in the example represents the labels
+in the instruction array. The boolean in the constructor specifies wheither the 
+\url{Label} start a block or not. You may also add a comment to a \url{Label} by calling 
+the \url{setComment} method which takes a string to represent the comment.
+
+\begin{listing}{2}
+// The index represents represents a unique offset, .i.e. its offset
+// in the instruction array
+int index = 23;
+EDU.purdue.cs.bloat.editor.Label label = new EDU.purdue.cs.bloat.editor.Label(index,false);
+label.setComment(``Hello'');
+System.out.println(label);
+tree.addLabel(label);
+\end{listing}
+
+An additional \url{Stmt} can also be added to a \url{Tree} using the method {\tt addStmt(Stmt stmt)}. 
+A \url{Stmt} is the super class of \url{JumpStmt}, \url{ExprStmt}, and \url{PhisStmt}. A \url{JmpStmt} 
+is a super class of the following: \url{GotoStmt},\url{IfStmt},\url{JsrStmt}. A \url{GotoStmt} represents an unconditional 
+branch to a basic block. The constructor takes a \url{Block} as an argument which represents the 
+target of the \url{GotoStmt}. An \url{IfStmt} is a super class of statements in which some expression 
+is evaluated and one of two branches is taken. Its subclasses are \url{IfCmpStmt} and \url{IfZeroStmt}.
+To create an \url{IfCmpStmt} the constructor takes 5 arguments. The first is an integer that represents
+the comparison operator the if statement. Next it takes a left \url{Expr} and right \url{Expr}. Finally
+it takes a \url{Block} to jump to when the if condition is true and then a \url{Block} to jump to if the 
+condition is false. An \url{IfZeroStmt} evaluates an expression and executes one of its two branches 
+depending on whether or not the expression evaluated to zero. To create a \url{IfZeroStmt} you simply
+use the same arguement sequence as supplied to a \url{IfCmpStmt}. You should take note that a \url{Stmt} 
+can not be nested as \url{Expr} can. These are not all of the \url{Stmt} supplied by BLOAT. This is only 
+an introduction into what they offer. \url{Stmt}s can be removed from a \url{Tree}
+using the method {\tt removeStmt(Stmt stmt)}.
+
+
+\subsection{SSA (Value Graphs)}
+A \url{FlowGraph} object may also be used to create a value graph. The SSA
+graph (also called the value graph) represents the nesting of
+expression in a control flow graph. Each node in the SSA graph
+represents an expression.  If the expression is a definition, the it
+is labeled with the variable it defines. Each node has directed edges
+to the nodes representing its operands.
+
+\url{SSAGraph} is a representation of the definitions found in a CFG in the
+following form: Each node in the graph is an expression that defines a
+variable (a \url{VarExpr}, \url{PhiStmt}, or a \url{StackManipStmt}). 
+Edges in the graph point to the nodes whose expressions define the 
+operands of the expression in the source node.
+
+This class is used primarily get the strongly connected components of
+the SSA graph in support of value numbering and induction variable
+analysis.
+
+Nate (One of the Authors of BLOAT) warns: Do not modify the CFG while
+using the SSA graph! The effects of such modification are undefined
+and will probably lead to nasty things occurring.
+
+\begin{listing}{1}
+EDU.purdue.cs.bloat.ssa.SSAGraph ssaGraph = 
+   new EDU.purdue.cs.bloat.ssa.SSAGraph(cfg);
+\end{listing}
+
+\subsection{Type-Based Alias Analysis (TBBA)}
+
+Type-Based Alias Analysis (TBAA) is used to determine if one expression 
+can alias another. An expression may alias another expression if there is 
+the possibility that they refer to the same location in memory. BLOAT 
+models expressions that may reference memory locations with \url{MemRefExprs}. 
+There are two kinds of "access expressions" in Java: field accesses 
+(\url{FieldExpr}  and \url{StaticFieldExpr}) and array references (\url{ArrayRefExpr}). Access 
+paths consist of one or more access expressions. For instance, {\tt a.b[i].c} is an 
+access expression.
+
+TBAA uses the \url{FieldTypeDecl} relation to determine whether or not two access 
+paths may refer to the same memory location.
+
+A static method in the \url{EDU.purdue.cs.bloat.tbaa.TBAA} class may be used to do
+Type-Based Alias Analysis.
+
+\begin{listing}{1}
+ EDU.purdue.cs.bloat.tbaa.TBAA.canAlias(EditorContext context, Expr a, Expr b) 
+\end{listing}
+
+Where the \url{EditorContext} represents the \url{BloatContext} and the \url{Expr} parameters represent
+expressions. \url{EDU.purdue.cs.bloat.tree.Expr} is a an abstract superclass. Its known subclasses
+are listed below.
+
+\begin{listing}{1}
+ArithExpr
+ArrayLengthExpr
+CallExpr
+CastExpr
+CatchExpr
+CheckExpr
+CondExpr
+ConstantExpr
+DefExpr
+NegExpr
+NewArrayExpr
+NewExpr
+NewMultiArrayExpr
+ReturnAddressExpr
+ShiftExpr
+StoreExpr
+\end{listing}
+
+
+\end{document}

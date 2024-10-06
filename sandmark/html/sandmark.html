@@ -1,0 +1,130 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>A Tool for the Study of Software Protection Algorithms</TITLE>
+  </HEAD>
+<BODY>
+
+<center>
+   <img src=logo.jpg width=214 height=56>
+<center>
+<p>
+<H1>A Tool for the Study of Software Protection Algorithms</H1>
+ <CENTER>
+ <p><a href="http://www.cs.arizona.edu/~collberg"><strong>Christian Collberg </strong></a><strong> <BR>
+    Department of Computer Science <BR>
+    The University of Arizona </strong><BR>
+ </p>
+ </CENTER>
+ <P>
+ <CENTER>
+    <table border="0" cellpadding="0" cellspacing="0"
+	<tr>
+	    <th> <img width="300" height="110" src="yuma1.jpg"> </th>
+	    <th> <img width="300" height="110" src="yuma2.jpg"> </th>
+	    <th> <img width="300" height="110" src="yuma3.jpg"> </th>
+	 </tr>
+    </table>
+    <table width="75%" border="0" cellpadding="2" cellspacing="1">
+      <tr>
+        <td><strong>SandMark is a tool developed at the University of Arizona for software
+          watermarking, tamper-proofing, and code obfuscation of Java bytecode.
+          The ultimate goal of the project is to implement and study the effectiveness
+          of all known software protection algorithms. Currently, the tool incorporates
+          several dynamic and static watermarking algorithms (such as those proposed
+          by Venkatesan, Collberg, Stern, and others), a large collection of
+          obfuscation algorithms, a code optimizer, and tools for viewing and
+        analyzing Java bytecode. </strong></td>
+      </tr>
+    </table>
+    <table width="100%" border="0" cellpadding="2" cellspacing="1">
+      <tr>
+        <td><ul>
+          <li> Software watermarking algorithms can be used to embed a customer
+            identification number (a fingerprint) into a Java program in order
+            to trace software pirates. A SandMark software watermarking algorithm
+            consists of two programs:
+              
+            <ul>
+                <li> The <em>embedder</em> takes a Java jar-file and a string
+                  (the watermark) as input and produces the a new jar-file that
+                  embeds the string.
+                
+                <li> The <em>recognizer</em> takes the watermarked jar-file as
+                  input and produces the watermark string as output.
+                
+            </ul>
+             Typically, the watermark is a copyright notice or a customer identification
+              number.
+            
+          <li> The code obfuscation algorithms in SandMark take a Java jar-file
+            as input and produce an obfuscated jar-file as output. They have
+            many applications:
+              
+            <ul>
+                <li> The obfuscations can be used to protect the intellectual
+                  property of Java programs (by rendering the code difficult
+                  to understand).
+                
+                <li> Obfuscations can protect fingerprinted programs from collusive
+                  attacks (by making differently fingerprinted program differ
+                  everywhere, not just in the parts where the mark is embedded).
+                
+                <li> Obfuscations can also be used to attack software watermarks
+                  (by reorganizing the code such that the mark can no longer
+                  be recognized).
+                
+            </ul>
+        </ul></td>
+      </tr>
+    </table>
+    <table width="100%" border="0" cellpadding="2" cellspacing="1">
+      <tr>
+        <td><P>SandMark is designed to be simple to use. A graphical user interface
+            allows novices to easily try out watermarking and obfuscation algorithms.
+            Algorithms can be combined, the resulting watermarked and/or obfuscated
+            code can be examined, and attacks can be easily launched. SandMark
+            has been designed using a plugin-style architecture which makes it
+            easy to extend with additional algorithms.
+        </strong>
+          <P> We are currently using SandMark to study which software watermarking
+            algorithms are vulnerable to which code optimizations and code obfuscations.
+            We are also interested in evaluating the effectiveness and performance
+        overhead of obfuscation algorithms. </strong></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <table width="75%" border="0" align="center">
+      <tr>
+        <td>The
+                development of SandMark is supported by the NSF under grant CCR-0073483,
+                the AFRL under contract F33615-02-C-1146, and by the New Economy
+        Research Fund of New Zealand under contracts UOAX9906 and UOAX0214.</strong></td>
+      </tr>
+   </table>
+    <p>&nbsp;</p>
+ </CENTER>
+ <P>
+   <strong>  </strong>
+ <P>
+ </body>
+ </html>
+
+
+</HTML>

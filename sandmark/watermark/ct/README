@@ -1,0 +1,17 @@
+
+To compare different graph encodings do:
+
+   make superjar
+   java -classpath sandmark.jar sandmark.watermark.ct.Evaluate > ! result
+   gawk -f sandmark/watermark/ct/eval2jgr.awk result
+   jgraph wm2bytecode.jgr > wm2bytecode.ps
+   jgraph wm2heap.jgr > wm2heap.ps
+   jgraph wm2bytecode2components.jgr > wm2bytecode2components.ps
+   jgraph wm2cycled.jgr > cycled.ps
+
+wm2bytecode plots the sizes of the bytecode graph building code wrt the watermark size.
+wm2heap plots the sizes of the heap graph wrt the watermark size.
+wm2bytecode2components plots the bytecode size of the graph wrt the watermark size and number of components.
+wm2cycled plots the bytecode size of the graph wrt the watermark size and
+number of components for cycled graphs.
+

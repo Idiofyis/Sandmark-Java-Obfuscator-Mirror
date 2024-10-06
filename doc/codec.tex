@@ -1,0 +1,99 @@
+\section{Adding a Graph Codec}
+\label{AddingCodecs}
+Several watermarking algorithms encode the
+watermark as a graph. \SM\ contains several
+methods for making this encoding, stored in
+the \url{sandmark.util.graph.codec} package.
+
+Adding a new graph coder/decoder {\em codec}
+algorithm is similar to adding an obfuscator
+or watermarker: just add a new class to
+the \url{codec} directory, make sure it
+extends the appropriate class, type {\tt make},
+and the new algorithm will have been added to
+the system.
+
+Every graph codec should extend \url{sandmark.util.graph.codec.GraphCodec}:
+\begin{listing}{1}
+package sandmark.util.graph.codec;
+public abstract class GraphCodec {
+   public java.math.BigInteger value = null;
+   public sandmark.util.graph.Graph graph = null;
+
+/**
+ * Codecs should implement this method to convert
+ * the 'value' into 'graph'.
+ */ 
+   abstract void encode();
+
+/**
+ * Codecs should implement this method to convert
+ * the 'graph' into 'value'. Whenever the decoding
+ * failes (eg. because the graph has the wrong
+ * shape) the codec should simply throw an exception.
+ */ 
+   abstract void decode() throws sandmark.util.graph.codec.DecodeFailure;
+
+/**
+ * Constructor to be used when encoding an integer into a graph.
+ *   @param value   The value to be encoded.
+ */ 
+   public GraphCodec (
+       java.math.BigInteger value) {
+       this.value = value;
+       encode();
+   }
+
+/**
+ * Constructor to be used when decoding a graph to an integer.
+ *   @param graph   The graph to be decoded.
+ *   @param root    The root of the graph.
+ *   @param kidMap  An array of ints describing which field
+ *                  should represent the first child, the
+ *                  second child, etc.
+ */ 
+   public GraphCodec (
+       sandmark.util.graph.Graph graph, 
+       int kidMap[]) throws sandmark.util.graph.codec.DecodeFailure {
+       this.graph = graph;
+       this.kidMap = kidMap;
+       decode();
+   }
+}
+\end{listing}
+Note that there are two constructors. One is used when
+encoding an integer ({\tt java.meth.BigInteger})
+into a graph (a \url{sandmark.util.graph.Graph}), and another when
+decoding a graph into an integer.
+
+For example, the simplest graph codec, {\tt RadixGraph}
+looks like this:
+\begin{listing}{1}
+package sandmark.util.graph.codec;
+
+public class RadixGraph extends sandmark.util.graph.codec.GraphCodec {
+
+    public final static String FULLNAME  = "Radix Graph";
+    public final static String SHORTNAME = "radix";
+
+// Used when encoding.
+public RadixGraph (java.math.BigInteger value)  {
+    super(value);
+    this.fullName = FULLNAME;
+    this.shortName = SHORTNAME;
+}
+
+void encode() { ... }
+
+// Used when decoding.
+   public RadixGraph (
+       sandmark.util.graph.Graph graph, 
+       int kidMap[]) throws sandmark.util.graph.codec.DecodeFailure {
+       super(graph, kidMap);
+       this.fullName = FULLNAME;
+       this.shortName = SHORTNAME;
+   }
+   void decode() throws sandmark.util.graph.codec.DecodeFailure { ... }
+}
+\end{listing}
+

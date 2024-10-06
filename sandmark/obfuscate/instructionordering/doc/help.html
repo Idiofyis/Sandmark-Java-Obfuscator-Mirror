@@ -1,0 +1,116 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Instruction Ordering Obfuscation</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Instruction Ordering Obfuscation</H1>
+    <H2>Author</H2>
+    <P>
+      Kamlesh Kantilal
+      (<A HREF="mailto:kamlesh@cs.arizona.edu">kamlesh@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      This algorithm tries to reorder the instructions within each basic block
+      of a method. The algorithm is as follows. First it creates a list of
+      expression trees within each block. This expression trees are obtained
+      by using the ExprTree class which resides in sandmark.util.exprtree.
+      Next it creates a dependency graph for the expression trees within each
+      block. An expression tree is dependent  on another expression tree if
+      there is a WAW, WAR or RAW hazard. Once the dependency graph is obtained
+      it writes out the instruction by doing a topological  sort of the nodes
+      in the dependency graph. When there are more than one choices it tries
+      to output the last instruction in the original order first thereby
+      reordering the code.
+    </P>
+    <H2>Example</H2>
+    <P>
+    <CENTER>
+      <table cellpadding="2" cellspacing="2" border="1" width="50%">
+	<tbody>
+	  <tr>
+	    <td valign="Top">The original byte code before applying the
+	      obfuscation</td>
+	    <td valign="Top">The reordered byte code as a result of applying
+	      the obfuscation</td>
+	  </tr>
+	  <tr>
+	    <td valign="Top">
+	      0 bipush 100<br>
+	      2 istore 1<br>
+	      3 sipush 10000<br>
+	      6 istore 2<br>
+	      7 lconst 1<br>
+	      8 lstore 3<br>
+	      9 ldc2_w #2 <br>
+	      12 lstore 5<br>
+	      14 ldc2_w #4 <br>
+	      17 dstore 7<br>
+	      19 bipush 24<br>
+	      21 iload 2<br>
+	      22 imul<br>
+	      23 istore 1<br>
+	      24 iconst 3<br>
+	      25 iload 1<br>
+	      26 imul<br>
+	      27 i2l<br>
+	      28 lload 3<br>
+	      29 lmul<br>
+	      30 l2i<br>
+	      31 istore 2<br>
+	      32 return<br>
+	    </td>
+	    <td valign="Top">
+	      0 ldc2_w #4 <br>
+	      3 dstore 7<br>
+	      5 ldc2_w #2 <br>
+	      8 lstore 5<br>
+	      10 lconst 1<br>
+	      11 lstore 3<br>
+	      12 sipush 10000<br>
+	      15 istore 2<br>
+	      16 bipush 100<br>
+	      18 istore 1<br>
+	      19 bipush 24<br>
+	      21 iload 2<br>
+	      22 imul<br>
+	      23 istore 1<br>
+	      24 iconst 3<br>
+	      25 iload 1<br>
+	      26 imul<br>
+	      27 i2l<br>
+	      28 lload 3<br>
+	      29 lmul<br>
+	      30 l2i<br>
+	      31 istore 2<br>
+	      32 return</td>
+	  </tr>
+	</tbody>
+      </table>
+    </CENTER>
+  </P>
+    <H2>Configuration</H2>
+    <P>
+      There are no extra configuration parameters necessary to run this
+      obfuscator.
+    </P>
+    <H2>References</H2>
+    <BR>
+  </BODY>
+</HTML>

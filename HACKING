@@ -1,0 +1,86 @@
+SANDMARK V3
+DEVELOPERS' README
+
+BUILD ENVIRONMENT
+
+Requires Java version 1.4 in your search path.  Type "java -version" to
+check.  If your system doesn't have this online, you can download from:
+    http://java.sun.com/j2se/1.4/
+
+Requires the ByteCode Engineering Library (JavaClass) Jar file from
+http://www.inf.fu-berlin.de/~dahm/JavaClass/.  At cs.arizona, this
+can be found in the file /cs/wmark/BCEL.jar.
+
+CONFIGURATION
+
+Configure Sandmark by editing ./Makedefs.
+Define JC to specify your Java compiler (jikes or javac or whatever).
+Define JDK to point to a Java Development Kit tree, even if using Jikes.
+Define BCEL to point to the JavaClass jar file.
+
+BUILDING
+
+make			builds sandmark.jar
+
+make jdoc		builds internal documentation from javadoc comments
+			(Initial file is jdoc/index.html)
+
+make test		runs automated tests
+			If you see no error messages, the tests worked.
+
+make run		runs SandMark interactively
+
+make clean		removes things built by the makefile
+
+
+USING CVS
+
+Don't check in anything until it builds cleanly and passes "make test".
+
+Make sure that any new files you add are at least group-readable, or
+you'll be asked, probably with some urgency, to repair the permissions
+in the CVS area.  
+
+(I usually just protect *directories* that I wish to keep private; then
+ I can run with umask 002 which makes collaboration easier in general.)
+
+Talk it over before making changes to the directory structure or
+Makefile techniques.
+
+CODING STYLE
+
+Use javadoc comments for anything that needs to be known outside the file.
+
+Stick to a maximum line length of 80 characters and assume normal tab stop
+settings (every 8 columns).
+
+I generally to follow the Sun coding conventions:
+	http://java.sun.com/docs/codeconv/html/CodeConvTOC.doc.html
+
+One exception:  With just one class per source file, there's no sense in
+indenting the whole class body encompassed by the outermost braces.  Begin
+outer-level methods and static variables in in column one.  Identify the
+lonely closing brace at the end of a file by its classname:
+	} // class ThisClass
+
+
+
+TEST DIRECTORY
+
+Simple tests go in the "test" directory.  The ideal test is a single
+Java class that writes commentary and confirmation of success to
+standard output, and diagnostics in the case of error to standard error.
+Put the Java file in classname.java and its expected output in
+classname.std, and "make test" will run it with sandmark.jar in the
+CLASSPATH.
+
+If a data file is needed, name it classname.dat and it will be passed
+to the test run both as standard input and by name as the sole
+command-line argument.
+
+Zero length .std files indicate tests that produce irreproducible
+output.  Such output is not checked for correctness.  Avoid this
+situation with any new tests.
+
+Some tests use Main methods contained within sandmark.jar; these
+tests have only a .std file and no .java file.

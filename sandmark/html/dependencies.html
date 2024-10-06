@@ -1,0 +1,74 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Running SandMark</TITLE>
+  </HEAD>
+<BODY>
+
+<H1>Running SandMark</H1>
+How you start SandMark will depend on your operating system.
+On Linux, you can run any of the following commands 
+to start the GUI frontend or the command-line version
+of SandMark:
+<PRE>
+   > java -jar sandmark.jar
+   > java -classpath sandmark.jar sandmark.gui.SandMarkFrame
+   > java -cp sandmark.jar sandmark.smash.SandmarkCLI -U
+</PRE>
+To run SandMark from the command line see the help
+information for <a href="scripting.html"> scripting </a>.
+
+<H2>Running Dynamic Watermarkers</H2>
+In order to run any of the dynamic watermarking algorithms, you must
+have the file <code>tools.jar</code> on your classpath. You can do
+this in either of two ways. First, find the location of
+<code>tools.jar</code> on your system. It is typically in the
+<code>lib</code> subdirectory of your Java installation, but it
+may, of course, be found anywhere on your filesystem.  
+Ask your system administrator. Then, start SandMark by saying
+<PRE>
+   > java -classpath /usr/java/.../lib/tools.jar:sandmark.jar sandmark.gui.SandMarkFrame
+</PRE>
+Where <code>/usr/java/.../lib/tools.jar</code> is the path to
+<code>tools.jar</code>
+<P>
+Alternatively, you can copy tools.jar into the JRE's extensions directory:
+<PRE>
+   > cp /usr/java/j2sdk1.4.2_01/lib/tools.jar /usr/java/j2sdk1.4.2_01/lib/ext/
+</PRE>
+Again, the actual paths will be specific to your particular installation.
+Then you should be able to run SandMark directly:
+<PRE>
+   > java -jar sandmark.jar
+</PRE>
+
+<H2>Requirements</H2>
+To run SandMark you need at least <b>JDK 1.4.0</b>.  To upgrade your JDK, go to 
+<a href="http://java.sun.com/">java.sun.com</a> and follow the appropriate 
+links.
+
+<h2>Example</h2>
+Below is a view of the SandMark main page and an open Help window.
+The Help browser can is opened by selecting from the Help menu.
+You can also click on the Help button that is available on most windows
+which will take you to the most appropriate help page.
+<center>
+<img src="help.jpg">
+</center>
+</body>
+</html>

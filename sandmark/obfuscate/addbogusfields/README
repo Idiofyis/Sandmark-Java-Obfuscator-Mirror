@@ -1,0 +1,8 @@
+authors: Ginger Myles {mylesg@cs.arizona.edu}
+         Miriam Miklofsky
+
+This directory contains a very simple obfuscator that inserts a bogus field into a class. The obfuscation is done by inserting a bogus field into the class and then making assignments to that field in specific locations throughout the code. The specific locations are determined by the random selection of a ``sister'' field. Where ever assignments are made to the sister field an assignment to the bogus field also occurs.
+
+The directory contains the following files:
+   AddBogusFields.java  -- The obfuscator
+   doc directory: help.HTML file

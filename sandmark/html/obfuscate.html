@@ -1,0 +1,46 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+	<TITLE>Collusion-resistance by Obfuscation in SandMark</TITLE>
+</HEAD>
+<!--<BODY BACKGROUND="sand.jpg" BGCOLOR="#E6D1B4"
+TEXT="#221100" LINK="#884400" ALINK="#EE7700" VLINK="#442200">-->
+<BGCOLOR="#FFFFFF"
+TEXT="#221100" LINK="#884400" ALINK="#EE7700" VLINK="#442200">
+
+<center>
+<img src="obfuscate.gif">
+</center>
+
+<H1>Collusion-resistance by Obfuscation in SandMark</H1>
+
+<P> Fingerprinting a program leaves you open to <em> collusive </em>
+attacks. In this figure Sally buys two differently fingerprinted
+copies of Alice's program, compares them for differences, 
+locates the fingerprinting code, and is able to remove the
+fingerprint from one of the copies:
+<center>
+<img src="Collusion.gif">
+</center>
+
+<P> To prevent collusive attacks, SandMark provides
+several types of code obfuscations that will scramble
+a fingerprinted program. This way you can distribute
+two differently fingerprinted copies of your program
+without fear that simple differential attacks will
+reveal the location of the fingerprints:
+
+<center>
+<img src="Obfuscation.gif">
+</center>
+
+<P> The output of the obfuscator is a new watermarked
+jar-file <b>prog<em>-watermark</em>-obf.jar</b>. This
+is the program that you would normally distribute and
+which will serve as input to the recognizer.
+
+<P> Follow these instructions to obfuscate:
+<center>
+<img src="ObfuscateTab.gif">
+</center>
+
+</BODY></HTML>

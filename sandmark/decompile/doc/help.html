@@ -1,0 +1,179 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Decompiling Jar-Files in SandMark</TITLE>
+  </HEAD>
+<BODY>
+
+<H1>Decompiling Jar-Files in SandMark</H1>
+
+<P> You can decompile the bytecode contents of a jar-file from
+    the Decompile pane. You need to provide access to an
+    external decompiler such as SourceAgain or Soot.
+
+<p>
+   You need to provide a program 
+<center>
+      <code> jDecompile <em>jardir</em>  <em>class</em> <em>classpath</em> </code>
+</center>
+in your path. 
+<ul>
+   <li> <em>jardir</em> is the path to a directory into
+        which the jar-file has been unpacked. 
+   <li> <em>class</em> is the fully qualified (as in <code>java.lang.Object</code>) name of
+        the class that should be decompiled. If <em>class</em> is 
+        set to <code>ALLCLASSES</code> the program should return the result of decompiling all
+        classes in <em>jardir</em>.
+   <li> <em>classpath</em> is a colon-separated list of classes or jar-files
+         on which the class depends.
+</ul>
+<p>
+For example, <code> jDecompile </code> might be called like
+this:
+<pre>
+   > jDecompile /tmp/smkCFC94620 myprogram.mypackage.MyClass
+   > jDecompile /tmp/smkCFC94620 ALLCLASSES
+   > jDecompile /tmp/smkCFC94620 TTTApplication sandmark.jar
+   > jDecompile /tmp/smkCFC94620 ALLCLASSES sandmark.jar
+</pre>
+<P>
+
+<h2> Using the SourceAgain Decompiler </h2>
+SourceAgain can be purchased from <a href="http://www.ahpah.com">
+www.ahpah.com </a>.
+<p>
+Here is an example <code>jDecompile</code> script that works for the 
+SourceAgain decompiler running under Unix:
+
+<hr>
+<pre>
+#!/bin/csh -f
+
+set jarPath = $1
+set className = $2
+set classPath = $3
+
+set JDK = /cs/linux/j2sdk1.4.2_02                # FIX THIS PATH!
+set RT  = $JDK/jre/lib/rt.jar
+
+set CFG  = /home/collberg/share/SourceAgain.cfg  # FIX THIS PATH!
+set SA   = /home/collberg/bin/srcagain           # FIX THIS PATH!
+
+if ($classPath != "") then
+   set CP = {$RT}:{$jarPath}:{$classPath}
+else
+   set CP = {$RT}:{$jarPath}
+endif
+
+set CMD  = "$SA -name $CFG -ilocal -topdecl -tabwidth 3 -i $CP"
+
+if ($className == "ALLCLASSES") then
+   foreach i (`find $jarPath -name \*.class`)
+      echo "-------------------- " $i
+      $CMD $i
+      echo
+   end
+else
+   $CMD $className
+endif
+
+exit 0
+</pre>
+<hr>
+<p>
+<code>SourceAgain.cfg</code> is SourceAgain's configuration file.
+It could look like this:
+<hr>
+<pre>
+int:			i j k l m n o p i#
+smNode:			A B C D E F G A#
+long:			l#
+float:			f#
+double:			d# 
+char: 			c#
+byte:			by#
+boolean:		b#
+short:			sh#
+java.lang.Object:	o#
+java.lang.String:	S T U V S#
+java.lang.Integer:	I J K L M N O P I#
+#array:			prefix a
+#temp:			prefix t
+#default:		short lower @
+</pre>
+<hr>
+
+<P>
+<h2> Using the Soot Decompiler </h2>
+The <code> soot </code> decompiler can be downloaded
+from <a href="http://www.sable.mcgill.ca/soot">
+http://www.sable.mcgill.ca/soot </a>.
+<p>
+Here is an example script that works for Soot
+running under Unix:
+<p>
+<hr>
+<pre>
+#!/bin/csh -f
+
+set jarPath = $1
+set className = $2
+set classPath = $3
+
+set JDK = /cs/linux/j2sdk1.4.2_02             # FIX THIS PATH!
+set RT  = $JDK/jre/lib/rt.jar
+
+set SOOT = /home/collberg/smark/smextern3     # FIX THIS PATH!
+set SOOTCP = $SOOT/soot.jar:$SOOT/jasmin.jar
+
+set TMP = $jarPath/SOOT-RESULT
+
+set CMD  = "$JDK/bin/java -classpath $SOOTCP soot.Main -f dava -soot-classpath $JDK/jre/lib/rt.jar:$jarPath/:$classPath -d $jarPath"
+
+if ($className == "ALLCLASSES") then
+   set XCMD = "$CMD -process-dir $jarPath"
+else
+   set XCMD = "$CMD $className"
+endif
+
+$XCMD >&! $TMP
+
+grep Exception $TMP > /dev/null
+if ($status == 0) then
+   echo "Executing Soot failed."
+   cat $TMP
+   exit
+endif
+
+foreach out (`grep "Generating" $TMP | sed 's/Generating//g;s/\.\.\.//g' `)
+   cat $out
+   echo "---------------------------"
+end
+</pre>
+<hr>
+
+<h2>Example</h2>
+Below is a view of SandMark decompiling the <code>TTT</code> application found
+<a href="sandmark/watermark/ct/doc/annotate.html"> here </a>.
+Note that <code>sandmark.jar</code> has been included on the class
+path since <code>TTT</code> calls annotation methods from
+the <code>sandmark.watermark.ct.trace.Annotate</code> class.
+<center>
+<img src="decompile.jpg">
+</center>
+</BODY></HTML>

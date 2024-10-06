@@ -1,0 +1,31 @@
+\algorithm{The RenameMethodsFields Watermarking Algorithm}%
+          {Martin Stepp and Kelly Heffner}
+
+\section{Introduction}
+This is an algorithm that embeds a watermark into a Java program by 
+modifying the names of different methods within the program.
+The code of this algorithm
+resides in \url{sandmark.watermark.RenameMethodsFields}.
+
+
+\section{Embedding}
+To embed the watermark we first generate a list of all of the method
+equivalence classes.  Two methods are in the same equivalence class
+if one method overrides the other.  This list does not contain any 
+special methods (overriden from Java, constructors, static initializers, 
+etc.)  From there, each letter of the watermark is appended on to a
+method name using a  random number generator (with a particular seed which
+remains constant between embedding and recognition) to pick which
+method to use next.  In the event that one method is used twice in order
+to embed the watermark, the letters of the watermark will be added in a
+LIFO (Last In First Out) order.  A delimeter \$ is used to mark the end of
+the watermark.  
+
+
+\section{Recognition}
+During recognition we generate the same list of equivalence classes as
+in the embedding process, and use the same seed for the random number
+generator in order to rescan the methods, and reconstruct the watermark.
+
+
+

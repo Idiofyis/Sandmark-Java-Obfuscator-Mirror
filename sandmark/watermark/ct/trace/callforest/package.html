@@ -1,0 +1,21 @@
+<body>
+
+This package takes a list <code>TracePoint.java</code>-objects
+and turns it into a forest of call-graphs. This
+graph is used to locate suitable <code>mark()</code>-locations.
+
+<UL>
+   <LI> <code>Forest.java</code> is the main class that constructs
+        the call forest.
+   <LI> <code>Build.java</code> builds the structure of the call
+        graphs.
+   <LI> <code>Decorate.java</code> adds weights to the call graph
+        nodes and edges.
+   <LI> <code>Edge.java</code> represents a call-graph edge.
+   <LI> <code>Node.java</code> represents a call-graph node.
+   <LI> <code>CallFrame.java</code> is just used internally.
+   <LI> <code>Test.java</code> does some rudimentary testing
+        of the package.
+</UL>
+
+</body>

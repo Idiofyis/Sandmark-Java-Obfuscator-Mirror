@@ -1,0 +1,66 @@
+\algorithm{Bogus Predicates  Obfuscating Algorithm}%
+          {Ashok Purushotham , RathnaPrabhu Rajendran}
+
+\section{Introduction}
+This is an algorithm that implements simple boolean identities  and add them to the user's code . The code of this algorithm resides in \url{sandmark.obfuscate.BogusPredicates}.
+
+
+\section{Apply}
+Our aim is to embed opaquely true constructs which must be stealthy . So we have selected some constructs based on algebraic properties and known facts in mathematics .For example ,we know for all x,y in I, (7(y X y) - 1) is not equal to (x X x) . A list of all the available constructs is maintained .At run time ,whenever we encounter a conditional expression ,we
+randomly select one among these to append to the current expression .Since the expression that we add is opaquely true,but the reverse engineer has to try out many inputs to find that this added expression is indeed opaquely true,if he isn't aware of mathematical properties .
+For example ,the original method and its transformation on applying bogusPredicates Algorithm:
+\begin{listing}{3}
+main(){
+ int a=10;
+ int b=20;
+ if(a<30)
+   b=a+99;
+
+}
+
+main(){
+ int a=10;
+ int b=20;
+ int c;
+ if(a<30 && c(c+1)%2 ==0)
+   b=a+99; 
+}
+
+\end{listing}
+
+The original byte code in a conditional expression was
+\begin{listing}{1}
+  iload_1
+  bipush 7
+  if_icmpne 29
+\end{listing} 
+The new added byte code as a result of our algorithm is 
+\begin{listing}{2}
+  iload_1
+  bipush 7
+  if_icmpne 29
+  iload_3
+  dup
+  iconst_1
+  iadd
+  imul
+  iconst_2
+  irem
+  iconst_0
+  if_icmpne 29
+\end{listing} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

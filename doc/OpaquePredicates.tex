@@ -1,0 +1,85 @@
+\algorithm{OpaquePredicate Library}%
+	  {Ashok P. Ramasamy Venkatraj}
+
+\section{Introduction}
+We have an OpaquePredicate library in the sandmark.util.opaquepredicatelib 
+package which will help us in constructing OpaquePredicates.
+
+Current Versions available for usage by Obfuscation algorithms are 
+\begin{itemize}
+	\item Algebraic Predicates, 
+	\item RuntimeInteger OpaquePredicates, 
+	\item RuntimeString OpaquePredicates, 
+	\item RuntimeIsNull OpaquePredicates, and 
+	\item DynamicStructure OpaquePredicates.
+\end{itemize}
+
+Future Versions will include 
+\begin{itemize}
+	\item Thread Contention based OpaquePredicates.
+	\item A wider variety of the currently available versions, so that no Opaque
+	Predicates are repeated while obfuscating an application.
+	\item New Obfuscation algorithms which integrate OpaquePredicate insertions
+	into their implementations.
+\end{itemize}
+
+The library consists of the following :
+\section{OpaqueManager} 
+The OpaqueManager class encapsulates the various OpaquePredicate libraries. 
+This class forms an interface between the user and the detailed low level 
+implementation of the various opaque predicates. 
+
+\section{Algebraic Predicates - Tapas R.Sahoo}
+	Embeds stealthy opaquely true constructs based on algebraic properties 
+and known facts in mathematics .For example, we know for all x, y in Integer, 
+\begin{itemize}
+   \item $( (7(y^{2}) - 1) != (x^{2}) )$
+   \item $((x(x+1)) mod 2 == 0)$
+\end{itemize} 
+are opaquely true.
+
+
+\section{RuntimeInteger OpaquePredicates}
+	Creates run time deterministic predicates at the requested bytecode 
+position, bcp of a Basic Block within the CFG of a method. For eg., if x is an 
+integer variable passed as parameter to a method, $(x {>,<,>=,<=,==,!=} Randomint)$ 
+is inserted at bcp.
+
+\section{RuntimeString OpaquePredicates}
+	 Similarly creates runtime deterministic predicates. To create a String 
+OpaquePredicate ,for eg. ,if x is a string variable passed as parameter to some 
+method then $(x.length \{ >,<,>=,<=,==,!=\} random int value)$ is inserted
+
+\section{RuntimeIsNull OpaquePredicates}
+	Used to create a (? null) OpaquePredicate. for example ,if x is an object 
+passed as method parameter, then at the requested bytecode position bcp, in the 
+method, (x \{==,!=\} null) is inserted.
+
+\section{DynamicStructure OpaquePredicates}
+	The basic technique used in the construction of the above is as follows:
+\begin{itemize}
+\item Add to the obfuscated application code which builds a set of complex dynamic 
+structures S1,S2... (At present, we have one set)
+
+\item Keep a set of pointers to these structures.
+
+\item Based on requests by user to generate a specific type of Predicate,(i.e.) opaquely 
+true/false or non-deterministic, do some operations on structures like Merging/ 
+Splitting Node Groups, Inserting nodes, Moving node pointers, but maintaining certain 
+invariants used in the construction of these OpaquePredicates such as 'pointers p,q 
+will never refer to the same memory'  and so on.
+\end{itemize}
+
+\section{How to use package}
+     There are two steps involved.
+\begin{itemize}
+  \item Create an instance of OpaqueManager class , with 2 parameters 
+     \begin{itemize}
+       \item The methodGen of the method in which you would like to implant an OpaquePredicate
+       \item The classFileCollection instance from which the method was extracted and ,to which 
+	     the changed methodgen should be saved back  
+     \end{itemize}
+   \item  use the BuildXPredicate, where X is the OpaquePredicate type available. The parameters
+          to be given as input are specified in detail by the API documentation.
+\end{itemize}
+

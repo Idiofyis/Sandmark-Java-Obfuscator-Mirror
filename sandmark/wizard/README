@@ -1,0 +1,49 @@
+README
+
+This README contains information about the quick protect wizard
+infrastructure, in particular information about using DFA to model
+the protection of the sandmark objects.
+
+Classes that extend QuickProtect contain a run method that takes an 
+AlgorithmProvider and ObjectProvider.  The AlgorithmProvider supplies 
+the list of sandmark protection algorithms and the ObjectProvider 
+supplies the sandmark objects to protect (i.e. applications, classes,
+methods).
+
+The run method typically utilizes three classes.  A Model, a Strategy
+and a Evaluator.  The Strategy has a reference to a Model and a
+Evaluator.  The Strategy then chooses how to protect the objects from
+the ObjectProvider using algorithms from the AlgorithmProvider and choosing
+from the choices provided by the model it is using.  This is done in the 
+step() method of the Strategy, which is typically called in the run method 
+of the QuickProtect class.  The Model also has a reference to the Evaluator.
+
+The DFAModel uses a deterministic finite automata to model the protection
+of the sandmark objects, with the start state being the unprotected
+program and each edge representing a Choice representing algorithms to
+run next.  At each step of the Model tells the Strategy the Choices
+and the Strategy then runs a Choice (using a ChoiceRunner object).  The
+DFAModel is interesting because one can visualize the steps of protection.
+
+Currently when I try use the DFAModel I have the problem that there is only
+one state in the DFAModel.  The DFA is created in DFA.createDFA.  First the
+restrictions for each algorithm are figured out (i.e. post prohibits, pre
+prohibits, prerequistes, postrequisite) and used to construct DFA's.  The
+intersect of the DFA's is taken as the DFA model.  I am not sure why only
+one state is constructed.  One problem may be that I have only run this
+only smaller applications.  When I run on larger applications I have the
+problem of the DFA.createDFA taking too long to finish.  The problem is
+the PreprohoibitDFA writes a dot file, using DFA.dotInFile.  This calles
+DFA.toDot that takes very long to finish.  I believe the bottleneck is
+here:
+
+228   java.util.Iterator edgeItr = edge2label.entrySet().iterator();
+229   while(edgeItr.hasNext()){
+230     java.util.Map.Entry edge = (java.util.Map.Entry)edgeItr.next();
+231     retVal += "             " + edge.getKey().toString() + "[ label=\"" + edge.getValue() + "\"];\n";
+232   }
+
+Note:  To try DFAModel I change the Model used in AllAlgsOnce quick protect to
+use DFAModel instead of LazyDFAModel.  This could possibly be the problem too,
+but I do not think it should be a problem to use the AllAlgsOnce Strategy with
+the DFAModel.

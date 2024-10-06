@@ -1,0 +1,103 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      PRE {margin-left:3cm}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>ConstantPool Reordering Obfuscation</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>ConstantPool Reordering Obfuscation</H1>
+    <H2>Author</H2>
+    <P>
+      Ashok Purushotham Ramasamy Venkatraj
+      (<A HREF="mailto:ashok@cs.arizona.edu">ashok@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      The reason we are implementing this algorithm is that after the reverse
+      engineer gets the watermarked and the original jar file, not only the
+      watermark be embedded in the jar file, but also some other useful
+      obfuscations should be done to confuse the reverse engineer about what
+      exactly the watermarking algorithm does. One among these obfuscations is
+      ConstantPool Reordering. CPReorderer reorders the constants in the
+      constantpool and assigns random indices to them. The constants are
+      randomly assigned some unique index within the length of constantpool,
+      and changes should also be made to reflect the recursive indices within
+      a particular constant pool index. There is no change in code as a result
+      of this obfuscation. Only those bytecode statements which use constant
+      pool references, those references should be modified according to the
+      new random assignment.
+    </P>
+    <H2>Example</H2>
+    <P>
+      Original ConstantPool:
+    </P>
+    <PRE>
+[1]: CONSTANT_Utf8[1]("F")
+[2]: CONSTANT_Utf8[1]("java/lang/Object")
+[3]: CONSTANT_Utf8[1]("(LRc;)LRc;")
+[4]: CONSTANT_Utf8[1]("(LRa;)I")
+[5]: CONSTANT_Utf8[1]("(LRg;)I")
+[6]: CONSTANT_Utf8[1]("a")
+[7]: CONSTANT_Utf8[1]("b")
+[8]: CONSTANT_Utf8[1]("c")
+[9]: CONSTANT_Utf8[1]("d")
+[10]: CONSTANT_Utf8[1]("()V")
+[11]: CONSTANT_Utf8[1]("&lt;init>")
+[12]: CONSTANT_Utf8[1]("(I)LRb;")
+[13]: CONSTANT_Utf8[1]("Code")
+[14]: CONSTANT_Class[7](name_index = 2)
+[15]: CONSTANT_Class[7](name_index = 1)
+[16]: CONSTANT_NameAndType[12](name_index = 11, signature_index = 10)
+[17]: CONSTANT_Methodref[10](class_index = 14, name_and_type_index = 16)
+    </PRE>
+    <P>
+      After random assignment:<BR>
+      {17=6, 16=8, 15=15, 14=14, 13=9, 12=5, 11=17, 10=13, 9=12, 8=1, 7=11,
+      6=10, 5=7, 4=3, 3=4, 2=16, 1=2, 0=0}
+    </P>
+    <P>
+      New Constant Pool:
+    </P>
+    <PRE>
+[1] CONSTANT_Utf8[1]("c")
+[2] CONSTANT_Utf8[1]("F")
+[3] CONSTANT_Utf8[1]("(LRa;)I")
+[4] CONSTANT_Utf8[1]("(LRc;)LRc;")
+[5] CONSTANT_Utf8[1]("(I)LRb;")
+[6] CONSTANT_Methodref[10](class_index = 14, name_and_type_index = 8)
+[7] CONSTANT_Utf8[1]("(LRg;)I")
+[8] CONSTANT_NameAndType[12](name_index = 17, signature_index = 13)
+[9] CONSTANT_Utf8[1]("Code")
+[10] CONSTANT_Utf8[1]("a")
+[11] CONSTANT_Utf8[1]("b")
+[12] CONSTANT_Utf8[1]("d")
+[13] CONSTANT_Utf8[1]("()V")
+[14] CONSTANT_Class[7](name_index = 16)
+[15] CONSTANT_Class[7](name_index = 2)
+[16] CONSTANT_Utf8[1]("java/lang/Object")
+[17] CONSTANT_Utf8[1]("&lt;init>")
+</PRE>
+    <H2>Configuration</H2>
+    <P>
+      There are no extra configuration parameters necessary to run this
+      obfuscator.
+    </P>
+    <H2>References</H2>
+    <BR>
+  </BODY>
+</HTML>

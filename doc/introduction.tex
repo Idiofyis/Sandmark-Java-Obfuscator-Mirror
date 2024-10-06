@@ -1,0 +1,68 @@
+\section{Introduction}
+\SM\ is designed to be the Swiss-Army-Chainsaw of 
+software protection research. In other words, we
+hope to build an infrastructure that makes it
+easy to implement algorithms for
+\begin{enumerate}
+   \item code obfuscation,
+   \item softeware watermarking, and
+   \item tamper-proofing.
+\end{enumerate}
+In fact, we hope to implement {\em every} 
+software protection algorithm know to man, so 
+that we can compare and evaluate them.
+
+You normally interact with sandmark through its
+graphical interface. Start it by typing
+{\tt make run} in the \url{smark3} directory:
+\begin{center}
+\scalebox{0.7}{\includegraphics{PS/main.ps}}
+\end{center}
+
+
+\subsection{Trying out the Watermarker}
+
+To get started try watermarking the {\tt TTT}
+(tic-tac-toe) application. It can be found in
+the {\tt smapps2} directory. Start \SM, then 
+do the following:
+\begin{enumerate}
+   \item In the {\em trace} pane enter
+         \begin{description}
+            \item[Jar-file to watermark:] {\tt TTT.jar}
+            \item[Main class name:]       {\tt TTTApplication}
+         \end{description}
+   \item Hit \fbox{START}.
+   \item Click on a few X's and O's. Remember the order
+         in which you do the clicks! It should look
+         something like this:
+         \begin{center}
+            \scalebox{0.7}{\includegraphics{PS/trace.ps}}
+         \end{center}
+   \item Hit \fbox{DONE}.
+   \item Go to the {\em embed} pane and enter the watermark value {\tt 123456},
+         like this:
+         \begin{center}
+            \scalebox{0.7}{\includegraphics{PS/embed.ps}}
+         \end{center}
+   \item Hit \fbox{EMBED}.
+   \item Go to the {\em recognize} pane and hit the \fbox{START} button.
+   \item Click on the same X's and O's as you did in step 3),
+      in the same order.
+   \item Hit \fbox{DONE}:
+         \begin{center}
+            \scalebox{0.7}{\includegraphics{PS/recognize.ps}}
+         \end{center}
+         You should see the watermark {\tt 123456} extracted from the 
+         watermarked {\tt TTT} application.
+\end{enumerate}
+
+You can also try
+\begin{verbatim}
+    > smark -f ../smapps2/TTT.script
+\end{verbatim}
+This will run a script that traces, embeds, and
+recognizes a watermark in the TTT application.
+You still have to enter the X's and O's and
+hit the \fbox{DONE} buttons in the trace and recognize
+panes.

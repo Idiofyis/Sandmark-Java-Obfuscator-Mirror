@@ -1,0 +1,213 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+	<TITLE>Annotating in SandMark</TITLE>
+</HEAD>
+<HTML><HEAD>
+	<TITLE>Annotating in SandMark</TITLE>
+</HEAD>
+
+<H1>Annotating Programs in the CT Algorithm</H1>
+Annotations identify the points in a program where the watermarker
+can insert additional code.
+
+<P>Annotations take the form of extra method calls added to the source
+code.  At execution time, these methods write messages to a tracing log.
+
+<P>One execution sequence, as defined by a specific sequence of input
+actions, is chosen by the program author to trigger recognition of the
+watermark.  This is the "recognition sequence", and the corresponding
+path through the code is the "recognition path".
+
+<P>The watermarking process generates special code that replaces the
+annotation calls.  This code has no effect except to manipulate
+internal data structures that are otherwise unused.
+
+<h2> Example </h2>
+Below is an example program, TTT.java which has been annotated
+with calls to <b>sandmark.watermark.ct.trace.Annotator.sm$mark(*)</b>.
+
+<PRE>
+import java.awt.*;       
+import java.awt.event.*; 
+
+public class TTT extends Frame {   
+  Label lab = new Label("Tic-Tac-Toe", Label.CENTER ); 
+  Panel pan = new Panel();
+  Button [] sq = new Button [ 9 ];
+  Panel south = new Panel();            
+  Button quit = new Button("Exit");     
+  Button reload = new Button("Reload"); 
+  int ply = 2; 
+
+  public void start() {
+    for ( int p = 0; p < 9; p ++ ) { 
+      sq[ p ] = new Button( "." );                       
+      sq[ p ].setActionCommand( Integer.toString( p ) ); 
+                                                         
+      sq[ p ].addActionListener( new ActionListener() {  
+        public void actionPerformed( ActionEvent e ) {   
+          int b = new Integer( e.getActionCommand() ).intValue(); 
+          move( b );                                     
+        }
+      } );
+      pan.add( sq[ p ] );                                
+    }      
+  }
+
+  public void init() {
+    sandmark.watermark.ct.trace.Annotator.sm$mark();
+    setBackground( Color.green );                 
+    setForeground( Color.yellow );                
+    setFont( new Font("SansSerif", Font.BOLD, 60 ) ); 
+    setSize( 360, 360 );                          
+    setLayout( new BorderLayout() );              
+    addWindowListener( new WindowAdapter() {       
+      public void windowClosing( WindowEvent e ){  
+        dispose();                                 
+        System.exit( 0 );                          
+      }                                            
+    } );                                           
+    add ( "North",  lab );
+    add ( "Center", pan );
+    pan.setLayout( new GridLayout( 3, 3 ) );
+    sandmark.watermark.ct.trace.Annotator.sm$mark();
+    south.setLayout( new FlowLayout() );       
+                                               
+
+    quit.addActionListener( new ActionListener() {    
+      public void actionPerformed( ActionEvent e ) {  
+        dispose();                                    
+        System.exit( 0 );                             
+      }                                               
+    } );                                              
+    reload.addActionListener( new ActionListener() {  
+      public void actionPerformed( ActionEvent e ) {  
+        clear();                                      
+      }                                               
+    } );                                              
+    add( "South", south );                            
+    south.add( quit );                                
+    south.add( reload );                              
+  }
+
+  public static void main( String[] args ) {          
+    TTT ttt = new TTT();        
+    ttt.init();                                       
+    ttt.start();                                      
+    ttt.pack();                                       
+    ttt.show();                                       
+  }                                                   
+                                                      
+  public void clear() {                               
+    setForeground( Color.yellow );                    
+    for ( int p = 0; p < 9; p ++ )                    
+      sq[ p ].setLabel( "." );                        
+    sandmark.watermark.ct.trace.Annotator.sm$mark();
+    lab.setText("Tic-Tac-Toe");                       
+  }                                                   
+
+  public void move( int b ) {                         
+    if ( !hit() && free() ) {                       
+      ply = ( ply == 2 )? 1 : 2;                    
+      sandmark.watermark.ct.trace.Annotator.sm$mark(ply);
+      mark( b );                                    
+      if ( hit() ) { setForeground( Color.blue );   
+      lab.setText ("Player " + ply + " won!");      
+      }
+    }
+    else {                                          
+      if ( free() ) setForeground( Color.magenta );
+      else          setForeground( Color.red );
+      lab.setText ("Reload game!");
+    }
+  }
+
+  public boolean free() {                           
+     boolean f = false;
+     for( int b = 0; b < 9; b++ ) 
+        if  ( sq[ b ].getLabel() == "." ) f = true;
+     return f;
+  }
+
+  public boolean hit() {                           
+    boolean hit = singleHit(0,4,8) | singleHit(2,4,6);
+    for(int p = 0; p<3; p++) hit |= singleHit(p,p+3,p+6);
+    for(int p = 0; p<9; p+=3) hit |= singleHit(p,p+1,p+2);
+    return hit; 
+  }  
+
+  public void mark( int b ) {                      
+    if ( sq[ b ].getLabel() == "." ) {
+      if ( ply == 1 ) 
+        sq[ b ].setLabel( "X" );
+      else 
+        sq[ b ].setLabel( "O" ); 
+      sandmark.watermark.ct.trace.Annotator.sm$mark(b);
+    }
+  } 
+
+  private boolean singleHit( int b1, int b2, int b3 ) {  
+    return ( ( sq[ b1 ].getLabel() != "." ) &&
+             ( sq[ b1 ].getLabel() == sq[ b2 ].getLabel() ) &&
+             ( sq[ b1 ].getLabel() == sq[ b3 ].getLabel() ) );
+  } 
+}
+</PRE>
+
+This program should be compiled and packaged into a jar-file,
+and then traced from SandMark's tracing pane:
+<center>
+<img src="tracing-screenshot.jpg">
+</center>
+
+<H2>Where to Annotate</H2>
+
+<P>A number of annotation points should be scattered along the
+recognition path.  As the number of points increases, the amount
+of code added at each point decreases.  (It's not at all clear
+what the best tradeoff is in terms of stealth.)
+
+<P>Annotation points should not be placed at performance-critical
+points, because the added code will slow things down.
+
+<P>Annotation points should be placed where only the input (and not
+the environment or other random factors) controls whether the
+points are reached.  For example, no annotation point should be
+placed on a code path that is conditionalized on having (or lacking)
+a particular type of network connection.
+
+<P>Annotation points can pass a string or numeric value, in which case
+the value is referenced by the generated code.  This further muddles
+analysis and makes watermark recognition dependent on the correct
+values.
+
+<p>
+These annotation calls can be made by the application:
+<PRE>
+sandmark.watermark.ct.trace.Annotator.sm$mark()
+	marks an annotation point with no parameters
+
+sandmark.watermark.ct.trace.Annotator.sm$mark(String s)
+	marks an annotation point parameterized by a string value
+
+sandmark.watermark.ct.trace.Annotator.sm$mark(long v)
+	marks an annotation point parameterized by a char, byte,
+	short, int, or long value
+</PRE>
+
+</BODY></HTML>

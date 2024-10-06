@@ -1,0 +1,101 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: packimports(3) 
+// Source File Name:   TTTApplication.java
+
+import java.awt.*;
+import java.awt.event.*;
+import sandmark.trace.Annotator;
+
+public class TTTApplication2 extends TTTApplication1
+{
+
+    public TTTApplication2()
+    {
+        lab = new Label("Tic-Tac-Toe", 1);
+        pan = new Panel();
+        sq = new Button[9];
+        south = new Panel();
+        quit = new Button("Exit");
+        reload = new Button("Reload");
+        ply = 2;
+    }
+
+    public boolean hit()
+    {
+        boolean flag = singleHit(0, 4, 8) | singleHit(2, 4, 6);
+        for(int i = 0; i < 3; i++)
+            flag |= singleHit(i, i + 3, i + 6);
+
+        for(int j = 0; j < 9; j += 3)
+            flag |= singleHit(j, j + 1, j + 2);
+
+        return flag;
+    }
+
+    // Unreferenced inner class TTTApplication$1
+
+/* anonymous class */
+    class TTTApplication._cls1
+        implements ActionListener
+    {
+
+        public void actionPerformed(ActionEvent actionevent)
+        {
+            int i = (new Integer(actionevent.getActionCommand())).intValue();
+            move(i);
+        }
+
+    }
+
+
+    // Unreferenced inner class TTTApplication$2
+
+/* anonymous class */
+    class TTTApplication._cls2 extends TTTApplication._cls20
+    {
+
+        public void windowClosing(WindowEvent windowevent)
+        {
+            dispose();
+            System.exit(0);
+        }
+
+            
+            {
+                this$0 = final_tttapplication;
+            }
+    }
+
+
+    // Unreferenced inner class TTTApplication$3
+
+/* anonymous class */
+    class TTTApplication._cls3
+        implements ActionListener
+    {
+
+        public void actionPerformed(ActionEvent actionevent)
+        {
+            dispose();
+            System.exit(0);
+        }
+
+    }
+
+
+    // Unreferenced inner class TTTApplication$4
+
+/* anonymous class */
+    class TTTApplication._cls4
+        implements ActionListener
+    {
+
+        public void actionPerformed(ActionEvent actionevent)
+        {
+            clear();
+        }
+
+    }
+
+}

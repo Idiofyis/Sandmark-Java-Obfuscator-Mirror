@@ -1,0 +1,76 @@
+#!/usr/bin/perl -w
+$body = "\<body\>";
+$endbody = "\<\/body\>";
+$beginItem = "\\begin\{itemize\} \n";
+$endItem = "\\end\{itemize\} \n";
+$item = "\\item ";
+$begintextformat = "\\texttt\{";
+$endtextformat = "\}";
+$file = "packageSummary.tex";
+$list = "package-list";
+$newlist = "new-package-list";
+#system("cp package-list $list"); need to add a
+#recursive traversal of the directories looking for package.html files.
+
+#need to replace all of the . with / in package-list
+open(LIST, "$list");
+open(NEWLIST, "> $newlist");
+while($directory = <LIST>){
+	chomp $directory;
+	$directory =~ s/\./\//g;
+	print NEWLIST "$directory \n";
+}
+close(NEWLIST);
+close(LIST);
+
+system("rm $file");
+open(PACKAGE, "> $file") || die "Can't write to $file: error $!\n";
+print PACKAGE "\\section\{\\SM\\ Packages} \n";
+print PACKAGE "\\SM\\ is a large application. Currently it is made
+up of some 80000 lines of java code distributed over
+200 classes. The code is organized in a fairly deep 
+package hierarchy. \\\\ \n";
+print PACKAGE "\\begin\{description\}\n";
+open(NEWLIST, "$newlist");
+open(LIST, "$list");
+while($fileName = <NEWLIST>){
+	$packageName = <LIST>;
+	chomp $packageName;
+	chomp $fileName;
+	chop($fileName);
+
+	print PACKAGE "\\item\[$packageName \:\]";
+	open(PROC1, "pwd|");
+	while(<PROC1>){
+		$dir = $_
+
+	}
+	$dir =~ s/\/doc//g;
+	$dir =~ s/\/.automount//g;
+	chomp $dir;
+	close(PROC1);
+   $packageLocation = $dir.'/'.$fileName.'/package.html';
+	if(!(-e "$packageLocation")){
+		print PACKAGE "\\hfill \\\\ \n";
+	}else{
+		open(SUMMARY, "$packageLocation");
+		while($line = <SUMMARY>){
+			chomp $line;
+			if($line ne $body){
+				if($line ne $endbody){
+				$line =~ s/<UL>/$beginItem/g;
+				$line =~ s/<\/UL>/$endItem/g;
+				$line =~ s/<LI>/$item/g;
+				$line =~ s/<code>/$begintextformat/g;
+				$line =~ s/<\/code>/$endtextformat/g;
+				print PACKAGE "$line \n";
+				}
+			}
+		}
+		close(SUMMARY);
+	}
+}	
+close(NEWLIST);
+close(LIST);
+print PACKAGE "\\end\{description\}\n";
+close(PACKAGE);

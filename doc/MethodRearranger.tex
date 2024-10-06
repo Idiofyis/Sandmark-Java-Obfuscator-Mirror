@@ -1,0 +1,13 @@
+MethodRearranger is a static obfuscation algorithm that moves
+all of the static methods that it can into their own class.
+Only static methods that do not rely on private information within
+its residing class can be moved.
+
+The MethodRearranger works as follows:
+\begin{enumerate}
+\item A list of movable methods is collected, and those methods
+are moved into MasterStaticClass.
+\item Constant pool references within each moved method are updated.
+\item Constant pool references for the method calls for those methods
+are updated to reference the new class.
+\end{enumerate}

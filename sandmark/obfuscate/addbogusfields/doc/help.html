@@ -1,0 +1,65 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Add Bogus Fields Obfuscation Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Add Bogus Fields Obfuscation Algorithm</H1>
+    <H2>Authors</H2>
+    <P>
+      Ginger Myles
+      (<a href="mailto:mylesg@cs.arizona.edu">mylesg@cs.arizona.edu</a>)<BR>
+      Miriam Miklofsky
+      (<a href="mailto:miriamm@cs.arizona.edu">miriamm@cs.arizona.edu</a>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      This algorithm obfuscates a class. The obfuscation is done by inserting
+      a bogus field into a class and then making assignments to that field in
+      specific locations throughout the code. The specific locations are
+      determined by the random selection of a "sister" field. Wherever
+      assignments are made to the sister field an assignment to the bogus
+      field also occurs.
+    </P>
+    <P>
+      To obfuscate the code a new field in added to the class and then
+      assignments are made to this field. The way the obfuscation works is
+      that a "sister" field is identified which is used to insert an
+      assignment to the new field. The sister field is chosen randomly.
+      Everytime there is an assignment to the sister field an assignment to
+      the new field is inserted into the code.
+    </P>
+    <PRE>
+        newFieldName = "sm$" + i
+        sisterFieldIndex = randomNumberGen() % fields.length
+        insert newFieldName in the class
+        for (each method in class){
+           search instruction list for assignment to sisterField
+           insert assignment to newField
+        }
+    </PRE>
+    <H2>Example</H2>
+    <H2>Configuration</H2>
+    <P>
+      There are no extra configuration parameters necessary to run this
+      obfuscator.
+    </P>
+    <H2>References</H2>
+    <BR>
+  </BODY>
+</HTML>

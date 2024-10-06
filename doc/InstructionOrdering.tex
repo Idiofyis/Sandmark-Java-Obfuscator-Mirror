@@ -1,0 +1,76 @@
+\algorithm{InstructionOrdering  Obfuscation Algorithm}%
+          {Kamlesh Kantilal}
+
+\section{Introduction}
+This is an algorithm that tries to reorder the instructions within each basic block of a method. The code of this algorithm resides in \url{sandmark.obfuscate.instructionordering}.
+
+\section{Apply}
+The algorithm is as follows. First it creates a list of expression trees within each block. This expression trees are obtained by using the ExprTree class which resides in \url{sandmark.util.exprtree}.
+Next it has to create a dependency graph for the expression trees within each block. An expression tree is dependent on another expression tree if there is a WAW, WAR or RAW hazard. 
+Once the dependency graph is obtained it writes out the instruction by doing a topological sort of the nodes in the dependency graph. 
+
+The original byte code was
+\begin{enumerate}
+ \item  /  0 bipush 100
+ \item  /  2 istore 1
+ \item  /  3 sipush 10000
+ \item  /  6 istore 2
+ \item  /  7 lconst 1
+ \item  /  8 lstore 3
+ \item  /  9 ldc2_w #2 
+ \item  / 12 lstore 5
+ \item  / 14 ldc2_w #4 
+ \item  / 17 dstore 7
+ \item  / 19 bipush 24
+ \item  / 21 iload 2
+ \item  / 22 imul
+ \item  / 23 istore 1
+ \item  / 24 iconst 3
+ \item  / 25 iload 1
+ \item  / 26 imul
+ \item  / 27 i2l
+ \item  / 28 lload 3
+ \item  / 29 lmul
+ \item  / 30 l2i
+ \item  / 31 istore 2
+ \item  / 32 return
+ \item / The reordered byte code as a result of our algorithm is 
+ \item  /  0 ldc2_w #4 
+ \item  /  3 dstore 7
+ \item  /  5 ldc2_w #2 
+ \item  /  8 lstore 5
+ \item  / 10 lconst 1
+ \item  / 11 lstore 3
+ \item  / 12 sipush 10000
+ \item  / 15 istore 2
+ \item  / 16 bipush 100
+ \item  / 18 istore 1
+ \item  / 19 bipush 24
+ \item  / 21 iload 2
+ \item  / 22 imul
+ \item  / 23 istore 1
+ \item  / 24 iconst 3
+ \item  / 25 iload 1
+ \item  / 26 imul
+ \item  / 27 i2l
+ \item  / 28 lload 3
+ \item  / 29 lmul
+ \item  / 30 l2i
+ \item  / 31 istore 2
+ \item  / 32 return
+\end{enumerate}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,91 @@
+\algorithm{The HatTrick Watermarking Algorithm}%
+          {Danny Mandel and Anna Segurson}
+
+\section{Introduction}
+
+This algorithm embeds a static watermark in a java *.jar file through
+the sandmark interface. It first converts the watermark (which is a String)
+to a number. This number is then encoded into the java byte code by adding
+bogus local variables to one method of one class in the *.jar file. The
+class in which the method is in is marked by a extra field variable that
+contains the name of the method.
+
+Each number of the watermark is mapped to a specific type:
+
+\begin{center}
+\begin{tabular}{| c | c |}
+  \hline
+  Number & Type \\
+  \hline
+  0 & \texttt{java.util.GregorianCalendar} \\
+  \hline
+  1 & \texttt{java.lang.Thread} \\
+  \hline
+  2 & \texttt{java.util.Vector} \\
+  \hline
+  3 & \texttt{java.util.Stack} \\
+  \hline
+  4 & \texttt{java.util.Date} \\
+  \hline
+  5 & \texttt{java.io.InputStream} \\
+  \hline
+  6 & \texttt{java.io.ObjectInputStream} \\
+  \hline
+  7 & \texttt{java.lang.Math} \\
+  \hline
+  8 & \texttt{java.io.OutputStream} \\
+  \hline
+  9 & \texttt{java.lang.String} \\
+  \hline
+\end{tabular}
+\end{center}
+
+\hfill \\
+A local variable of the proper type is created for each digit of the watermark
+and the digit's location in the watermark is stored in the name of the bogus
+local variable. The rightmost digit is position $0$.
+
+
+The code of this algorithm
+resides in \url{sandmark.watermark.hattrick}.
+
+
+\section{Embedding}
+The watermark is embedded in the first non-abstract method found in 
+the first class file
+of the jar file. The name of the method is recorded in the name of a field with
+the value of a hockey player's name. These are the local variables added to
+a class when the watermark ``Howdy!" was embedded:
+\begin{listing}{1}
+   Math yzerman$0 = new Math();
+   String yzerman$1 = new String();
+   ObjectInputStream yzerman$2 = new ObjectInputStream();
+   Stack yzerman$3 = new Stack();
+   InputStream yzerman$4 = new InputStream();
+   Stack yzerman$5 = new Stack();
+   OutputStream yzerman$6 = new OutputStream();
+   InputStream yzerman$7 = new InputStream();
+   InputStream yzerman$8 = new InputStream();
+   OutputStream yzerman$9 = new OutputStream();
+   Thread yzerman$10 = new Thread();
+   Thread yzerman$11 = new Thread();
+   Thread yzerman$12 = new Thread();
+   ObjectInputStream yzerman$13 = new ObjectInputStream();
+   Stack yzerman$14 = new Stack();
+\end{listing}
+This is the field that is added:
+\texttt{public static final String hat<init>Trick = ``Vrbata'';}
+where \texttt{<init>} is the name of the method the watermark is in.
+
+\section{Recognition}
+The watermark is recognized when the proper field is present which stores the
+name of the method. Every local variable that contains the \texttt{SECRET\_NAME}
+in that method is part of the watermark.
+
+In the example listed above \texttt{yzerman} is the secret name. To recover the
+number stored by the \texttt{SECRET\_NAME} variables, the algorithm initializes
+a number, \texttt{wm}, to zero then loops 
+through all of the locals in the method and adds the mapped value of the
+variable times 10 to the power of the number after the \$ to \texttt{wm}.
+After the number is recovered it is converted back to the watermark string.
+

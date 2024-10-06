@@ -1,0 +1,107 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: packimports(3) 
+// Source File Name:   TTTApplet.java
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class TTTApplet1 extends TTTApplet0
+{
+
+    public TTTApplet1()
+    {
+        lab = new Label("Tic-Tac-Toe", 1);
+        pan = new Panel();
+        sq = new Button[9];
+        again = new Button("New game");
+        ply = 2;
+    }
+
+    public void start()
+    {
+        for(int i = 0; i < 9; i++)
+        {
+            sq[i] = new Button(".");
+            sq[i].setActionCommand(Integer.toString(i));
+            sq[i].addActionListener(new TTTApplet._cls1());
+            pan.add(sq[i]);
+        }
+
+    }
+
+    public void init()
+    {
+        setBackground(Color.green);
+        setForeground(Color.yellow);
+        setFont(new Font("SansSerif", 1, 60));
+        resize(360, 480);
+        setLayout(new BorderLayout());
+        add("North", lab);
+        add("Center", pan);
+        pan.setLayout(new GridLayout(3, 3));
+        again.addActionListener(new TTTApplet._cls2());
+        add("South", again);
+    }
+
+    public boolean free()
+    {
+        boolean flag = false;
+        for(int i = 0; i < 9; i++)
+            if(sq[i].getLabel() == ".")
+                flag = true;
+
+        return flag;
+    }
+
+    public void mark(int i)
+    {
+        if(sq[i].getLabel() == ".")
+            if(ply == 1)
+                sq[i].setLabel("X");
+            else
+                sq[i].setLabel("O");
+    }
+
+    private boolean singleHit(int i, int j, int k)
+    {
+        return sq[i].getLabel() != "." && sq[i].getLabel() == sq[j].getLabel() && sq[i].getLabel() == sq[k].getLabel();
+    }
+
+    // Unreferenced inner class TTTApplet$1
+
+/* anonymous class */
+    class TTTApplet._cls1
+        implements ActionListener
+    {
+
+        public void actionPerformed(ActionEvent actionevent)
+        {
+            int i = (new Integer(actionevent.getActionCommand())).intValue();
+            move(i);
+        }
+
+    }
+
+
+    // Unreferenced inner class TTTApplet$2
+
+/* anonymous class */
+    class TTTApplet._cls2
+        implements ActionListener
+    {
+
+        public void actionPerformed(ActionEvent actionevent)
+        {
+            setForeground(Color.yellow);
+            for(int i = 0; i < 9; i++)
+                sq[i].setLabel(".");
+
+            lab.setText("Tic-Tac-Toe");
+            again.setLabel("New game");
+        }
+
+    }
+
+}

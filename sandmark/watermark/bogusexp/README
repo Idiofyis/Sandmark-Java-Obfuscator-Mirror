@@ -1,0 +1,26 @@
+
+Authors: Balamurgan Chirtsabesan ( balamc@cs.arizona.edu )
+         Tapas Ranjan Sahoo      ( tapas@cs.arizona.edu  )
+
+This directory contains a very simple static watermarker
+that adds a bogus expression to the constant pool and 
+recovers the watermark value. 
+
+The watermark given in randomly split into 2 values and 
+then the expression is formed using this the values which
+is embedded in a random instruction list index of a 
+random method.  The recognizer searches for the local variable
+and takes action to recover the corresponding instructions
+from the list and retrieve the watermark.
+
+The directory contains the following files:
+
+   Makefile
+   README
+   package.html
+
+   BogusExpression.java     -- The watermark embedding and retrieving code.
+   Test.java                -- A main wrapper to test the watermarker.
+
+   doc directory: help.HTML file
+

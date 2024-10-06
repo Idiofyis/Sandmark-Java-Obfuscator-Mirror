@@ -1,0 +1,13 @@
+Algorithms in sandmark/obfuscate/localvar
+    - Variable Reassigner by: Kelly Heffner and Ginger Myles
+      Variable Reassigner uses intelligent minimal register allocation
+      to reassign the local variables in a method.
+
+Files sandmark/obfuscate/renamefieldsmethods
+    - VariableReassigner.java
+    - package.html
+    - Makefile
+    - README
+    - doc/
+      -  help.html
+

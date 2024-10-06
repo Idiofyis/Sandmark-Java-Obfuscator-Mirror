@@ -1,0 +1,39 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: packimports(3) 
+// Source File Name:   TTTBox.java
+
+
+class TTTBox extends TTTBox0
+{
+
+    public TTTBox()
+    {
+        mark = 2;
+    }
+
+    public void putX()
+    {
+        mark = 1;
+    }
+
+    public void putO()
+    {
+        mark = 0;
+    }
+
+    public int getMark()
+    {
+        return mark;
+    }
+
+    public boolean isEmpty()
+    {
+        return mark == 2;
+    }
+
+    public String toString()
+    {
+        return mark != 2 ? mark != 0 ? mark != 1 ? "" : "X" : "O" : ".";
+    }
+}

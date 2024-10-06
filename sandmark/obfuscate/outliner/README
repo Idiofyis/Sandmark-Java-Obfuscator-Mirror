@@ -1,0 +1,15 @@
+authors: tapas@cs.arizona.edu
+
+	 This directory contains an obfuscator that outlines method code. 
+
+The directory contains the following files:
+
+   README
+   Makefile
+   package.html
+
+   Outliner.java
+   OutlineUtil.java
+   LiveVar.java
+
+   doc (directory) - help.html

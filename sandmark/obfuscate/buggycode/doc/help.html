@@ -1,0 +1,162 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Buggy Code Obfuscator</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Buggy Code Obfuscator</H1>
+    <H2>Authors</H2>
+    <P>
+      Balamurgan Chirtsabesan
+      (<A HREF="mailto:balamc@cs.arizona.edu">balamc@cs.arizona.edu</A>)<BR>
+      Tapas Ranjan Sahoo
+      (<A HREF="mailto:tapas@cs.arizona.edu">tapas@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      The obfuscator selects a random method from the classfile. It selects a
+      random basic block in the method by reading through the code array and
+      the header labels of the basic blocks. To introduce a bug code, a copy
+      of the basic block is made. Some additional bug codes are also
+      introduced in this new basic block which changes the local variable
+      values in the method. This basic block of code is inserted immediately
+      after the original basic block in the code array. This basic block is
+      bypassed from execution by creating an opaquely false predicate at the
+      end of the original basic block.    
+    </P>
+    <H2>Example</H2>
+    <P>
+      Consider the following method code which is to be obfuscated.
+    </P>
+    <PRE>
+        Method void a(boolean, int)
+         0 iconst_0
+         1 istore_2
+         2 iconst_0
+         3 istore_3
+         4 iload_2
+         5 istore_1
+         6 iload_0
+         7 ifeq 15
+        10 iconst_2
+        11 istore_2
+        12 goto 17
+        15 iconst_2
+        16 istore_3
+        17 iload_3
+        18 ifle 26
+        21 iconst_5
+        22 istore_3
+        23 goto 28
+        26 iconst_5
+        27 istore_2
+        28 new #2 <Class java.lang.NullPointerException>
+        31 dup
+        32 ldc #3 <String "Opps">
+        34 invokespecial #4 <Method java.lang.NullPointerException(java.lang.String)>
+        37 athrow
+        38 astore 4
+        40 getstatic #6 <Field java.io.PrintStream out>
+        43 aload 4
+        45 invokevirtual #7 <Method void println(java.lang.Object)>
+        48 iconst_0
+        49 istore_2
+        50 goto 64
+        53 getstatic #6 <Field java.io.PrintStream out>
+        56 ldc #8 <String "Hello World!!">
+        58 invokevirtual #9 <Method void println(java.lang.String)>
+        61 iinc 2 1
+        64 iload_2
+        65 bipush 10
+        67 if_icmplt 53
+        70 return
+    </PRE>
+    <P>
+      In the above code, our obfuscator selects a random basic block, in this
+      case block 21-23 is selected. Then we create our false opaque predicate
+      in the same block. We copy the basic block into one more block
+      immediately after that and introduce some additional bugcode  (47-50)
+      (see below) that modifies a random local variable (in this case local 2).
+    </P>
+    <PRE>
+        Method void a(boolean, int)
+         0 iconst_0
+         1 istore_2
+         2 iconst_0
+         3 istore_3
+         4 iload_2
+         5 istore_1
+         6 iload_0
+         7 ifeq 15
+        10 iconst_2
+        11 istore_2
+        12 goto 17
+        15 iconst_2
+        16 istore_3
+        17 iload_3
+        18 ifle 51
+        21 bipush 55
+        23 bipush 65
+        25 istore 6
+        27 istore 5
+        29 iconst_5
+        30 istore_3
+        31 goto 53
+        34 iload 6
+        36 iload 5
+        38 isub
+        39 ifne 51
+        42 iconst_5
+        43 istore_3
+        44 goto 53
+        47 iload_2
+        48 iconst_1
+        49 iadd
+        50 istore_2
+        51 iconst_5
+        52 istore_2
+        53 new #2 <Class java.lang.NullPointerException>
+        56 dup
+        57 ldc #3 <String "Opps">
+        59 invokespecial #4 <Method java.lang.NullPointerException(java.lang.String)>
+        62 athrow
+        63 astore 4
+        65 getstatic #6 <Field java.io.PrintStream out>
+        68 aload 4
+        70 invokevirtual #7 <Method void println(java.lang.Object)>
+        73 iconst_0
+        74 istore_2
+        75 goto 89
+        78 getstatic #6 <Field java.io.PrintStream out>
+        81 ldc #8 <String "Hello World!!">
+        83 invokevirtual #9 <Method void println(java.lang.String)>
+        86 iinc 2 1
+        89 iload_2
+        90 bipush 10
+        92 if_icmplt 78
+        95 return
+    </PRE>
+    <H2>Configuration</H2>
+    <P>
+      No additional configuration parameters are required to carry out this
+      obfuscation.
+    </P>
+    <H2>References</H2>
+    <BR>
+  </BODY>
+</HTML>

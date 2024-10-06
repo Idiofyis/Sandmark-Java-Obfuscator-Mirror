@@ -1,0 +1,241 @@
+\algorithm{The Method 2R Madness Obfuscation Algorithm}%
+          {Martin Stepp and Kelly Heffner}
+          
+
+\section{Introduction}
+The Method 2R Madness Obfuscation (M2M) algorithm is based on the idea that
+useful information about program organization lies in the parameter list
+and separation of methods.  In order to destroy that information, the M2M 
+obfuscator performs a six pass obfuscation:
+\begin{enumerate}
+\item In pass one, all fields and methods are made public.
+\item In pass two, each dynamic method body are moved into a static helper
+method.  The dynamic shell is simply a call on this static helper.
+\item In pass three, all primitive types residing in a static method signature
+are promoted to their respective object wrapper types.
+\item In pass four, the parameter lists of all static methods are scrambled.
+\item In pass five, the parameter lists of all static methods are condensed into
+one large \verb/Object []/ array.
+\item In pass six, static methods in the same class with the same signature are
+merged into one method.
+\end{enumerate}
+
+\section{Pass Two - Method Splitting}
+As mentioned above, the second phase of the M2M obfuscation splits each dynamic method
+into two parts.  The first part is the same dynamic method, except that the body
+of the method is changed to a simple call on a static helper method.  The first parameter
+to this static method is the actual \verb/this/ reference which was implicitly argument
+zero in the dynamic method.  Take for example the following class to computer Ackermann's 
+function:
+\begin{verbatim}
+public class Ackermann 
+{
+    public static void main(String[] args) 
+    {
+      int num = Integer.parseInt(args[0]);
+      System.out.println("Ack(3," + num + "): " + new Ackermann().Ack(3, num));
+      }
+    
+    public int Ack(int m, int n) 
+    {
+      return (m == 0) ? (n + 1) : ((n == 0) ? Ack(m-1, 1) :
+                  Ack(m-1, Ack(m, n - 1)));
+    }
+}
+\end{verbatim}
+
+After being split into a static section by the StaticSplit obfuscator phase, and then run through
+the SourceAgain decompiler, the code looks as follows:
+
+\begin{verbatim}
+// 
+// SourceAgain (TM) v1.10i (C) 2001 Ahpah Software Inc
+// 
+
+import java.io.PrintStream;
+
+public class Ackermann {
+
+    public static void main(String[] as)
+    {
+        int i = Integer.parseInt( as[0] );
+
+        System.out.println( "Ack(3," + i + "): " + (new Ackermann().Ack( 3, i )) );
+    }
+
+    public static int Ackintint0(Ackermann this, int arg0, int arg1)
+    {
+        return (arg0 == 0) ? arg1 + 1 : (arg1 == 0) ? Ack( arg0 - 1, 1 ) : Ack( arg0 - 1, Ack( arg0, arg1 - 1 ) );
+    }
+
+    public int Ack(int arg0, int arg1)
+    {
+        return Ackintint0( this, arg0, arg1 );
+    }
+}
+\end{verbatim}
+
+\section{Pass Three - Primitive Promoting}
+The third phase of the M2M obfuscation consists of promoting the argument list and return type of 
+the static methods so that all primitive typed arguments or returns are now reference types.  A restriction
+of reference only parameters and returns allows for easier parameter reordering and array parameterize,
+and this primitive promoting obfuscation makes it possible for more static methods to fit the ``reference
+only" criteria for reordering.  We will again use the Ackermann example from above, and tack on the 
+primitive promoting pass.
+
+\begin{verbatim}
+// 
+// SourceAgain (TM) v1.10i (C) 2001 Ahpah Software Inc
+// 
+
+import java.io.PrintStream;
+
+public class Ackermann {
+
+    public static void main(String[] arg0)
+    {
+        int i = Integer.parseInt( arg0[0] );
+
+        System.out.println( "Ack(3," + i + "): " + (new Ackermann().Ack( 3, i )) );
+    }
+
+    public static Integer get0(Ackermann this, Integer arg0, Integer arg1)
+    {
+        return new Integer( (arg0.intValue() == 0) ? arg1.intValue() + 1 : (arg1.intValue() == 0) ? Ack( arg0.intValue() - 1, 1 ) : Ack( arg0.intValue() - 1, Ack( arg0.intValue(), arg1.intValue() - 1 ) ) );
+    }
+
+    public int Ack(int arg0, int arg1)
+    {
+        return get0( (Ackermann) new Object[3][0], (Integer) new Object[3][1], (Integer) new Object[3][2] ).intValue();
+    }
+}
+
+\end{verbatim}
+Notice that the decompiler has a problem interpreting that the arguments to method calls were promoted using a
+temporary array of Objects.
+
+\section{Pass Four - Parameter Reordering}
+The parameter reorderer adds an extra dose of confusion to the algorithm, so that there is no direct mapping 
+between the order of the nonstatic stub methods, and their static helpers.  This also shuffles the \verb/this/
+reference out of slot zero, making our static helpers less obvious.
+
+\begin{verbatim}
+// 
+// SourceAgain (TM) v1.10i (C) 2001 Ahpah Software Inc
+// 
+
+import java.io.PrintStream;
+
+public class Ackermann {
+
+    public static void main(String[] arg0)
+    {
+        int i = Integer.parseInt( arg0[0] );
+
+        System.out.println( "Ack(3," + i + "): " + (new Ackermann().Ack( 3, i )) );
+    }
+
+    public static Integer get0(Integer this, Ackermann arg0, Integer arg1)
+    {
+        return new Integer( (arg1.intValue() == 0) ? intValue() + 1 : (intValue() == 0) ? arg0.Ack( arg1.intValue() - 1, 1 ) : arg0.Ack( arg1.intValue() - 1, arg0.Ack( arg1.intValue(), intValue() - 1 ) ) );
+    }
+
+    public int Ack(int arg0, int arg1)
+    {
+        return get0( (Integer) new Object[3][0], (Ackermann) new Object[3][1], (Integer) new Object[3][2] ).intValue();
+    }
+}
+\end{verbatim}
+
+\section{Pass Five - Signature Bludgeoning}
+The bludgeon takes the final step in confusing the signatures of methods, by making all of the static
+method signatures the \emph{same}, ``(L[java/lang/Object;)Ljava/lang/Object;".  This prepares the classes
+for the final pass, which is to combine any methods with the same signature (which is now all static methods).
+
+\begin{verbatim}
+// 
+// SourceAgain (TM) v1.10i (C) 2001 Ahpah Software Inc
+// 
+
+import java.io.PrintStream;
+
+public class Ackermann {
+
+    public static void main(String[] arg0)
+    {
+        int i = Integer.parseInt( arg0[0] );
+
+        System.out.println( "Ack(3," + i + "): " + (new Ackermann().Ack( 3, i )) );
+    }
+
+    public static Object get0(Object[] this)
+    {
+        return new Integer( (((Integer) this[2]).intValue() == 0) ? ((Integer) this[0]).intValue() + 1 : (((Integer) this[0]).intValue() == 0) ? ((Ackermann) this[1]).Ack( ((Integer) this[2]).intValue() - 1, 1 ) : ((Ackermann) this[1]).Ack( ((Integer) this[2]).intValue() - 1, ((Ackermann) this[1]).Ack( ((Integer) this[2]).intValue(), ((Integer) this[0]).intValue() - 1 ) ) );
+    }
+
+    public int Ack(int arg0, int arg1)
+    {
+        return ((Integer) get0( new Object[] { (Integer) new Object[3][0], (Ackermann) new Object[3][1], (Integer) new Object[3][2] } )).intValue();
+    }
+}
+\end{verbatim}
+
+\section{Pass Six - Method Merging}
+The method merger combines static methods with the same signature into one method, that is multiplexed on an extra
+\verb/int/ parameter.  Consider the code for the original Ackermann, with an extra static method added in:
+\begin{verbatim}
+public class Ackermann 
+{
+    public static void main(String[] args) 
+    {
+      int num = Integer.parseInt(args[0]);
+      System.out.println("Ack(3," + num + "): " + new Ackermann().Ack(3, num));
+      }
+    
+		public static void hi(long p)
+		{
+			System.out.println(p);
+		}
+
+    public int Ack(int m, int n) 
+    {
+      return (m == 0) ? (n + 1) : ((n == 0) ? Ack(m-1, 1) :
+                  Ack(m-1, Ack(m, n - 1)));
+    }
+}
+\end{verbatim}
+After a pass through all five other phases, the two static methods (which now share an Object[] to Object signature)
+are merged together as follows:
+
+\begin{verbatim}
+// 
+// SourceAgain (TM) v1.10i (C) 2001 Ahpah Software Inc
+// 
+
+import java.io.PrintStream;
+
+public class Ackermann {
+
+    public static void main(String[] arg0)
+    {
+        int i = Integer.parseInt( arg0[0] );
+
+        System.out.println( "Ack(3," + i + "): " + (new Ackermann().Ack( 3, i )) );
+    }
+
+    public int Ack(int arg0, int arg1)
+    {
+        return ((Integer) keldaANDmartio0( new Object[] { (Integer) new Object[3][0], (Integer) new Object[3][1], (Ackermann) new Object[3][2] }, 1 )).intValue();
+    }
+
+    public static Object keldaANDmartio0(Object[] keldaANDmartio0, int switchVar)
+    {
+        if( 1 == switchVar )
+            return new Integer( (((Integer) keldaANDmartio0[1]).intValue() == 0) ? ((Integer) keldaANDmartio0[0]).intValue() + 1 : (((Integer) keldaANDmartio0[0]).intValue() == 0) ? ((Ackermann) keldaANDmartio0[2]).Ack( ((Integer) keldaANDmartio0[1]).intValue() - 1, 1 ) : ((Ackermann) keldaANDmartio0[2]).Ack( ((Integer) keldaANDmartio0[1]).intValue() - 1, ((Ackermann) keldaANDmartio0[2]).Ack( ((Integer) keldaANDmartio0[1]).intValue(), ((Integer) keldaANDmartio0[0]).intValue() - 1 ) ) );
+        if( 0 != switchVar )
+            ;
+        System.out.println( ((Long) keldaANDmartio0[0]).longValue() );
+        return null;
+    }
+}
+\end{verbatim}

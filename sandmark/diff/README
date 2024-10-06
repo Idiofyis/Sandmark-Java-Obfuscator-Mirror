@@ -1,0 +1,48 @@
+
+Author: Zachary Heidepriem ( zachary@cs.arizona.edu ) 
+
+ This directory contains modules that have been designed to diff two
+ (and only two) jar files. The diff criteria is determined by the diff
+ algorithm. These algorithms are split into method diff algorithms and 
+ class diff algorithms which are located in subdirectories methoddiff and
+ classdiff respectively. The GUI for the diff tool is located in 
+ sandmark.gui.diff and can be run by creating a DiffFrame.
+
+ To implement your own diff algorithm, extend classdiff.ClassDiffAlgorithm
+ or methoddiff.MethodDiffAlgorithm depending on which your algorithm compares.
+ This requires you to implement 4 methods:
+	-getName()
+	-getDescription()
+	-diff{Methods,Classes}()
+	-color()
+
+ Currently, the GUI code does not dynamically load algorithms, so you will 
+ have to update sandmark.gui.diff.DiffFrame by inserting an instance of your
+ algorithm into the algorithms vector.
+
+ If your algorithm compares something else (e.g. Application), create your own 
+ subpackage, e.g. appdiff. Then subclass DiffAlgorithm, implementing run(),
+ getTaskLength(), getCurrent(), and diff(). You may want to add an abstract
+ method diffApp() for typechecking. See methoddiff.MethodDiffAlgorithm and
+ classdiff.ClassDiffAlgorithm for examples. Then extend that class to implement
+ your algorithm.
+
+The directory contains the following files:
+
+   package.html
+   Makefile
+   README
+
+   Coloring.java
+   DiffAlgorithm.java
+   DiffOptions.java
+   DiffUtil.java
+   InstructionWrapper.java
+   LCS.java
+   Monitorable.java
+   Result.java  
+
+   methoddiff directory: method diff algorithms
+   classdiff directory: class diff algorithms
+   doc directory: help.html file
+

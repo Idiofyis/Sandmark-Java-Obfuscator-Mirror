@@ -1,0 +1,25 @@
+Known bugs in SandMark 3
+------------------------
+
+Date: 6/3/2002
+Submitted by: Kelly Heffner
+Bug: The obfuscation and watermark panel do not change the name of the jar file
+     created for subsequent obfuscation and watermarking runs.
+Status: submitted
+
+Date: 6/3/2002
+Submitted by: Kelly Heffner
+Bug:  The obfuscation configuration pane is illegible.
+Status: Fixed (Kelly)
+
+Date: 7/25/2002
+Submitted by: CC
+Bug: The about box generates "Syntax error in HTML codes!"
+Status: open
+
+Date: 7/25/2002
+Submitted by: CC
+Bug: The SandMark logo doesn't show up in the about box.
+Status: open
+
+

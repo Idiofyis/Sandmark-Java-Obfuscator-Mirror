@@ -1,0 +1,2 @@
+This directory is for sandmark.obfuscate.util classes to be defined,
+if they more appropriately belong here than in Obfuscator.java.

@@ -1,0 +1,26 @@
+CallGraph.java 
+
+Implemented by Ashok Venkatraj (ashok@cs.arizona.edu)
+Advisor: Christian S Collberg (collberg@cs.arizona.edu)
+
+Generates the call graph for an application, given a root
+method to start. The pessimistic method of Rapid Type
+Analysis for generating call graphs has been implemented. 
+
+The construction of the callgraph is based upon "Practical
+Techniques for Virtual Call Resolution in Java" by Vijay
+Sundaresan and BLOAT optimistic implementation of Rapid
+Type Analysis.
+
+The program works for test cases where all the call sites
+are dependent upon the application methods present in the
+jar file. The program doesn't work for cases that requires
+usage of Java Library classes.(e.g. System.out.println()).
+The reason being, the ClassHierarchy right now, doesn't 
+contain any information about classes loaded at runtime.
+I use subclasses() in sandmark.util.ClassHierarchy to 
+find out the hierarch types of a particular class. Since
+subclasses returns null, I am not able to predict the
+possible runtime receiver types of some classes.
+
+

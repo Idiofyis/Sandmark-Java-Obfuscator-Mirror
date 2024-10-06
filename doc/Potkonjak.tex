@@ -1,0 +1,114 @@
+\algorithm{Potkonjak's Watermarking Algorithm}%
+          {G. Myles}
+
+\section{Introduction}
+Potkonjak's watermarking algorithm is based upon the ideas of graph coloring and register allocation. Java does not use registers to store values put instead uses local variables. So this algorithm will assign local variables based upon graph coloring instead of registers. The idea is to embed a watermark in a Java program that uniquely maps to one of the possible allocations of local variables. The reason that a watermark can be uniquely mapped to a local variable allocation is because a technique called bridge construction is used to generate multiple allocations from one specific allocation. By using this technique no additional code needs to be added so examining the code will not lead to the discovery of the watermark.
+
+Currently this technique only works for a single method in a class, but in the future it will be extended so that an entire set of classes can be watermarked.
+
+\section{Embedding}
+The embedding of the watermark involves several different phases.
+
+\subsection{Convert watermark to binary}
+Converting the watermark, which is a string, to a binary is a fairly 
+simple 
+and straight forward task. This task is necessary because the binary is 
+used to help choose the appropriate local variable allocation.
+ 
+\subsection{Generate the original coloring}
+The first real step of the algorithm is to determine the coloring of the 
+method before any modifications have been made. This first step is 
+necessary because a base is needed in order to base the binary 
+relationship. It is not possible to used the local variable assignment 
+that has already been allocated because BLOAT performs many optimizations 
+in the process of completing the register allocation, which must be used 
+in later phases of the algorithm. The majority of this step is handled by 
+classes 
+within BLOAT. To complete this task a control flow graph 
+is created, SSA analysis is performed to generate the 
+def-use information, liveness analysis is performed to 
+generate the interference graph, and then register 
+allocation takes place. Once these steps have been 
+completed the instructions for the method are scaned to 
+determine what loacal variable allocation was assigned.
+
+\subsection{Bridge construct and generate new coloring}
+Bridge construction is a technique used on graphs so that many colorings 
+can be generated from the same graph. This is desirable since graph 
+coloring is an NP problem and thus generating many colorings from the 
+unmodified graph would be very intensive. With this algorithm it is 
+necessary to generate as many colorings as possible so as to increase the 
+chances of being able to embed the watermark in the method. Since the 
+algorithm does not involve adding any code to the methods finding a 
+suitable local variable allocation is crucial.
+
+The bridge construction technique works by taking two unconnected nodes 
+and connecting them and connecting the neighbors of one to the other. Each 
+pair of nodes that can be connected generates $2^{2}$ different colorings. 
+If a set of three unconnected nodes can be found connecting them would 
+generate $2^{3}$ different colorings. It is also possible to combine these 
+two sets to generate even more colorings. The bridge construction is 
+performed on the interference graph which was generated from the liveness 
+analysis. Once the bridge construction has been completed the new interference 
+graph is passed to the register allocator. Again after the register 
+allocation has been completed the instructions are scaned to determine the 
+allocation.
+
+
+\subsection{Determine if the method can be watermarked}
+Determining if the method can actually be watermarked is currently folded 
+in with generating the colorings. Once the algorithm can be performed on 
+multiple methods it will be necessary to check if the binary will fit 
+perfectly in the program.
+
+
+\subsection{Generate the pool of graphs}
+In order to generate all of the different colorings it is necessary to 
+know which edges were added to the interference graph. Currently the 
+algorithm does not generate all of the colorings at once but instead 
+generates certain sections of the coloring and determines if any of those 
+possibilites will work. It they don't work then the method cannot be 
+watermarked. The sections that are generated are the pairs of nodes that were 
+connected. If two nodes were connected then those four solutions are 
+generated and compared with the appropriate location in the binary to see 
+if one will work. The nodes that are not connected will maintain their 
+same coloring and therefore result in a 0 for the binary.
+
+\subsection{Pick the correct coloring}
+The coloring that is chosen is based upon the binary that needs to be 
+embedded and the relationship between the original coloring and the 
+generated colorings. By comparing the original to the generated coloring a 
+binary relationship can be determined which corresponds to the binary 
+watermark.
+
+
+\subsection{Embed the chosen coloring}
+Once a coloring has been selected it is passed to the register allocator 
+along with the corresponding node label. The node labels are necessary 
+because BLOAT does not appear to access the nodes of the graph in any 
+particular order. This technique of passing the colors to the modified 
+register allocator proved to be the easiest and most reliable because it 
+takes care of both the defs and uses (stores and loads).
+
+
+\section{Recognition}
+Recognizing the watermark also involves several phases.
+
+\subsection{Determine the current coloring}
+Because the embedded watermark is based upon the comparison of two different local variable allocations, the first thing that must be done is to determine what allocation is currently assigned to the method. This is done simply by scanning the instructions in the method and looking for places where a store is perfomed. One a store has been found we can obtain the index of the local variable. The indexes are stored in a Vector, \texttt{currentColoring}, for later reference.
+
+\subsection{Generate the original coloring for the method}
+In order to generate the binary that dictated which coloring was chosen we have to determine the original local variable allocation for the method. This is done following the same steps that were used in order to generate the original. First we have to generate a control flow graph for the method. We then have to perform the SSA analysis in order to generate the def-use information that is used in the liveness analysis. After the SSA analysis the liveness analysis is performed so that an interference graph is generated. The interference graph is then used by the register allocator to assign local variable. Once all of this has been completed it is necessary to scan the instructions again to determing the local variable allocation. Again we store this imformation in a Vector, \texttt{originalColoring}.
+
+\subsection{Compare the two colorings}
+Just as was done by in the embedding it is possible to compare the current 
+coloring and the original coloring to get a binary. This binary will then 
+become the watermark.
+
+
+\subsection{Convert binary to string}
+Again this is a simple task, but a necessary one. By converting the 
+generated binary into a string we get the watermark back.
+
+\section{Future Work}
+Currently this watermarking technique has only been implemented so that a single method can be watermarked.

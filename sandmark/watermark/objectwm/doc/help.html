@@ -1,0 +1,133 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Robust Object Watermarking Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Robust Object Watermarking Algorithm</H1>
+    <H2>Authors</H2>
+    <P>
+      Balamurgan Chirtsabesan
+      (<A HREF="mailto:balamc@cs.arizona.edu">balamc@cs.arizona.edu</A>)<BR>
+      Tapas Ranjan Sahoo
+      (<A HREF="mailto:tapas@cs.arizona.edu">tapas@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      This algorithm is a static watermark algorithm.
+      <BR>
+      <BR>
+      The <b>Robust Object Watermarking</b> presents a new approach to
+      watermarking. Instead of applying the watermarking scheme to the raw
+      code directly, a new vector representation of the code is created. The
+      basic idea revolving around this scheme is that instead of considering
+      the overall structure of the code and its control flow, the code is
+      viewed as a statistical object. The frequencies of groups of
+      instructions in the entire code are taken into consideration in creating
+      a new vector representation of the data. Spreading the watermark
+      throughout the target code ensures a large measure of security against
+      intentional and unintentional attacks.
+    </P>
+    <P>
+      The watermark value is passed as a string parameter, which is converted
+      into a frequency vector representation and embedded in the code. Each
+      vector element represents an instruction group which is identified
+      through some profiling information. Various embedding techniques such as
+      code substitution, instruction group insertion, etc are used to build
+      the watermark in the code. The basic idea is increase the frequency of
+      the instruction groups in the code which form a component of the
+      watermark vector. The embedding module references the 'CodeBook' to
+      carry out different types of embedding.
+    </P>
+    <P>
+      <b>RESTRICTIONS:</b><br>
+      The algorithm is usually applicable over a large application where the
+      code size is large enough to embed the watermark vector. Embedding new
+      instructions in a code is a sensitive issue since it must satisfy to lot
+      of criterias such as maintaining proper stack size, proper variable
+      intialization and use, etc. In very small applications, there might not
+      be enought scope to carry out the entire vector instruction embedding,
+      especially the approaches other than code substitution. The algorithm
+      uses a "decision procedure" to make sure that the implementation does
+      not go into an infinite loop. Incase there is no further scope for
+      embedding, the program exits with a log message saying that the
+      watermark embedding was not completed.
+    </P>
+    <H2>Example</H2>
+    <P>
+      As a simple example, let us briefly describe a simple substitution
+      procedure for embedding a vector instruction group. Say, iload; isub is
+      a two element instruction group that is a watermark vector component.
+      The 'CodeBook' stores a substitution group corresponding to it as: A{
+      iload X, iload Y,if_icmpne -> Z } --> B{ iload X, iload Y,isub, ifne ->
+      Z}. Hence, finding an occurence of A in the code and substituting it by
+      a semantically equivalent group B, effectively increase the frequency of
+      the vector component by one.
+    </P>
+    <P>
+      The recognition procedure follows a different approach. Instead of
+      retrieving the watermark directly from the target code, the recognizer
+      is provided with both the original code and the new code along with the
+      watermark. The recognizer then answers with a 'yes/no' whether the
+      particular watermark exists in the code or not.
+    </P>
+    <P>
+      <b>EMBEDDING THE WATERMARK:</b><br>
+      Input the original jar file (eg. A.jar). We have the watermarked jar
+      file as A_wm.jar. Enter the watermark value in the 'watermark' field as
+      well as in the 'key' field.  The watermark must be an integer with
+      8 or fewer digits.
+    </P>
+    <P>
+      <b>WATERMARK RECOGNITION:</b><br>
+      Input the watermarked jar file (ie. A_wm.jar) and the original jar file
+      (i.e. A.jar). Enter the watermark, which
+      you wish to detect, in the 'key' field.  The recognizer then outputs
+      "WATERMARK FOUND/ WATERMARK NOT FOUND" based on whether the particular
+      watermark was detected in the target code (ie. A_wm.jar) or not. The
+      recognizer extracts the watermark within a certain threshold value. The
+      default 'recognition threshold' is set to 1. This threshold level can be
+      changed in the 'myRecognitionThreshold' field of the 'Config' class.
+    </P>
+    <H2>Configuration</H2>
+    <H2>References</H2>
+    <UL>
+      <LI>
+	Julien P. Stern, Gael Hachez, Francois Koeune, and Jean-Jacques
+	Quisquater, "Robust Object Watermarking: Application to Code". In A.
+	Pfitzmann, editor, Information Hiding '99, volume 1768 of Lectures
+	Notes in Computer Science (LNCS), pages 368--378, Dresden, Germany,
+	2000. Springer-Verlag.
+	<A HREF="http://citeseer.nj.nec.com/stern00robust.html">http://citeseer.nj.nec.com/stern00robust.html</A>
+      </LI>
+      <LI>
+	I. Cox, J. Kilian, T. Leighton and T. Shamoon, "A secure, robust
+	watermark for multimedia", in Proc. Workshop on Information Hiding,
+	Univ. of Cambridge, U.K., May 30 - June 1, 1996, pp. 175-190.
+	<A HREF="http://citeseer.nj.nec.com/article/cox96secure.html">http://citeseer.nj.nec.com/article/cox96secure.html</A>
+      </LI>
+      <LI>
+        Tapas Ranjan Sahoo, Christian Collberg,
+	Software Watermarking in the Frequency Domain: Implementation, Analysis, and Attacks
+        University of Arizona Technical Report, 
+        <a href="http://www.cs.arizona.edu/research/reports.html"> TR04-07 </a>
+      </LI>
+    </UL>
+    <BR>
+  </BODY>
+</HTML>

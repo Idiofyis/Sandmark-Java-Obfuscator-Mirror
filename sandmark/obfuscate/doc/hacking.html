@@ -1,0 +1,193 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Adding an Obfuscator</TITLE>
+  </HEAD>
+<BODY>
+
+
+<h1>Adding an Obfuscator</h1>
+SandMark is designed to make it easy to add a new obfuscation
+algorithm. Assume that we want to add a new obfuscation
+<code> ReorderMethods</code>. The process would be the following:
+<ol>
+   <li> Create a new directory <code>sandmark/obfuscate/reorderMethods</code>.
+   <li> Create a new class  <code>sandmark/obfuscate/reorderMethods/ReorderMethods.java</code>.
+   <li> The <code>ReorderMethods</code> class should extend one of 
+         the base classes <code>AppObfuscator</code> (if the algorithm works
+         on the entire user program), <code>MethodObfuscator</code>
+         (if the algorithm works one method at a time),
+         or <code>ClassObfuscator</code> (if the algorithm works
+         on one individual class at a time). Let's assume
+         that our algorithm reorders methods within one
+         class. <code>ReorderMethods</code> should therefore
+         extend <code>ClassObfuscator</code>, which looks like
+         this:
+<pre>
+package sandmark.obfuscate;
+public abstract class ClassObfuscator extends GeneralObfuscator {
+protected ClassObfuscator(String label) {
+    super(label);
+}
+abstract public void apply(
+    sandmark.util.ClassFileCollection cfc, String classname)
+    throws Exception;
+}
+public String toString() {
+    return "ClassObfuscator(" + getLabel() + ")";
+}
+}
+</pre>
+   <li> The <code>ReorderMethods</code> class should look something
+         like this:
+<pre>
+package sandmark.obfuscate.myobfuscator;
+public class MyObfuscator extends sandmark.obfuscate.ClassObfuscator {
+
+   public MyObfuscator() {}
+
+   public String getAuthor() {
+      return "Jane Doe";
+   }
+
+   public String getAuthorEmail() {
+      return "doe@cs.arizona.edu";
+   }
+
+   public String getDescription() {
+      return "Turn all foos into bars by first turning them into yadas.";
+   }
+
+   public String getShortName() {
+      return "BarMaker";
+   }
+
+   public String getLongName() {
+      return "Turn foos into bars.";
+   }
+
+   public java.lang.String getAlgHTML() {
+      return "...";
+   }
+
+   public java.lang.String getAlgURL() {
+      return "sandmark/obfuscate/myobfuscator/doc/help.html";
+   }
+
+   public void apply(sandmark.program.Class cls) throws Exception {
+      // Actual code goes here!
+   }
+
+}
+</pre>
+   <li> Use <code> BCEL</code>  to implement your obfuscation.
+         The <code> cls</code> parameter represents the set of classes
+         to be obfuscated. Use routines in <code>sandmark.program.*</code>
+         to open a class to be edited by <code> BCEL</code>.
+   <li> Create a file <code>sandmark/obfuscate/myobfuscator/doc/help.html</code>
+        documenting your work.
+   <li> Type <code> make</code> at the top-level sandmark directory (<code>smark</code>).
+         The new obfuscation should be loaded automagically at runtime.
+</ol>
+
+<h2>Example</h2>
+Here is a real example of a simple obfuscator.
+<pre>
+package sandmark.obfuscate.setfieldspublic;
+
+/**
+ * The SetFieldsPublic obfuscator changes the field access modifiers
+ * of all of the fields in a class.
+ @author         Christian Collberg
+ @version        1.0
+ */
+
+public class SetFieldsPublic extends sandmark.obfuscate.ClassObfuscator {
+   static int AND_MASK = ~(org.apache.bcel.Constants.ACC_PRIVATE
+         | org.apache.bcel.Constants.ACC_PROTECTED);
+   static int OR_MASK = org.apache.bcel.Constants.ACC_PUBLIC;
+
+   /**
+    *  Constructor.
+    */
+   public SetFieldsPublic() {}
+
+   public String getAuthor() {
+      return "Christian Collberg";
+   }
+
+   public String getAuthorEmail() {
+      return "collberg@cs.arizona.edu";
+   }
+
+   public String getDescription() {
+      return "Make all the fields and methods in a class public";
+   }
+
+   public sandmark.config.ModificationProperty[] getMutations() {
+      return null;
+   }
+
+   public sandmark.config.RequisiteProperty[] getPostprohibited() {
+      return new sandmark.config.RequisiteProperty[] {
+         new sandmark.config.AlgorithmProperty(this)
+      };
+   }
+
+   public String getShortName() {
+      return "Publicize Fields";
+   }
+
+   public String getLongName() {
+      return "Make all the fields/methods in this class public";
+   }
+
+   public java.lang.String getAlgHTML() {
+      return "...";
+   }
+
+   public java.lang.String getAlgURL() {
+      return "sandmark/obfuscate/setfieldspublic/doc/help.html";
+   }
+
+   /*************************************************************************/
+   
+   /* Embedding                               */
+   
+   /*************************************************************************/
+
+
+   public void apply(sandmark.program.Class cls) throws Exception {
+      sandmark.program.Field[] fields = cls.getFields();
+
+      for (int i = 0; i < fields.length; i++) {
+         fields[i].setAccessFlags((fields[i].getAccessFlags() & AND_MASK)
+               | OR_MASK);	    
+      }
+      cls.mark();
+   }
+
+}
+</pre>
+</body>
+</html>
+
+
+
+
+

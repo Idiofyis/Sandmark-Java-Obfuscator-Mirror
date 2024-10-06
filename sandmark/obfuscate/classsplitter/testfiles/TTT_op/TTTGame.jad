@@ -1,0 +1,57 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: packimports(3) 
+// Source File Name:   TTTGame.java
+
+import java.io.PrintStream;
+
+class TTTGame
+{
+
+    TTTGame()
+    {
+    }
+
+    public static void main(String args[])
+    {
+        byte byte0 = 2;
+        boolean flag = false;
+        do
+        {
+            do
+            {
+                if(byte0 == 2)
+                    byte0 = 1;
+                else
+                    byte0 = 2;
+                System.out.print("Player " + byte0 + ":");
+                int i;
+                do
+                {
+                    System.out.print("  Enter box (1...9): ");
+                    i = KeyboardInput.readInt() - 1;
+                    if(i < 0 || i > 8)
+                        System.exit(-1);
+                    if(b.isEmpty(i))
+                        break;
+                    System.out.println("  It's marked!");
+                } while(true);
+                if(byte0 == 1)
+                    b.putX(i);
+                else
+                    b.putO(i);
+                System.out.print(b.toString());
+                if(b.hit())
+                {
+                    System.out.println("Player " + byte0 + " won!");
+                    System.exit(0);
+                }
+            } while(!b.noFree());
+            System.out.println("Nobody won...");
+            System.exit(0);
+        } while(true);
+    }
+
+    static TTTBoard b = new TTTBoard();
+
+}

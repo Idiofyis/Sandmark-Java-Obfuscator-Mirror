@@ -1,0 +1,93 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Adding an Optimizer</TITLE>
+  </HEAD>
+<BODY>
+
+
+<h1>Adding an Optimizer</h1>
+Adding an optimizer is similar to adding a code obfusctor.
+Here's an example from <code>sandmark.optimise.inliner.Inliner</code>.
+<p>
+<pre>
+package sandmark.optimise.inliner;
+
+public class Inliner extends sandmark.optimise.MethodOptimizer {
+    public void apply(sandmark.program.Method method) throws Exception {
+        ...
+        sandmark.program.Class clazz = method.getEnclosingClass();
+	
+        if(method.getInstructionList() == null)
+           return;
+
+        org.apache.bcel.generic.InstructionHandle ihs[];
+        int i;
+        for(ihs = method.getInstructionList().getInstructionHandles(),
+               i = 0 ; i < ihs.length ; i++) {
+           if(!(ihs[i].getInstruction() instanceof
+                org.apache.bcel.generic.INVOKESTATIC))
+              continue;
+            ....
+        }
+    }
+
+    public String getShortName() {
+        return "Inliner";
+    }
+    public String getLongName() {
+        return "Inline static method calls";
+    }
+    public String getAlgHTML() {
+        return "..."
+    }
+    public String getAlgURL() {
+        return "sandmark/optimise/inliner/doc/help.html";
+    }
+
+    public String getAuthor(){
+        return "Andrew Huntwork";
+    }
+
+    public String getAuthorEmail(){
+        return "ash@cs.arizona.edu";
+    }
+
+    public String getDescription(){
+        return "Inliner inlines static methods.";
+    }
+    public String[] getReferences() {
+        return new String[] {};
+    }
+    public sandmark.config.ModificationProperty[] getMutations() {
+        return new sandmark.config.ModificationProperty[]{
+            sandmark.config.ModificationProperty.I_ADD_METHOD_CODE,
+            sandmark.config.ModificationProperty.I_REMOVE_METHOD_CODE,
+            sandmark.config.ModificationProperty.I_PUBLICIZE_FIELDS,
+            sandmark.config.ModificationProperty.I_PUBLICIZE_METHODS,
+        };
+    }
+}
+</pre>
+</body>
+</html>
+
+
+
+
+

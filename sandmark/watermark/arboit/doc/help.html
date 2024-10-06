@@ -1,0 +1,57 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Arboit Watermarking Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Arboit Watermarking Algorithm</H1>
+    <H2>Author</H2>
+    <P>Ginger Myles
+       (<A HREF="mailto:mylesg@cs.arizona.edu">mylesg@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      Arboit is a watermarking algorithm that embeds the watermark via opaque
+      predicates. This is accomplished by encoding the watermark in the opaque
+      precicate and then appending the predicate to a selected branch.
+    </P>
+    <H2>Example</H2>
+    <H2>Configuration</H2>
+      There are two different Arboit Algorithms: static and dynamic. The
+      difference between the two is how the branches are selected. In the static
+      version a random number generator is used to select the branches. In the
+      dynamic version a trace of the program is used to selected the branches.
+      There are also configurations options. The watermark can be encoded in
+      the opaque predicate by ranking the predicates in the library and then
+      assigning each predicate a value or by using constants in the predicated
+      to encode. It is also possible to embed the watermark through the use of
+      opaque methods. In this case a method call is appended to the branch and 
+      this method evaluates the opaque predicate. If the watermark is encoded
+		using the rank of the predicate then it is possible to reuse the opaque 
+      methods to futher disguish the watermark.
+    <H2>References</H2>
+    <ul>
+       <li> Genevieve Arboit. A Method for Watermarking Java Programs via Opaque Predicates. 
+            In The Fifth International Conference on Electronic Commerce Research 
+            (ICECR-5), 2002. 
+       <li> Ginger Myles and Christian Collberg,  
+            Software Watermarking via Opaque Predicates: Implementation,
+            Analysis, and Attack. ICECR-7, June 10-13, 2004 (to appear).
+    </ul>
+</BODY>
+</HTML>

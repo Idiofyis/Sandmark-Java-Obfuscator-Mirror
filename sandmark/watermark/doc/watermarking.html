@@ -1,0 +1,96 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Software Watermarking</TITLE>
+  </HEAD>
+<BODY>
+
+<H1>Software Watermarking </H1>
+
+<P> The watermarking part of SandMark is a tool designed to 
+help to protect programs from illegal copying and redistribution, i.e.
+Software Piracy. In the figure below Alice sells a copy
+of her program to Bob (a software pirate) who proceeds
+to resell the program to third parties, incurring a
+loss of revenue for Alice:
+
+<center>
+<img src="Piracy.gif">
+</center>
+
+<P> Watermarking does not prevent software from being pirated, 
+but allows a pirated program to be traced back to the
+person who bought the original copy. SandMark uses 
+watermarking techniques to embed a copyright notice
+(a <em>watermark</em>) into a program to
+identify the company who originally wrote it:
+
+<center>
+<img src="Watermarking.gif">
+</center>
+
+<P>More importantly, watermarking allows a software vendor to embed
+a unique customer identification number (a <em>fingerprint</em>)
+into each distributed copy of her program to identify the customer 
+who bought it:
+<center>
+<img src="Fingerprint.gif">
+</center>
+The fingerprint can be a string (<em>Customer #314</em>), a
+credit card number, etc.
+
+<P>
+SandMark will allow you to ship to each customer a version of
+your Java program that has been individualized specifically
+to that customer, for example by embedding their credit card number
+into the program. If, at a later date, you obtain a pirated copy of
+your application you can extract its stored fingerprint. This will
+allow you to identify the customer who bought the copy from which 
+the pirated copies originate.
+
+<P> In the example below, Alice watermarks and figerprints her
+program, and sells it to Sally. For example, <em> W</em> could
+be the string <b>"Copyright 2000, Alice"</b> and <em>F</em> could
+be the string <b>"Customer=Sally"</b>.
+<center>
+<img src="Extract.gif">
+</center>
+Sally illegally resells her copy to Sue. Charles, Alice's lawyer, 
+retrieves a copy of Sue's program, extracts the watermark and 
+fingerprint from the copy, and can now argue that
+<ol>
+   <li> the program is the intellectual property of Alice, and
+   <li> the copy found in the possession of Sue was originally
+        bought by Sally, who can now be tried for piracy.
+</ol>
+SandMark provides a number of different software watermarking
+algorithms. Some have a high bit-rate (it is easy to embed
+a large fingerprint), some are very stealthy (the marks are
+difficult to detect), and some are highly resilient to attack
+(the marks are difficult to remove).
+
+<P> Fingerprinting a program leaves you open to <em> collusive </em>
+attacks. These attacks compare two differently fingerprinted
+programs to locate the watermark. To prevent collusive attacks, 
+SandMark provides several types of code obfuscations that will scramble
+a fingerprinted program. However, some watermark algorithms are
+not resilient against some obfuscations. Hence, the obfuscations
+should either be run <em>before</em> watermarking, or be chosen
+carefully not to interfere with a particular watermark.
+
+</BODY></HTML>

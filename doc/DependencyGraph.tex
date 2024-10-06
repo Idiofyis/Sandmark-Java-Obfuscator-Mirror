@@ -1,0 +1,12 @@
+\algorithm{DependencyGraph Utility}%
+          {Kamlesh Kantilal}
+
+\section{Introduction}
+This is an utility that creates Dependency Graph for each basic block of a method. The code of this algorithm resides in \url{sandmark.util.exprtree}.
+
+\section{Apply}
+The algorithm is as follows. First it creates a list of expression trees within each block. This expression trees are obtained by using the ExprTree class which resides in \url{sandmark.util.exprtree}.
+Next it has to create a dependency graph for the expression trees for each block. An expression tree is dependent on another expression tree if there is a WAW, WAR or RAW hazard. 
+It applies this algorithm for each method in a class and all the basic blocks in that method. It provides API that returns the dependency Graph if a basic block is given as an argument.
+
+\end

@@ -1,0 +1,74 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+	<TITLE>Annotating in SandMark</TITLE>
+</HEAD>
+<BODY BACKGROUND="sand.jpg" BGCOLOR="#E6D1B4"
+TEXT="#221100" LINK="#884400" ALINK="#EE7700" VLINK="#442200">
+
+<center>
+<img src="annotate.gif">
+</center>
+
+<H1>Annotating Programs in SandMark</H1>
+Annotations identify the points in a program where the watermarker
+can insert additional code.
+
+<P>Annotations take the form of extra method calls added to the source
+code.  At execution time, these methods write messages to a tracing log.
+
+<P>One execution sequence, as defined by a specific sequence of input
+actions, is chosen by the program author to trigger recognition of the
+watermark.  This is the "recognition sequence", and the corresponding
+path through the code is the "recognition path".
+
+<P>The watermarking process generates special code that replaces the
+annotation calls.  This code has no effect except to manipulate
+internal data structures that are otherwise unused.
+
+
+
+<H1>Where to Annotate</H1>
+
+One annotation point is used for initialization.  It must be placed
+so that it executed first by *every* execution of the program, not
+just by recognition runs.  This is vital because the watermarker
+generates code that depends on proper initialization.
+
+<P>A number of annotation points should be scattered along the
+recognition path.  As the number of points increases, the amount
+of code added at each point decreases.  (It's not at all clear
+what the best tradeoff is in terms of stealth.)
+
+<P>Annotation points should not be placed at performance-critical
+points, because the added code will slow things down.
+
+<P>Annotation points should be placed where only the input (and not
+the environment or other random factors) controls whether the
+points are reached.  For example, no annotation point should be
+placed on a code path that is conditionalized on having (or lacking)
+a particular type of network connection.
+
+Annotation points can pass a string or numeric value, in which case
+the value is referenced by the generated code.  This further muddles
+analysis and makes watermark recognition dependent on the correct
+values.
+
+
+<PRE>
+Annotation Calls
+
+Annotator.init()
+	marks the initialization point
+
+Annotator.mark()
+	marks an annotation point with no parameters
+
+Annotator.mark(String s)
+	marks an annotation point parameterized by a string value
+
+Annotator.mark(long v)
+	marks an annotation point parameterized by a char, byte,
+	short, int, or long value
+</PRE>
+
+</BODY></HTML>

@@ -1,0 +1,64 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: packimports(3) 
+// Source File Name:   TTTApplet.java
+
+import java.applet.Applet;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class TTTApplet0 extends Applet
+{
+
+    public TTTApplet0()
+    {
+        lab = new Label("Tic-Tac-Toe", 1);
+        pan = new Panel();
+        sq = new Button[9];
+        again = new Button("New game");
+        ply = 2;
+    }
+
+    Label lab;
+    Panel pan;
+    Button sq[];
+    Button again;
+    int ply;
+
+    // Unreferenced inner class TTTApplet$1
+
+/* anonymous class */
+    class TTTApplet._cls1
+        implements ActionListener
+    {
+
+        public void actionPerformed(ActionEvent actionevent)
+        {
+            int i = (new Integer(actionevent.getActionCommand())).intValue();
+            move(i);
+        }
+
+    }
+
+
+    // Unreferenced inner class TTTApplet$2
+
+/* anonymous class */
+    class TTTApplet._cls2
+        implements ActionListener
+    {
+
+        public void actionPerformed(ActionEvent actionevent)
+        {
+            setForeground(Color.yellow);
+            for(int i = 0; i < 9; i++)
+                sq[i].setLabel(".");
+
+            lab.setText("Tic-Tac-Toe");
+            again.setLabel("New game");
+        }
+
+    }
+
+}

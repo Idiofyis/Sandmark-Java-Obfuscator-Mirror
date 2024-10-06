@@ -1,0 +1,92 @@
+\section{Adding an Obfuscator}
+\SM\ is designed to make it easy to add a new obfuscation
+algorithm. Assume that we want to add a new obfuscation
+{\tt ReorderMethods}. The process would be the following:
+\begin{enumerate}
+   \item Create a new directory \url{sandmark/obfuscate/reorderMethods}.
+   \item Create a new class  \url{sandmark/obfuscate/reorderMethods/ReorderMethods.java}.
+   \item The \url{ReorderMethods} class should extend one of 
+         the base classes \url{AppObfuscator} (if the algorithm works
+         on the entire user program), \url{MethodObfuscator}
+         (if the algorithm works one method at a time),
+         or \url{ClassObfuscator} (if the algorithm works
+         on one individual class at a time). Let's assume
+         that our algorithm reorders methods within one
+         class. \url{ReorderMethods} should therefore
+         extend \url{ClassObfuscator}, which looks like
+         this:
+\begin{listing}{1}
+package sandmark.obfuscate;
+public abstract class ClassObfuscator extends GeneralObfuscator {
+protected ClassObfuscator(String label) {
+    super(label);
+}
+abstract public void apply(
+    sandmark.util.ClassFileCollection cfc, String classname)
+    throws Exception;
+}
+public String toString() {
+    return "ClassObfuscator(" + getLabel() + ")";
+}
+}
+\end{listing}
+   \item The \url{ReorderMethods} class should look something
+         like this:
+\begin{listing}{1}
+public class ReorderMethods extends sandmark.obfuscate.ClassObfuscator {
+   public ReorderMethods(String label) {
+      super(label);
+   }
+   public void apply(
+       sandmark.util.ClassFileCollection cfc, String classname) throws Exception {
+      // Your code goes here!
+   }
+}
+\end{listing}
+   \item Use {\tt BCEL} or {\tt BLOAT} to implement your obfuscation.
+         The {\tt cfc} parameter represents the set of classes
+         to be obfuscated. Use routines in \url{sandmark.util.ClassFileCollection}
+         to open a class to be edited by {\tt BCEL} or {\tt BLOAT}.
+   \item Type {\tt make} at the top-level sandmark directory (\url{smark}).
+         The new obfuscation should be loaded automagically at runtime.
+\end{enumerate}
+
+\section{Obfuscation Configuration}
+ To customize Obfuscation Algorithm Application
+and Obfuscation Level Settings for a whole jar file ,or a class file and its methods  or a method alone
+the configure button in the obfuscation panel is to be used .On clicking The Configure
+button in the obfuscate panel , a new window pops up which is known
+   as Obfuscation Dialog ,which helps the users to select specific obfuscation algorthims and
+   obfuscation level .
+\subsection {Method Summary}
+\begin {listing}{2}
+/*  Find if a particular algorithm is marked for obfuscation in the case
+ *  of a class or jar file . Default is that all algorithms are to be applied
+ *  for all classes and methods in the jar file .
+ */
+    public boolean IsMarked(String algo,String class_or_jarname);
+
+/*  Find if a particular algorithm is marked for obfuscation in the case
+ *  of a method . Please specify the  signature enclosed in brackets.
+ */
+    public boolean IsMarked(String algo,String classname,String methodname,
+         String signature);
+
+/*  Obtain the obfuscation level for a class or jar file. Possible String
+ *  values are high , medium, low,none. Default is high .
+ */
+    public String getLevel(String class_or_jarname) ;
+
+/*  Obtain the obfuscation  level for a method .The  signature should
+ *   be enclosed in brackets .Possible values are high ,medium,low,none.
+ *   Default is high .
+ */
+    public String getLevel(String classname,String methodname,String signature)
+\end {listing}
+
+
+
+
+
+
+

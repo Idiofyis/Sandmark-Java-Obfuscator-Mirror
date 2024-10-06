@@ -1,0 +1,11 @@
+This directory contains a static watermarker patented by Davidson and 
+Myhrvold of the Microsoft Corporation (Patent #5,559,884, Sep. 24, 1996).
+
+A signature is embedded into the executable via  a reordering of basic 
+blocks. The signature is unique to each authorized copy of the code.
+
+The directory contains the following files:
+   DM.java   			-- The watermarking code.
+   Makefile			-- Commands to run the test code.
+
+Implemented by: Zachary Heidepriem (zachary@cs.arizona.edu)

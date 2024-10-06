@@ -1,0 +1,16 @@
+This directory contains a static watermarking algorithm. AssignLV is a watermarking algorithm that embeds the watermark in the local variable assignment by adding constraints to the interference graphs.
+
+This watermarking algorithm relies heavily upon some utility classes 
+found in sandmark.util.controlflowgraph.
+ 
+The directory contains the following files:
+   AssignLV.java        -- The watermarking code.
+   FromBinary.java      -- Converts a binary string to its ASCII 
+                           equivalent
+   ToBinary.java        -- Converts an ASCII string to its binary 
+                           equivalent
+   MethodCompare.java   -- A technique for comparing methods so that 
+                           they can be sorted
+   Makefile             -- Commands to run the test code.
+
+Implemented by: Ginger Myles

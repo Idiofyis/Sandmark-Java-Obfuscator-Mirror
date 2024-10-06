@@ -1,0 +1,266 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      H3 {margin-left:1.5cm}
+      P {margin-left:1.5cm;}
+      PRE {margin-left:3cm}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Boolean Splitter Obfuscation Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Boolean Splitter Obfuscation Algorithm</H1>
+    <H2>Author</H2>
+    <P>
+      Kamlesh Kantilal
+      (<A HREF="mailto:kamlesh@cs.arizona.edu">kamlesh@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      This algorithm detects boolean variables and arrays and modifies all
+      uses and definitions of these variables. Every boolean variable or array
+      element is split into 2 variables or array elements, and the state of the
+      original variable is reflected in the combined state of these 2
+      variables or array elements. This algorithm consists of two components.
+      One is boolean variable identification.  The other is splitting.
+    </P>
+    <H2>Examples</H2>
+    <H3>Application of the algorithm</H3>
+    <P>
+      An assignment to a boolean variable in java source code generates the
+      following java bytecode sequence:
+    </P>
+    <PRE>
+ifeq l1
+iconst 0
+goto l2
+l1:
+iconst 1
+l2:
+istore boolean var
+    </PRE>
+    <P>
+      An boolean operation is implemented similarly. For example, b=a&&c
+      generates the following code sequence:
+    </P>
+    <PRE>
+iload a
+ifeq l1
+iload c
+ifeq l1
+iconst 1
+goto l2
+l1:
+iconst 0
+l2:
+istore 1
+    </PRE>
+    <H3>Boolean variable detection</H3>
+    <P>
+      We do data flow analysis to identify the possbile value range of any
+      variable, if it is [0,1], we consider it as boolean variable. This
+      information is partly obtained using the stack simulator. But it does
+      not work for the following cases:<BR>
+      b=a, whose code sequence is:
+    </P>
+    <PRE>
+iload a
+istore b
+    </PRE>
+    <P>
+      Hence, we have to do something else. An iterative algorithm is used
+      wherein on every iteration we identify non boolean variables and
+      eliminate them. This iteration stops when no elimination were made in
+      the last iteration as we have identified all the non boolean variables.
+      The remaining variables are considered as boolean.
+    </P>
+    <H3>XOR Splitting</H3>
+    <P>
+      The basic idea of the XOR splitting technique is as follows:
+    </P>
+    <PRE>
+1 boolean a = true;
+2 boolean b = false;
+    </PRE>
+    <P>
+      is converted to:
+    </P>
+    <PRE>
+1 boolean a1 = true,a2 = false;
+2 boolean b1 = false,b2 = false;
+    </PRE>
+    <P>or</P>
+    <PRE>
+1 boolean a1 = false,a2 = true;
+2 boolean b1 = true,b2 = true;
+    </PRE>
+    <P>
+      In general, a single boolean variable will be replaced with a pair of
+      boolean variables such that the state of the original variable at any
+      program point is equal to the XOR of the 2 new variables. Likewise, a
+      boolean array 'a' will be replaced by an array 'b' with twice as many
+      elements, in which the state of array element a[i] in the original array
+      at any program point is equal to the XOR of b[2*i] and b[2*i + 1].
+    </P>
+    <H3>Code Transformation Techniques</H3>
+    <P>
+      Our implementation only obfuscates boolean variables where all
+      assignments to the variables are in one of the following forms:
+    </P>
+    <PRE>
+1 iconst_0
+2 istore_1
+3
+4 <or>
+5
+6 iconst_1
+7 istore_1
+    </PRE>
+    <P>
+      or
+    </P>
+    <PRE>
+iload_1
+
+istore_2
+    </PRE>
+    <P>
+      or
+    </P>
+    <PRE>
+1 <compute integer condition>
+2 ifeq L1
+3 iconst_1
+4 goto L2
+5 L1:
+6 iconst_0
+7 L2:
+8 istore_1
+    </PRE>
+    <P>
+      These patterns are easily modi ed to work as split variables:
+    </P>
+    <PRE>
+1 ifeq L1
+2 iconst_1
+3 iconst_0
+4 goto L2
+5 L1:
+6 iconst_0
+7 iconst_0
+8 L2:
+9 istore_1
+10 istore_2
+    </PRE>
+    <H3>Boolean Array Splitting Techniques</H3>
+    <P>
+      Our implementation only obfuscates arrays that are allocated in a
+      function and used in speci c ways exclusively in that function.
+      Allocation must look like this (all examples use the XOR obfuscation):
+    </P>
+    <PRE>
+1 newarray boolean
+2 astore_1
+</PRE>
+    <P>
+      This pattern is converted to this pattern in the obfuscated code, which
+      produces an array that is twice as long:
+    </P>
+    <PRE>
+1 iconst_1
+2 ishl
+3 newarray boolean
+4 astore_1
+</PRE>
+    <P>
+      All stores must look approximately like this:
+    </P>
+    <PRE>
+1 aload_1
+2 iload_2
+3 iload_2
+4 ifeq L1
+5 iconst_1
+6 goto L2
+7 L1:
+8 iconst_0
+9 L2:
+10 bastore
+    </PRE>
+    <P>
+      This pattern is obfuscated as follows:
+    </P>
+    <PRE>
+ALOAD_1
+ILOAD_2
+DUP2_X1
+POP
+DUP_X1
+POP
+DUP
+DUP2_X1;
+POP
+POP
+ICONST_1
+ISHL
+DUP
+DUP_X2
+POP
+ICONST_1
+IADD
+ICONST_0
+BASTORE
+DUP_X2
+POP
+DUP_X2
+POP
+BASTORE
+POP
+    </PRE>
+    <P>
+      All uses must look approximately like this:
+    </P>
+    <PRE>
+1 aload_1
+2 iload_2
+3 baload
+    </PRE>
+    <P>
+      This pattern is obfuscated as follows:
+    </P>
+    <PRE>
+1 aload_1
+2 iload_2
+3 iconst_1
+4 ishl
+5 dup2
+6 iconst_1
+7 iadd
+8 baload
+9 dup_x2
+10 pop
+11 baload
+12 ixor 
+    </PRE>
+    <H2>Configuration</H2>
+    <P>
+      There are no extra configuration parameters necessary to run this
+      obfuscator.
+    </P>
+    <H2>References</H2>
+    <BR>
+  </BODY>
+</HTML>
+

@@ -1,0 +1,146 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>HatTrick Static Watermarking Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>HatTrick Static Watermarking Algorithm</H1>
+    <H2>Authors</H2>
+    <P>
+      Danny Mandel
+      (<A HREF="dmandel@cs.arizona.edu">dmandel@cs.arizona.edu</A>)<BR>
+      Anna Segurson
+      (<A HREF="segurson@cs.arizona.edu">segurson@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      This algorithm embeds a static watermark in a java *.jar file through 
+      the sandmark interface. It first converts the watermark (which is a
+      String) to a number. This number is then encoded into the java byte code
+      by adding bogus local variable to one method of one class in the *.jar
+      file. The class in which the method is in is marked by a extra field
+      variable that contains the name of the method.
+    </P>
+    <P>
+      Each number of the watermark is mapped to a specific type:
+    </P>
+    <CENTER>
+      <TABLE BORDER=1>
+
+	  <TR>
+	    <TD> Number </TD> 
+	    <TD> Type </TD>
+	  </TR>
+	  <TR>
+	    <TD> 0 </TD> 
+	    <TD> <TT> java.util.GregorianCalendar </TT> </TD>
+	  </TR>
+	  <TR>
+	    <TD> 1 </TD> 
+	    <TD> <TT> java.lang.Thread </TT> </TD>
+	  </TR>
+	  <TR>
+	    <TD> 2 </TD> 
+	    <TD> <TT> java.util.Vector</TT> </TD>
+	  </TR>
+	  <TR>
+	    <TD> 3 </TD> 
+	    <TD> <TT> java.util.Stack</TT> </TD>
+	  </TR>
+	  <TR>
+	    <TD> 4 </TD> 
+	    <TD> <TT> java.util.Date</TT> </TD>
+	  </TR>
+	  <TR>
+	    <TD> 5 </TD> 
+	    <TD> <TT> java.io.InputStream </TT> </TD>
+	  </TR>
+	  <TR>
+	    <TD> 6 </TD> 
+	    <TD> <TT> java.io.ObjectInputStream </TT> </TD>
+	  </TR>
+	  <TR>
+	    <TD> 7 </TD> 
+	    <TD> <TT> java.lang.Math </TT> </TD>
+	  </TR>
+	  <TR>
+	    <TD> 8 </TD> 
+	    <TD> <TT> java.io.OutputStream </TT> </TD>
+	  </TR>
+	  <TR>
+	    <TD> 9 </TD> 
+	    <TD> <TT> java.lang.String </TT> </TD>
+	  </TR>
+      </TABLE>
+    </CENTER>
+    <P>
+      A local variable of the proper type is created for each digit of the
+      watermark and the digit's location in the watermark is stored in the
+      name of the bogus local variable.
+    </P>
+    <H2>Example</H2>
+    <P>
+      <B>Embedding</B><BR>
+      The watermark is embedded in the first non-abstract method found in the
+      first class file of the jar file. The name of the method is recorded in
+      the name of a field with the value of a hockey player's name. These are
+      the local variables added to a class when the watermark ``Howdy!" was
+      embedded:
+    </P>
+    <PRE>
+        Math yzerman$0 = new Math();
+        String yzerman$1 = new String();
+        ObjectInputStream yzerman$2 = new ObjectInputStream();
+        Stack yzerman$3 = new Stack();
+        InputStream yzerman$4 = new InputStream();
+        Stack yzerman$5 = new Stack();
+        OutputStream yzerman$6 = new OutputStream();
+        InputStream yzerman$7 = new InputStream();
+        InputStream yzerman$8 = new InputStream();
+        OutputStream yzerman$9 = new OutputStream();
+        Thread yzerman$10 = new Thread();
+        Thread yzerman$11 = new Thread();
+        Thread yzerman$12 = new Thread();
+        ObjectInputStream yzerman$13 = new ObjectInputStream();
+        Stack yzerman$14 = new Stack();
+    </PRE>
+    <P>
+      This is the field that is added:<BR>
+      <TT>    public static final String hat&#60init&#62Trick = "Vrbata";</TT><BR>
+      where <TT>&#60init&#62</TT> is the name of the method the watermark is
+      in.
+    </P>
+    <P>
+      <B>Recognition</B><BR>
+      The watermark is recognized when the proper field is present which
+      stores the name of the method. Every local variable that contains the
+      <TT>SECRET_NAME</TT> in that method is part of the watermark.<BR>
+      <BR>
+      In the example listed above <TT>yzerman</TT> is the secret name. To
+      recover the number stored by the <TT>SECRET_NAME</TT> variables, the
+      algorithm initializes a number, <TT>wm</TT>, to zero then loops through
+      all of the locals in the method and adds the mapped value of the
+      variable times 10 to the power of the number after the $ to <TT>wm</TT>.
+      After the number is recovered it is converted back to the watermark
+      string.
+    </P>
+    <H2>Configuration</H2>
+    <H2>References</H2>
+    <BR>
+  </BODY>
+</HTML>

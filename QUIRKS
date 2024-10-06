@@ -1,0 +1,88 @@
+Quirks of the JVM/Java/BCEL/etc.
+
+- The LOOKUPSWITCH instruction may have 0 case labels, but the 
+  TABLESWITCH instruction must have at least 1, in addition to its
+  default case.
+
+- The LOOKUPSWITCH instruction's case labels (if any) must be distinct, 
+  and sorted in increasing order.
+
+- If class A has a private method M with signature S, 
+  and class B extends A, then B may also have a method M with signature S.
+  Since the private method is not callable from any class but A, 
+  B may reuse the name M and S without fear of a name collision.
+  In this case, B.M does NOT override A.M.
+
+- A method need not have a return statement at all, even if it is nonvoid.
+  This can only happen if control flow does not permit a return statement;
+  i.e. if control flow always reaches an ATHROW instruction, or the method
+  has a statically infinite loop.
+
+- Fields and methods may have reserved words as their names. Only the compiler
+  stops you from naming your fields 'if' or 'switch'.
+
+- The same BASTORE or BALOAD instruction can use either 
+  a boolean array or a byte array. This means you could do 
+  something like this:
+
+  public static void method(byte[] arg0, boolean[] arg1, boolean which){
+    0: ILOAD_2
+    1: IFEQ 4
+    2: ALOAD_0
+    3: GOTO 5
+    4: ALOAD_1
+    5: ICONST_0
+    6: BALOAD
+    ....
+  }
+
+  This would load the 0th element out of either arg0 or arg1, depending on the
+  value of 'which'.
+
+- A class may only be PUBLIC or PACKAGE PRIVATE.
+
+- JVM Bug: All security modifiers on methods can be 
+  circumvented at runtime using invokespecial.
+
+- An interface EXTENDS java.lang.Object and it
+  IMPLEMENTS its superinterfaces.
+
+- About the JSR/JSR_W instructions:
+  * Not every JSR needs a RET. It is legal to have the 
+    method return after a JSR, without ever doing a RET.
+  * The "return address" type created by the JSR/JSR_W instructions 
+    is implicitly parameterized by the target of the JSR jump. That 
+    is, according to the verifier, if two different return addresses 
+    have different targets, they are not equal.
+  * The "return address" type can only be manipulated in certain ways. 
+    It can only be stored using ASTORE or moved with a stack instruction. 
+    It cannot be loaded with an ALOAD.
+  * Any JSR can have at most 1 RET that will return to its physical 
+    successor. If there are more, the method will not verify. 
+  * Any RET may be reached by multiple JSRs. 
+  * A JSR cannot be the last instruction of a method, even if it 
+    is unreachable code.
+  * Nested subroutines can RET in the wrong order... that is, if a 
+    JSR leads to another JSR before it has a RET to the first JSR, 
+    then you may RET to the first JSR without ever RETing to the second 
+    JSR. You cannot then RET to the second JSR. In essence, you cannot cross-RET.
+
+- About exceptions:
+  * As far as the bytecode verifier is concerned, ANY instruction (even NOP) that is
+    inside an exception handler (a 'try' block) may cause that exception, and hence
+    invoke the handler. Thus, every local variable context found inside a 'try' block
+    can potentially occur in the corresponding handler(s).
+    Note the following subtlety:
+      if the last instruction of a 'try' block modifies a local variable, the resulting context
+      cannot occur in the handler, because if that instruction WERE to cause an
+      exception, then it would not complete, and hence the local variable would not change.
+
+- About BCEL:
+  * All BCEL Instruction instances are immutable, except for the BranchInstructions and 
+    the IndexedInstructions (Load, Store, IINC, RET). The branches may have their targets 
+    changed and the indexed instructions may have their local variable indexes changed.
+
+  * Never ever ever ever use the InstructionList.getInstructions() method. It will cause
+    the instruction list to be dumped to raw bytes, then REPARSED into Instructions. This
+    is not what you want. It will also not assign any of the targets of the branch 
+    instructions in the new list, so they will all point to null. 

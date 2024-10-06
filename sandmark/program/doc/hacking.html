@@ -1,0 +1,110 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Program Objects</TITLE>
+  </HEAD>
+<BODY>
+
+
+<h1>Program Objects</h1>
+This is a framework built on top of the <code>BCEL</code> bytecode
+manipulation package. It provides a higher level API, extensive
+caching of information, etc.
+<p>
+The API is <a href="http://sandmark.cs.arizona.edu/API/3.4.0/sandmark/program/package-summary.html"> here </a>
+<p>
+<em>Insert more information here!</em>
+<p>
+The package provides classes for manipulating components of a Java program. An
+application is represented as a hierarchy of program objects. Different
+objects represent:
+<ul>
+    <li> the entire application,
+    <li> Java classes, methods, and fields,
+    <li> other files stored in the jar file.
+</ul> 
+An Application object can be exported to produce an executable jar file.
+<p>
+Program objects are built atop the BCEL byte code engineering library and
+provide wrappers for BCEL methods. Finer-level components such as
+instruction lists are manipulated by calling BCEL methods directly. Code
+that makes direct BCEL calls must also call the <code>mark()</code> method of the
+enclosing program object to inform it of the change.
+<p>
+Program objects support caching by associating a version counter with each
+object. The counter is incremented automatically by the methods in this
+package or manually by calling the <code>mark()</code> method. The caching system is
+used to improve performance by this package and by external packages such
+as sandmark.metric.
+<p>
+The methods in this package act locally: For example, renaming a method
+does not alter any references to the method. Some heavyweight methods with
+global effect are provided in the sandmark.program.util package.
+
+<h2>Application Objects</h2>
+Represents a complete Java program. An Application object is the root of a
+tree encompassing Classes and all their subcomponents, plus other jar file
+entries such as images or sound clips. The jar file manifest is part of the
+application itself and is not a node in the tree.
+<p>
+Here is a simple example that reads a jar file and prints the classes:
+<p>
+<pre>
+    sandmark.program.Application app =
+       new sandmark.program.Application("program.jar");
+    java.util.Iterator it = a.classes();
+    while (it.hasNext()) {
+       sandmark.program.Class cls = (sandmark.program.Class) it.next();
+       System.out.println("class " + cls.getName());
+    }
+</pre> 
+<p>
+This example renames the main class and writes a new jar file:
+<pre>
+    sandmark.program.Application app =
+       new sandmark.program.Application("old.jar");
+    sandmark.program.Class c = app.getMain();
+    c.setName("Start");
+    app.setMain(c);
+    app.save("new.jar");
+ </pre> 
+
+<h2>Method Objects</h2>
+Method objects Represent a single method within a class or interface. A Method object
+embeds a BCEL MethodGen object in a Sandmark program object. Most methods
+just call the corresponding BCEL method. Modification methods automatically
+call the mark method to register their changes.
+<p>
+Here is a simple example of how to use the BCEL interfaces. 
+This code adds a NOP instruction at the beginning of each method in a supplied class.
+<pre>
+    static void addNOPs(sandmark.program.Class c) {
+       sandmark.program.Method[] mlist = c.getMethods();
+       java.util.Iterator it = c.methods();
+       while (it.hasNext()) {
+          sandmark.program.Method m = (sandmark.program.Method) it.next();
+          System.out.println(
+             "    method " + m.getName() + " " + m.getSignature());
+          org.apache.bcel.generic.InstructionList ilist = m.getInstructionList();
+          ilist.insert(org.apache.bcel.generic.InstructionConstants.NOP);
+          m.mark();
+       }
+    }
+ </pre>
+</body>
+</html>

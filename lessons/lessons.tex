@@ -1,0 +1,35 @@
+\documentclass{book}
+\usepackage{url}
+\usepackage{graphics}
+\usepackage{fullpage}
+\usepackage{epic}
+\usepackage{eepic}
+\usepackage{amsfonts}
+\usepackage{fancyheadings}
+\usepackage{moreverb}
+
+\title{Lessons Learned}
+\author{Christian Collberg}
+
+\input{definitions}
+
+\begin{document}
+\hacker{Christian Collberg}
+\maketitle
+
+\setcounter{secnumdepth}{1}
+\tableofcontents
+
+\chapter{Working with \BCEL}
+\input{bcel}
+
+\chapter{Working with \BLOAT}
+\input{bloat}
+
+\chapter{Working with \SM}
+\input{sm}
+
+\chapter{Working with CVS}
+\input{cvs}
+
+\end{document}

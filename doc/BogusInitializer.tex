@@ -1,0 +1,79 @@
+\algorithm{Bogus Initializers  Watermarking Algorithm}%
+          {Ashok Purushotham , RathnaPrabhu Rajendran}
+
+\section{Introduction}
+This is an algorithm that embeds a  number in the constant pool of the application. The code of this algorithm resides in \url{sandmark.watermark.constantstring}.
+
+
+\section{Embedding}
+To embed the watermark we pick one of the user's classes at random and add a few local variables to a method in the class. The initial values of the variables added, store the watermark.Suppose the number to be watermarked is 129091,we create three local variables sm\$1, sm\$2 and sm\$3 and assign 12,90 and 91 to each of them respectively. If the number of digits in the number is an odd number, we append a zero to it, to make it even and split it among the variables appropriately. We also store the number of digits  in the original watermark number, which is useful while recognizing the watermark.
+\begin{listing}{1}
+int temp_len=watermark.length();
+int stringIndex = cpg.addString("sm$len" + "=" + watermark.length();
+if(temp_len%2 ==0)
+    bogus_ids_no=temp_len /2;
+else
+  {
+    bogus_ids_no=temp_len /2 +1;
+    watermark=watermark+"0";
+    System.out.println(watermark);
+   }
+org.apache.bcel.classfile.Method[] methods=cg.getMethods()   ;
+org.apache.bcel.generic.MethodGen mg=
+   new org.apache.bcel.generic.MethodGen(methods[methods.length-1],className,cpg);
+int cp_index[] = new int[bogus_ids_no];
+org.apache.bcel.generic.InstructionList il = mg.getInstructionList();
+for(int i=0;i<bogus_ids_no;i++){
+   String index=String.valueOf(i+1);
+   org.apache.bcel.generic.LocalVariableGen lv= 
+      mg.addLocalVariable("sm$"+index,org.apache.bcel.generic.Type.INT,null,null);
+   cp_index[i]=lv.getIndex();
+   String str_value = watermark.substring((2*i),(2*i+1)+1);
+   int int_value=Integer.parseInt(str_value);
+   byte b = (byte)int_value;
+   il.insert( new org.apache.bcel.generic.ISTORE(cp_index[i]));
+   il.insert( new org.apache.bcel.generic.BIPUSH(b));
+   }
+
+\end{listing}
+
+
+\section{Recognition}
+During recognition, we go through every class in the watermarked jar-file looking for a string in the constant pool that starts with {\tt "sm\$len"} (This string holds the length the watermark added). Once we identify the string, we extract the values of the bogus variables added during embedding and combine them to reveal the watermark. We also take care of the extra '0' added to make the number of digits even, during the embedding process.
+
+\begin{listing}{1}
+if (v.startsWith("sm$len")) {
+   String w = v.substring("sm$len".length()+1);
+   int no_of_vars=Integer.parseInt(w);
+   if(no_of_vars%2==0)
+       no_of_vars/=2;
+   else
+       no_of_vars=no_of_vars/2 +1;
+   String wm="";
+   for(int j=0;j<no_of_vars;j++){
+       org.apache.bcel.generic.BIPUSH bip= (org.apache.bcel.generic.BIPUSH)instr[2*j];
+       int sub_value= bip.getValue().intValue();
+       String str = String.valueOf(sub_value);
+       if( sub_value < 10)
+          str= "0"+str;
+       wm = str + wm;
+       }
+       if(wm.length()==Integer.parseInt(w))
+          result.add(wm);
+       else
+          result.add(wm.substring(0,wm.length()-1));
+
+\end{listing}
+
+
+
+
+
+
+
+
+
+
+
+
+

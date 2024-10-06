@@ -1,0 +1,28 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+	<TITLE>Tracing in SandMark</TITLE>
+</HEAD>
+<BODY BACKGROUND="sand.jpg" BGCOLOR="#E6D1B4"
+TEXT="#221100" LINK="#884400" ALINK="#EE7700" VLINK="#442200">
+
+<H1>Tracing in SandMark</H1>
+
+<P> Before you can actually embed a watermark into your
+program you have to produce a <em>trace</em>. Simply
+put, you have to 
+<ol>
+  <li> choose an input sequence to your program,
+  <li> keep this input sequence secret and secure, since 
+       only with this sequence can the watermark be retrieved, and
+  <li> enter the input sequence into your program, as it
+       is being run from SandMark's <b>TRACE</b> pane.
+</ol>
+As a result, a <em> trace </em> file is produced. This trace file
+becomes the input to the watermark <em> embedder </em> which
+you access from SandMark's <b> EMBED </b> tab. When, at a later
+date, you want to extract the watermark from the program you
+go to SandMark's <b> RECOGNIZE</b> tab. There, you run the program 
+again with the same command-line arguments and the same secret
+input sequence, and the watermark/fingerprint will reappear.
+
+</BODY></HTML>

@@ -1,0 +1,148 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: packimports(3) 
+// Source File Name:   TTTApplication.java
+
+import java.awt.*;
+import java.awt.event.*;
+import sandmark.trace.Annotator;
+
+public class TTTApplication extends TTTApplication2
+{
+
+    public TTTApplication()
+    {
+        lab = new Label("Tic-Tac-Toe", 1);
+        pan = new Panel();
+        sq = new Button[9];
+        south = new Panel();
+        quit = new Button("Exit");
+        reload = new Button("Reload");
+        ply = 2;
+    }
+
+    public void init()
+    {
+        Annotator.mark();
+        setBackground(Color.green);
+        setForeground(Color.yellow);
+        setFont(new Font("SansSerif", 1, 60));
+        setSize(360, 360);
+        setLayout(new BorderLayout());
+        addWindowListener(new _cls20() {
+            private class _cls20 extends WindowAdapter
+            {
+
+                _cls20()
+                {
+                }
+            }
+
+
+            public void windowClosing(WindowEvent windowevent)
+            {
+                dispose();
+                System.exit(0);
+            }
+
+            
+            {
+                this$0 = TTTApplication.this;
+            }
+        });
+        add("North", lab);
+        add("Center", pan);
+        pan.setLayout(new GridLayout(3, 3));
+        Annotator.mark();
+        south.setLayout(new FlowLayout());
+        quit.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent actionevent)
+            {
+                dispose();
+                System.exit(0);
+            }
+
+        });
+        reload.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent actionevent)
+            {
+                clear();
+            }
+
+        });
+        add("South", south);
+        south.add(quit);
+        south.add(reload);
+    }
+
+    public static void main(String args[])
+    {
+        TTTApplication tttapplication = new TTTApplication();
+        tttapplication.init();
+        tttapplication.start();
+        tttapplication.pack();
+        tttapplication.show();
+    }
+
+    public void clear()
+    {
+        setForeground(Color.yellow);
+        for(int i = 0; i < 9; i++)
+            sq[i].setLabel(".");
+
+        Annotator.mark();
+        lab.setText("Tic-Tac-Toe");
+    }
+
+    public void move(int i)
+    {
+        if(!hit() && free())
+        {
+            ply = ply != 2 ? 2 : 1;
+            Annotator.mark(ply);
+            mark(i);
+            if(hit())
+            {
+                setForeground(Color.blue);
+                lab.setText("Player " + ply + " won!");
+            }
+        } else
+        {
+            if(free())
+                setForeground(Color.magenta);
+            else
+                setForeground(Color.red);
+            lab.setText("Reload game!");
+        }
+    }
+
+    public void mark(int i)
+    {
+        if(sq[i].getLabel() == ".")
+        {
+            if(ply == 1)
+                sq[i].setLabel("X");
+            else
+                sq[i].setLabel("O");
+            Annotator.mark(i);
+        }
+    }
+
+    // Unreferenced inner class TTTApplication$1
+
+/* anonymous class */
+    class _cls1
+        implements ActionListener
+    {
+
+        public void actionPerformed(ActionEvent actionevent)
+        {
+            int i = (new Integer(actionevent.getActionCommand())).intValue();
+            move(i);
+        }
+
+    }
+
+}

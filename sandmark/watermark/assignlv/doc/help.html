@@ -1,0 +1,56 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Assign Local Variables Static Watermarking Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Assign Local Variables Watermarking Algorithm</H1>
+    <H2>Author</H2>
+    <P>Ginger Myles
+       (<A HREF="mailto:mylesg@cs.arizona.edu">mylesg@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      Assign Local Variables is a watermarking algorithm that embeds the
+      watermark in the local variable assignment by adding constraints to the
+      interference graphs.
+    </P>
+    <P>
+      This algorithm has the advantage of being very stealthy due to the fact
+      that it doesn't add any code. The only changes that can be seen between
+      the original version and the watermarked version are the local variable
+      numbers. Unfortunately this algorithm is highly suseptable to various
+      attacks. For instance an obfuscator that modifies the method bodies
+      should not be used after the watermark has been embedded as this will
+      effect the interference graph.
+    </P>
+    <H2>Example</H2>
+    <H2>Configuration</H2>
+    <H2>References</H2>
+     <ul>
+      <li>Gang Qu and Miodrag Potkonjak. Hiding Signatures in Graph Coloring
+      Solutions. In Information Hiding, pages 348-367, 1999.
+      <li>Gang Qu and Miodrag Potkonjak. Analysis of Watermarking Techniques for
+      Graph Coloring Problem. In ICCAD, pages 190-193, 1998.
+      <LI>
+      Ginger Myles and Christian Collberg, Software Watermarking Through Register
+      Allocation: Implementation, Analysis, and Attacks. In 6th International
+      Conference on Information Security and Cryptology, 2003.
+     </ul>
+  </BODY>
+</HTML>

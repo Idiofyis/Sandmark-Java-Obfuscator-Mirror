@@ -1,0 +1,106 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>False Refactor Obfuscation Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>False Refactor Obfuscation Algorithm</H1>
+    <H2>Authors</H2>
+    <P>
+      Ashok Purushotham
+      (<A HREF="mailto:ashok@cs.arizona.edu">ashok@cs.arizona.edu</A>)<BR>
+      Rathna Prabhu Rajendran
+      (<A HREF="mailto:prabhu@cs.arizona.edu">prabhu@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      False refactoring is performed on two classes C1 and C2 that have no
+      common behavior. If both classes have instance variables of the same
+      type, these can be moved into the new parent class C3. C3's methods can
+      be buggy versions of some of the methods from C1 and C2.
+    </P>
+    <H2>Example</H2>
+    <P>
+      Consider the following sample code:
+    </P>
+    <PRE>
+      C1.java
+        class C1 {
+          String customerName = "";
+          public void process( ) {
+            /* Process customer */
+            customerName = ...
+          }
+        }
+
+      C2.java
+        class C2 {
+          String furnitureName = "";
+          public int polish( ) {
+            furnitureName = ...
+            /* Polish the furniture */
+          }
+        }
+    </PRE>
+    <P>
+      After false refactoring the classes:
+    </P>
+    <PRE>
+        class SMBaseC1 {
+          String smstring = "";
+          public void process( ) {
+            /* Buggy code */
+          }
+        }
+
+        class C1 extends SMBaseC1 {
+          public void process( ) {
+            smstring = ...
+          }
+        }
+
+        class C1 extends SMBaseC1 {
+          public int polish( ) {
+            smstring = ...
+          }
+        }
+    </PRE>
+    <P>
+      If one of the classes inherits from some other class other than
+      java.lang.Object, then SMBaseC1 has to be an interface and the two
+      classes have to implement SMBaseC1 instead of extending it.
+    </P>
+    <H2>Configuration</H2>
+    <P>
+      No additional configuration parameters are required to carry out this
+      obfuscation.
+    </P>
+    <H2>References</H2>
+    <UL>
+      <LI>
+	Chidamber, S. and C. Kemerer, <I>Towards a Metrics Suite for Object
+	  Oriented Design</I>, Proceedings of OOPSLA, July 1991.
+      </LI>
+      <LI>
+	Collberg, Christian, Thomborson, Clark, and Low, Douglas, <I>Breaking
+	  Abstractions and Unstructuring Data Structures</I>.
+      </LI>
+    </UL>
+    <BR>
+  </BODY>
+</HTML>

@@ -1,0 +1,85 @@
+Added by kheffner - 12/03/03 (kheffner@cs.arizona.edu)
+
+You need to provide a program
+
+jDecompile jardir class 
+
+in your path.
+
+jardir is the path to a directory into which the jar-file has been unpacked. class is the fully qualified (as in java.lang.Object) name of the class that should be decompiled. If class is empty the program should return the result of decompiling all classes in jardir.
+
+For example, jDecompile might be called like this:
+   jDecompile /tmp/smkCFC94620 myprogram.mypackage.MyClass
+
+Sample scripts:
+
+Source Again - requires RT, CFG, and SA variables
+------------------------------------------------------
+
+#!/bin/csh -fx
+
+set jarPath = $1
+set className = $2
+
+#/home/collberg/lib/j2sdk1.4.0/jre/lib/rt.jar
+set RT = 
+
+#/home/collberg/share/SourceAgain.cfg
+set CFG =
+
+#/home/collberg/bin/srcagain
+set SA =
+
+set CMD  = "$SA -name $CFG -ilocal -topdecl -tabwidth 3 -i $RT"
+
+cd $jarPath
+
+if ($className != "#") then
+   $CMD $className
+   exit 0
+endif
+
+foreach i (`find . -name \*.class`)
+   $CMD $i
+   echo
+end
+exit 0
+
+
+Soot - requires JDK and SOOT/SOOTCP variables
+------------------------------------------------------
+#!/bin/csh -fx
+
+set jarPath = $1
+set className = $2
+set classPath = $3
+
+set JDK = /cs/linux/j2sdk1.4.2_02
+set RT   = $JDK/jre/lib/rt.jar
+
+#use soot.jar in smextern3
+set SOOT = #location of soot.jar and jasmin.jar
+set SOOTCP = $SOOT/soot.jar:$SOOT/jasmin.jar
+
+set CMD  = "$JDK/bin/java -classpath $SOOTCP soot.Main -f dava -soot-classpath $JDK/jre/lib/rt.jar:$jarPath/:$classPath -d $jarPath"
+
+cd $jarPath
+
+if ($className != "#") then
+   echo $className
+   set outfile = `$CMD $className | grep "Generating" | sed 's/Generating//g;s/\.\.\.//g'`
+   foreach out ($outfile)
+      cat $out
+   end
+   exit 0
+endif
+
+#foreach i (`find . -name \*.class | sed 's/\.\///g;s/\//\./g;s/\.class//g' `)
+#   echo $i
+   set outfiles = `$CMD -process-dir $jarPath | grep "Generating" | sed 's/Generating//g;s/\.\.\.//g'`
+   foreach out ($outfiles)
+      cat $out
+      echo "---------------------------"
+   end
+#end
+exit 0

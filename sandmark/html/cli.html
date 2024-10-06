@@ -1,0 +1,372 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+  <meta name="GENERATOR"
+ content="Mozilla/4.77 [en] (X11; U; Linux 2.4.18-686 i686) [Netscape]">
+  <title>scripting.html</title>
+</head>
+<body text="#221100" bgcolor="#e6d1b4" link="#884400" vlink="#442200"
+ alink="#ee7700" background="sand.jpg">
+<center>
+<h1>Scripting SandMark</h1>
+</center>
+SandMark can be run through a CLI interface, or from a shell prompt.<br>
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+Use the following command to run CLI: <br>
+java -cp sandmark.jar sandmark.smash.sandmarkCLI -options <br>
+<br style="font-weight: bold;">
+<span style="font-weight: bold;">CLI options:</span><br>
+-U : <small><big>Usage</big><br>
+</small>-S &nbsp;: Display static watermark list<br>
+-D : Display dynamic watermark list<br>
+-R : Display obfuscator list<br>
+-L &lt;level&gt;: Specify obfuscator level to be displayed -
+'app'/'class'/'method'<br>
+-A &lt;algoname&gt;:<big> </big>Specify algorithm<br>
+-H : Get algorithm help<br>
+-i &nbsp;&lt;inputJar&gt; : Specify input jar file<br>
+-o &nbsp;&lt;outputJar&gt; : Specify output jar file<br>
+-w &lt;watermark&gt; : Specify watermark value<br>
+-k &nbsp;&lt;key&gt; &nbsp;: Specify key value<br>
+-E : Perform embedding<br>
+-R : Perform recognizing<br>
+-O : Perform obfuscation<br>
+<small><small><small><small><small><small><small><big><big><big>-P
+&lt;prefixStr&gt; :<big> </big>Specify prefix string </big></big></big></small></small></small></small></small></small><big>(for
+ConstantString watermark)</big></small><br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+<span style="font-weight: bold;"> Dynamic Watermark specific options:</span><br>
+-t <span style="font-style: italic;">&lt;tracefile&gt;</span> : Specify
+trace file<br>
+-c <span style="font-style: italic;">&lt;classpath&gt;</span> : Set
+ClassPath<big> </big><br>
+-m <span style="font-style: italic;">&lt;mainclass&gt; </span>: Set
+MainClass<br>
+-a <span style="font-style: italic;">&lt;arguments&gt;</span> : Set
+Arguments<br>
+-T : start Trace<br>
+-N <span style="font-style: italic;">&lt;encodeStr&gt;</span> : Specify
+parameters for CT/DynamicAA algorithm.<br>
+&nbsp; &nbsp;&nbsp;&nbsp; <span style="font-style: italic;">encodeStr</span>
+format &nbsp;- <br>
+<ul>
+  <li>&nbsp;CT:<small><span style="font-style: italic;"> &lt;nodetype&gt;</span><big>#</big><span
+ style="font-style: italic;">&lt;storewhat&gt;</span><big>#</big>&lt;storemethods&gt;<big>#</big><span
+ style="font-style: italic;">&lt;storelocation&gt;</span><big>#<span
+ style="font-style: italic;">&lt;</span><small
+ style="font-style: italic;">protectionmethods&gt;</small>#</big><span
+ style="font-style: italic;">&lt;encoding&gt;</span><big>#</big><span
+ style="font-style: italic;">&lt;components&gt;</span><big>#</big><span
+ style="font-style: italic;">&lt;encodeInline(true/false)</span><big>&gt;#</big><span
+ style="font-style: italic;">&lt;encodeReplace(true/false)</span>&gt;<big>#</big><span
+ style="font-style: italic;">&lt;dumpIR(true/false)&gt;</span></small>
+&nbsp; &nbsp; &nbsp;&nbsp;</li>
+  <li>DynamicAA/ Arboit Algorithm:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <small>&lt;minWMparts&gt;</small>#<small
+ style="font-style: italic;">&lt;encodeConsts(true/false)</small><span
+ style="font-style: italic;">&gt;</span>#<small
+ style="font-style: italic;">&lt;useOpaqueMethods(true/false)</small>&gt;#<small
+ style="font-style: italic;">&lt;reuseMethods(true/false)</small><span
+ style="font-style: italic;">&gt;</span><br>
+  </li>
+</ul>
+<small><small><small><small><small><small><small> &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; </small></small></small></small></small></small></small><br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+<hr style="width: 100%; height: 2px;"><br>
+Use &nbsp;the following command to start up SandMark shell:<br>
+java <span style="font-style: italic;">-cp sandmark.jar</span>
+sandmark.smash.Smash<br>
+<br>
+At the <span style="font-weight: bold;">$smash</span> prompt, you can
+give the following shell commands:<br>
+<ul>
+  <li><span style="font-weight: bold;">help();</span> - <small>Get help
+for various options</small></li>
+  <li><span style="font-weight: bold;">swm(); </span><span
+ style="font-weight: bold;"></span>- <small>Display static watermark
+algorithm list</small></li>
+  <li><span style="font-weight: bold;">dwm();</span><span
+ style="font-weight: bold;"> </span>- <small>Display dynamic watermark
+algorithm list</small></li>
+  <li><span style="font-weight: bold;">obf(level);</span> - <small>Display
+obfuscation algorithm&nbsp; list at <span style="font-style: italic;">'app'</span>,<span
+ style="font-style: italic;">'class'</span> or <span
+ style="font-style: italic;">'method'</span> level.</small></li>
+  <li><span style="font-weight: bold;">addOptions();</span> - <small>Display
+additional options;</small>&nbsp;</li>
+  <li><span style="font-weight: bold;">setInputFile(jarfile);</span> - <small>Set
+the input jar file name, specifying its fullpath&nbsp;</small></li>
+  <li><span style="font-weight: bold;">setOutputFile(jarfile);</span> - <small>Set
+the output jar file name; if not set, the default is <span
+ style="font-style: italic;">in_wm.jar</span> for watermark and <span
+ style="font-style: italic;">in_obf.jar</span> for obfuscation, where <span
+ style="font-style: italic;">in.jar</span> is the input file.</small></li>
+  <li><span style="font-weight: bold;">setKey(key);</span> - <small>Set
+the key value for the watermark algorithm</small></li>
+  <li><span style="font-weight: bold;">setWM(watermark)</span><span
+ style="font-weight: bold;">;</span> - <small>Set the watermark value</small></li>
+  <li><span style="font-weight: bold;">selectAlg(algoName)</span><span
+ style="font-weight: bold;">; </span>- <small>Select the
+algorithm&nbsp;</small></li>
+  <li><span style="font-weight: bold;">getAlgDesc()</span><span
+ style="font-weight: bold;">;</span> - <small>Get description of the
+current algorithm selected; <span style="font-style: italic;">selectAlg()</span>
+must be run before this.</small></li>
+  <li><span style="font-weight: bold;">getAlgDesc(algoName);</span> - <small>Get
+description of algorithm specified</small></li>
+  <li><span style="font-weight: bold;">embed();</span> - <small>Perform
+embed operation</small></li>
+  <li><span style="font-weight: bold;">recognize();</span> - <small>Perform
+recognition operation</small></li>
+  <li><span style="font-weight: bold;">getNextWM();</span> - <small>Retrieve
+the next watermark after recognition</small></li>
+  <li><span style="font-weight: bold;">setTraceFile(tracefile);</span> - <small>Specify
+the file of trace-points generated during tracing&nbsp;</small></li>
+  <li><span style="font-weight: bold;">setClassPath(classpath);</span><span
+ style="font-weight: bold;"> </span>- <small>Specify user defined
+ClassPath additions used during tracing or recognition</small></li>
+  <li><span style="font-weight: bold;">setMainClass(mainclass);</span> - <small>Specify
+mainClass where execution starts during tracing or recognition</small></li>
+  <li><span style="font-weight: bold;">setArguments(args);</span> - <small>Set
+arguments during tracing or recognition</small></li>
+  <li><span style="font-weight: bold;">startTrace();</span> - <small>start
+tracing</small>&nbsp;</li>
+  <li><span style="font-weight: bold;">stopTrace();</span> - <small>stop
+tracing</small>&nbsp;</li>
+  <li><span style="font-weight: bold;">endTrace();</span> - <small>terminate
+tracing</small></li>
+  <li><span style="font-weight: bold;">ct_encode(nodetype, storeWhat,
+storeMethods, storeLoc, protectionMethods, encoding, components);</span>
+- <small>specify encoding paramters for CT algorithm.</small></li>
+  <li><span style="font-weight: bold;">set_ct_encode_inline(arg);</span>
+- <small>Specify whether to inline the methods for creating the
+watermark at the call point; set to true/false</small></li>
+  <li><span style="font-weight: bold;">set_ct_e</span><span
+ style="font-weight: bold;">nco</span><span style="font-weight: bold;">de_replace(arg);</span>
+- <small>Allow sandmark to automatically choose a class that best
+represents the watermark graph node; set to true/false</small></li>
+  <li><span style="font-weight: bold;">set_ct_dumpIR(arg);</span> - <small>Print
+out the intermediate code; set to true/false</small></li>
+  <li><span style="font-weight: bold;">set_min_wmparts(numparts);</span>
+- <small>Specify number of parts the watermark is to be broken.</small></li>
+  <li><span style="font-weight: bold;">set_encode_consts(arg);</span><span
+ style="font-weight: bold;"> </span>- <small>Encode the watermark
+wither as constants in the opaque predicate or using the rank; set to
+true/false</small></li>
+  <li><span style="font-weight: bold;">set_use_opaque_methods(arg);</span><span
+ style="font-weight: bold;"> </span>- <small>Encode the watermark
+either as an inserted opaque method or as an inserted opaque predicate;
+set to true/false</small></li>
+  <li><span style="font-weight: bold;">set_reuse_methods(arg);</span> - <small>Reuse
+opaque methods when the rank is used to encode the value of watermark;
+set to true/false</small></li>
+  <li><span style="font-weight: bold;">setPrefix(prefixStr);</span><span
+ style="font-weight: bold;"> </span>- <small>The prefix of the string
+in which we hide the ConstantString watermark.</small></li>
+  <li><span style="font-weight: bold;">exit();</span> - <small>Exit
+SandMark shell.</small><br>
+  </li>
+</ul>
+Additional options:<br>
+<ul>
+  <li><span style="font-weight: bold;">runEmbed(jarString);</span> - <small>Embed
+a watemark on multiple input jar files; Specify <span
+ style="font-style: italic;">jarString</span> in the format <span
+ style="font-style: italic;">&lt;jar1:jar2: ... :jarN&gt;</span></small></li>
+  <li><span style="font-weight: bold;">runRecognizeWM(jarString);</span>
+- <small>Run recognition on multiple jar files; Specify jarString in
+the format <span style="font-style: italic;">&lt;jar1:jar2: ... :
+jarN&gt;</span></small></li>
+  <li><span style="font-style: italic;"></span><span
+ style="font-weight: bold;">embedMultipleWM(</span><span
+ style="font-weight: bold;">algoWmarkStr);</span> - <small>Run multiple
+watermark algorithm embed operations on an input jar file. The output
+of the first embedding is fed as the input to the next embedding in
+sequence. Specify <span style="font-style: italic;">algoWmarkStr</span>
+in the format</small> <small><span style="font-style: italic;">&lt;algo1.wmark1&gt;:&lt;algo2.wmark2&gt;:
+... :&lt;algoN.wmarkN&gt;</span></small></li>
+  <li><span style="font-style: italic;"></span><span
+ style="font-weight: bold;">recognizeMultipleWM(algoStr);</span> - <small>Run<span
+ style="font-weight: bold;"></span> multiple algorithm recognition on a
+single input jar file; Specify <span style="font-style: italic;">algoStr</span>
+in the format &lt;<span style="font-style: italic;">algo1:algo2: ...
+:algoN&gt;</span></small></li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4> <a href="cli.html#sample_CLI">Sample_Scripts for SandMark CLI&nbsp;</a></h4>
+<ul>
+  <li> <a href="cli.html#CLIScript1">Script1-Statically Embedding a
+watermark</a></li>
+  <li> <a href="cli.html#CLIScript2">Script2-Dynamically Embedding a
+watemark</a></li>
+  <li> <a
+ href="file:///.automount/home/tapas/Sandmark3.3/smark3/sandmark/html/cli.html#CLIScript3">Script3-Obfuscation</a></li>
+  <li> <a
+ href="file:///.automount/home/tapas/Sandmark3.3/smark3/sandmark/html/cli.html#CLIScript4">Script4-Running
+a recognition</a></li>
+</ul>
+<hr style="width: 100%; height: 2px;">&nbsp;<br>
+&nbsp; &nbsp; &nbsp; <a name="sample_CLI"></a>&nbsp;# &nbsp; <small>setenv
+sandmarkCLI&nbsp; "java -classpath sandmark.jar
+sandmark.smash.SandmarkCLI"</small>
+<ul>
+  <li>&nbsp;<a name="CLIScript1"></a>Statically embedding a watermark</li>
+</ul>
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;$<small>sandmarkCLI
+-A AddMethField -i TTT.jar -o outputTTT.jar -w 1234 -E -k 1111</small><br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &gt;
+Embed <span style="font-style: italic;">1234</span> &nbsp;in <span
+ style="font-style: italic;">TTT.jar</span> using the static watermark
+algorithm <span style="font-style: italic;">AddMethField</span> and key
+value<span style="font-style: italic;"> 1111</span>; <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-style: italic;">outputTTT.jar</span> is the watermarked jar
+file.<br>
+<ul>
+  <li><a name="CLIScript2"></a>Dynamically embedding a watermark</li>
+</ul>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; $s<small>andmarkCLI
+-A CT -i TTT.jar -o TTT.tra &nbsp;-m TTTApplication&nbsp; -T</small><br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &gt;
+Create a trace file <span style="font-style: italic;">TTT.tra</span>
+from the input file <span style="font-style: italic;">TTT.jar</span>; <span
+ style="font-style: italic;">TTTApplication</span> is the main class
+specified.&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <small>$sandmarkCLI
+&nbsp;-A CT -i TTT.jar -t TTT.tra -w 12345 -E</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &gt; Embed the
+wateramark <span style="font-style: italic;">12345</span> in <span
+ style="font-style: italic;">TTT.jar</span> using the tracefile <span
+ style="font-style: italic;">TTT.tra</span>. The default watermaked
+file is <span style="font-style: italic;">TTT_wm.jar</span><br>
+<ul>
+  <li><a name="CLIScript3"></a>Obfuscation</li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <small>$sandmarkCLI
+-A Method2RMadness -i TTT.jar&nbsp;&nbsp; -O</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &gt; &nbsp;Run the <span
+ style="font-style: italic;">Method2RMadness</span> obfuscation on <span
+ style="font-style: italic;">TTT.jar</span> ; <span
+ style="font-style: italic;">TTT_obf.jar</span> is the default
+obfuscated jar file created.&nbsp;
+<ul>
+  <li><a name="CLIScript4"></a>Running a recognition &nbsp;</li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <small>$sandmarkCLI
+-A AddMethField -i outputTTT.jar -k 1111 -R</small> <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &gt; Run the
+recognition for <span style="font-style: italic;">AddMethField</span>
+algorithm on <span style="font-style: italic;">outputTTT.jar</span> file
+with key value <span style="font-style: italic;">1111</span>.<br>
+<br>
+<br>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a href="cli.html#sample_SHELL">Sample_Scripts for SandMark shell</a></h4>
+<ul>
+  <li> <a href="cli.html#shell1">Script1-Statically Embedding a
+watermark</a></li>
+  <li> <a href="cli.html#shell2">Script2-Dynamically Embedding a
+watemark</a></li>
+  <li> <a href="cli.html#shell3">Script3-Obfuscation</a></li>
+  <li> <a href="cli.html#shell4">Script4-Run multiple watermark
+algorithms on a jar file in sequence</a></li>
+  <li><a href="cli.html#shell5">Script5-Run a recognition</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;">&nbsp; &nbsp; &nbsp; &nbsp;<a
+ name="sample_SHELL"></a># <small>java -classpath sandmark.jar
+sandmark.smash.Smash</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp;&gt; Initialize and start sandmark shell. A <span
+ style="font-style: italic; font-weight: bold;">smash</span><span
+ style="font-style: italic; font-weight: bold;">$</span> prompt will be
+displayed.<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp;<br>
+<ul>
+  <li><a name="shell1"></a>Statically Embedding a watermark</li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$</span> <small>selectAlg("ConstantString");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$</span> <small>setInputFile("TTT.jar");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$</span> <small>setKey("9876");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$</span> <small>setWM("12345");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$</span> <small>setPrefix("sm$");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$</span> <small>embed();</small><br>
+<br>
+<ul>
+  <li><a name="shell2"></a>Dynamically Embedding a watermark</li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$</span> <small>selectAlg("DynamicAA");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$ </span><small>setInputFile("TTT.jar");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-style: italic; font-weight: bold;">smash$</span> <small>setTraceFile("TTT.tra");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-style: italic; font-weight: bold;">smash$</span> <small>setMainClass("TTTApplication");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$</span> <small>startTrace();</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$</span> <small>set_min_wparts("2");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$</span> <small>set_encode_as_constants("true");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$</span> <small>set_use_opaque_methods("true");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-style: italic; font-weight: bold;">smash$</span> <small>set_reuse_methods("false");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$</span> <small>embed();</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp;
+<ul>
+  <li><a name="shell3"></a>Obfuscation</li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span
+ style="font-weight: bold; font-style: italic;">smash$</span> &nbsp;<small>selectAlg("Buggy
+Code");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span
+ style="font-weight: bold; font-style: italic;">smash$</span> &nbsp;<small>setInputFile("Ackermann.jar");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span
+ style="font-weight: bold; font-style: italic;">smash$</span> &nbsp;<small>setOutputFile("AckermannOutput.jar");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span
+ style="font-weight: bold; font-style: italic;">smash$</span> &nbsp;<small>obfuscate();</small><br>
+<br>
+<ul>
+  <li><a name="shell4"></a>Run multiple watermark algorithms on jar
+file in sequence</li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$</span> <small>setInputFile("TTT.jar");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$</span> <small>embedMultipleWM("AddMethField.1234:BogusExpression.56789:HatTrick.4444");</small><br>
+<br>
+<ul>
+  <li><a name="shell5"></a>Run a recognition</li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$</span> <small>setInputFile("TTT_wm.jar");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$</span> <small>selectAlg("BogusInitializer");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$</span> <small>setKey("1111");</small><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold; font-style: italic;">smash$</span> <small>recognize();</small><br>
+<br>
+<br>
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+</body>
+</html>

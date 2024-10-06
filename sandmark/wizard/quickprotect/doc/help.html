@@ -1,0 +1,80 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+	<TITLE>The QuickProtect Algorithm</TITLE>
+</HEAD>
+
+<H1>The QuickProtect Algorithm</H1>
+<H2>Authors</H2>
+<P>Kelly Heffner
+   (<A HREF="mailto:kheffner@cs.arizona.edu">kheffner@cs.arizona.edu</A>)<BR>
+</P>
+<H2>Description and Examples</H2>
+<P>
+   The QuickProtect algorithm will analyze your Java application and apply the 
+   obfuscations and/or watermarks that are determined to be the most successful.
+</P>
+<H2>Configuration Pane</H2>
+<P>There are a few configuration options for QuickProtect, and 
+   they are all taken from other obfuscation/watermarking algorithms:<BR>
+<UL>
+    <li><code>Ratio:
+        <table><tr><td>
+           See <B>Empty If Insertion</B> and <B>Empty If Insertion 2</B> obfuscation
+           algorithms
+        </td></tr></table>
+    <li><code>Encryption Key:
+        <table><tr><td>
+           See <B>ClassEncrypter</B> obfuscation algorithm
+        </td></tr></table>
+    <li><code>Debug:
+        <table><tr><td>
+           See <B>Graph Theoretic Watermark</B> dynamic watermarking algorithm
+        </td></tr></table>
+    <li><code>Dump Dot Graphs:
+        <table><tr><td>
+           See <B>Graph Theoretic Watermark</B> dynamic watermarking algorithm
+        </td></tr></table>
+    <li><code>Encode as constants:
+        <table><tr><td>
+           See <B>Arboit</B> static watermarking algorithm
+        </td></tr></table>
+    <li><code>Use opaque methods:
+        <table><tr><td>
+           See <B>Arboit</B> static watermarking algorithm
+        </td></tr></table>
+    <li><code>Reuse methods:
+        <table><tr><td>
+           See <B>Arboit</B> static watermarking algorithm
+        </td></tr></table>
+</UL>
+<center>
+   <img  src="screenshot.jpg">
+</center>
+</P>
+<H2>Configuration Button</H2>
+<p>The Quick Protect Panel also features a Configuration button.  This button allows
+you to tell SandMark about various properties of your application.  For example, you
+can tell SandMark whether each class and method in your application uses reflection 
+and how critical each class and method is to the overall performance of your application.
+<p>You can also tell SandMark which algorithms it is allowed to apply to each class and
+method in your application.
+<H2>References</H2>
+The Obfuscation Executive, Christian Collberg, Kelly Heffner, 
+University of Arizona Technical Report, 
+<a href="http://www.cs.arizona.edu/research/reports.html"> TR04-03 </a>
+</BODY></HTML>

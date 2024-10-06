@@ -1,0 +1,79 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      PRE {margin-left:3cm}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Node Splitter Obfuscation Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Node Splitter Obfuscation Algorithm</H1>
+    <H2>Author</H2>
+    <P>
+      Rathna Prabhu Rajendran
+      (<A HREF="mailto:prabhu@cs.arizona.edu">prabhu@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      The NodeSplitting obfuscation algorithm obfuscates a class file by
+      splitting a node into two, i.e. some of the fields from the class are
+      moved into a newly created class and all references to those fields in
+      the given class are modified to reflect the changes.
+    </P>
+    <H2>Example</H2>
+    <P>
+      Consider the following code:
+    </P>
+    <PRE>
+class A {
+    int i;
+    private float f;
+    public A(){ }
+    public void dummy() {
+        i=10;
+        f=12.2;
+    }
+}
+    </PRE>
+    <P>
+      After Obfuscation:
+    </P>
+    <PRE>
+class A {
+    int i;
+    A1 next;
+    public A() {
+        next = new A1();
+    }
+    public void dummy() {
+        i=10;
+        next.f = 12.2;
+    }
+}
+class A1 {
+    public float f;
+    public A1() { }
+}
+    </PRE>
+    <H2>Configuration</H2>
+    <P>
+      There are no extra configuration parameters necessary to run this
+      obfuscator.
+    </P>
+    <H2>References</H2>
+    <BR>
+  </BODY>
+</HTML>

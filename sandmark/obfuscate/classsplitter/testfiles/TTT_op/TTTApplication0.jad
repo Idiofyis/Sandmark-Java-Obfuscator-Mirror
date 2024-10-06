@@ -1,0 +1,97 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: packimports(3) 
+// Source File Name:   TTTApplication.java
+
+import java.awt.*;
+import java.awt.event.*;
+import sandmark.trace.Annotator;
+
+public class TTTApplication0 extends Frame
+{
+
+    public TTTApplication0()
+    {
+        lab = new Label("Tic-Tac-Toe", 1);
+        pan = new Panel();
+        sq = new Button[9];
+        south = new Panel();
+        quit = new Button("Exit");
+        reload = new Button("Reload");
+        ply = 2;
+    }
+
+    Label lab;
+    Panel pan;
+    Button sq[];
+    Panel south;
+    Button quit;
+    Button reload;
+    int ply;
+
+    // Unreferenced inner class TTTApplication$1
+
+/* anonymous class */
+    class TTTApplication._cls1
+        implements ActionListener
+    {
+
+        public void actionPerformed(ActionEvent actionevent)
+        {
+            int i = (new Integer(actionevent.getActionCommand())).intValue();
+            move(i);
+        }
+
+    }
+
+
+    // Unreferenced inner class TTTApplication$2
+
+/* anonymous class */
+    class TTTApplication._cls2 extends TTTApplication._cls20
+    {
+
+        public void windowClosing(WindowEvent windowevent)
+        {
+            dispose();
+            System.exit(0);
+        }
+
+            
+            {
+                this$0 = final_tttapplication;
+            }
+    }
+
+
+    // Unreferenced inner class TTTApplication$3
+
+/* anonymous class */
+    class TTTApplication._cls3
+        implements ActionListener
+    {
+
+        public void actionPerformed(ActionEvent actionevent)
+        {
+            dispose();
+            System.exit(0);
+        }
+
+    }
+
+
+    // Unreferenced inner class TTTApplication$4
+
+/* anonymous class */
+    class TTTApplication._cls4
+        implements ActionListener
+    {
+
+        public void actionPerformed(ActionEvent actionevent)
+        {
+            clear();
+        }
+
+    }
+
+}

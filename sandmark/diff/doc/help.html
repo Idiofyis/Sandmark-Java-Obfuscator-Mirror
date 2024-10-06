@@ -1,0 +1,158 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Diffing Jar-Files in SandMark</TITLE>
+  </HEAD>
+<BODY>
+
+<H1>Diffing Jar-Files in SandMark</H1>
+
+<P> You can view the differences between the bytecode contents of two jar-files from
+    the Diff pane. You may diff files based on different criteria by selecting
+    different diff algorithms from the combo box in the diff pane. Some algorithms
+    compare classes while others compare methods.
+</P>
+
+<H2>Diff Options</H2>
+
+<img src="options.jpg"><br>
+
+<table columns=2 border=1>
+<tr>
+<td><b>Filter out pairs of objects that have the same name</b></td>
+<td>If checked, program objects (e.g. methods, classes) with the same names are not displayed in the results pane.</td>
+</tr>
+
+<tr>
+<td><b>Filter out pairs of objects that appear to be identical</b></td>
+<td>If checked, program objects (e.g. methods, classes) that appear equivalent are not displayed in the results pane (does not look at object names).</td>
+</tr>
+
+<tr>
+<td><b>Compare all pairs of objects</b></td>
+<td>If selected, the diff algorithm will compare all pairs of objects. For example, if the algorithm is a method comparer, all pairs of methods will be compared.</td>
+</tr>
+
+<tr>
+<td><b>Compare only objects with the same name</b></td>
+<td>If checked, only program objects (e.g. methods, classes) with the same names are compared by the diff algorithm. Useful when inspecting a watermarked application that has not been obfuscated.</td>
+</tr>
+
+<tr>
+<td><b>Show pairs of objects with similarity greater than or equal to <i>filter</i></b></td>
+<td>Return only those pairs of objects whose similarity is greater than or equal to the value of <i>filter</i>. Algorithms use this value to speed up their comparisons; i.e., once a pair of objects is known to have similarity less than <i>filter</i>, it is free to move on to the next pair. By default, <i>filter</i> is set at 50%.</td>
+</tr>
+
+<tr>
+<td><b>Ignore methods with number of instructions less than: <i>n</i>.</b></td>
+<td>Method diff algorithms return only those pairs of methods in which both methods have <i>n</i> or more instructions. Useful for filtering out uninteresting methods. By default, <i>n</i> is set at 10.</td>
+</tr>
+</table>
+
+
+<H2>Literal Diff</H2>
+<P> Compares methods.
+Similarity is based on the length of the longest common subsequence (LCS), 
+which is displayed in red in each method. 
+
+<H2>Opcode Diff</H2>
+<P> Compares methods.
+The diff criteria is instruction opcode. Similarity is based on the length of
+the LCS, which is displayed in blue in each method.
+
+
+<H2>Baker Diff</H2>
+<P> Compares methods.
+The algorithm uses the positional relationship between variable uses as diff
+ criteria. 
+
+<H3>Example</H3>
+Consider the programs BakerTest1 and BakerTest2:<br><br>
+<tt><pre>
+public class BakerTest1 {
+
+	public static void main(String[] args){
+		int a = 8, b = 9, c = 7, d = 20, f = 12;
+		System.out.print(b+a);
+		Math.round(c+f);
+	}
+
+}
+public class BakerTest2 {
+	public static void main(String[] args){
+	    int dummy = 20, a = 8, b = 9, c = 7, e=11, f=12;
+	    System.out.print(b+a);
+	    Math.round(c+f);
+	}
+}
+</pre>
+</tt>
+<img src="literal.jpg"><br>
+The literal diff performs exact comparison of method bytecodes. 
+The longest common subsequence is displayed in red.<br><br>
+
+<img src="opcode.jpg"><br>
+The opcode diff performs opcode comparison of method bytecodes. 
+The longest common subsequence is displayed in red.<br><br>
+
+<img src="baker.jpg"><br>
+The Baker diff examines the positional relationship between variables.
+Thus an instruction that accesses a variable <i>i</i> in the local
+variable table may be deemed equivalent to an instruction that matches <i>j</i>
+if variables at <i>i</i> and <i>j</i> were last used the same number of instructions
+before.
+
+
+<H2>DM Diff</H2>
+<P> Method comparer. 
+Similarity is based on the number of basic blocks in method1 that are also present
+ in method2. The display panes show the basic blocks color-coded, such that 
+equivalent blocks will be the same color.
+</P>
+<H3>Example</H3>
+Consider the program:<br><br>
+<tt><pre>
+public class Palindrome {
+    public static boolean palindrome(String s){
+        if(s.length() <= 1)
+            return true;
+        else if(s.charAt(0) == s.charAt(s.length()-1))
+            return palindrome(s.substring(1,s.length()-1));
+        else
+            return false;
+    }
+}
+</pre>
+</tt>
+
+ 
+<img src="palindromedm.jpg"><br>
+We watermarked the Palindrome class with the DM watermarker (a block reorderer)and then compared the resulting method with the original method. The basic block diff algorithm finds those blocks which are common to both methods, and then colors them the same when displaying.
+
+<H2>Method Control Flow Graph Diff</H2>
+<p>Method comparer. Uses a naive (slow) algorithm to find the maximum common subtree of two method CFG's. Similarity is measured as the ratio of the size of this subtree to the size of the larger method's CFG. The basic blocks are colored according to their positions in the subtree. If a block is not in the common subtree, it is colored black. Note that this algorithm does not consider instructions, but only <i>structure of the CFG</i>.
+
+
+<H2>Constant Pool Diff</H2>
+<P> Class comparer. Performs a literal comparison of constant pools. Similarity
+is based on the length of the LCS between the two constant pools.
+<img src="cp.jpg">
+
+
+
+</BODY></HTML>

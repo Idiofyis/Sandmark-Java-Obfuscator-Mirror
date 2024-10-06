@@ -1,0 +1,50 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Parameter Alias Obfuscation Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Parameter Alias Obfuscation Algorithm</H1>
+    <H2>Author</H2>
+    <P>
+      Mary Grabher
+      (<A HREF="mailto:mtg@cs.arizona.edu">mtg@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      Parameter Alias looks at each class and tries to find a 
+      (non-initializer, non-abstract, non-native) method that takes
+      some object type as a parameter. It then aliases that parameter
+      within the method using Thread Local Storage (the ThreadLocal class).
+      Every load of the parameter is replaced with ThreadLocal.get(),
+      and every store is replaced with ThreadLocal.set(Object). Before 
+      every method invocation within this method, the ThreadLocal value is
+      stored back in the same parameter that it came from. This makes the alias
+      scheme work in recursive methods. Also, since the storage is thread local,
+      it is implcitly thread-safe.
+    </P>
+    <H2>Example</H2>
+    <H2>Configuration</H2>
+    <P>
+      There are no extra configuration parameters necessary to run this
+      obfuscator.
+    </P>
+    <H2>References</H2>
+    <BR>
+  </BODY>
+</HTML>

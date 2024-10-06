@@ -1,0 +1,71 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Venkatesan's Graph Theoretic Watermarking Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Venkatesan's Graph Theoretic Watermarking Algorithm</H1>
+    <H2>Authors</H2>
+    <P>
+      Gregg Townsend
+      (<A HREF="mailto:{gmt@cs.arizona.edu">gmt@cs.arizona.edu</A>)<BR>
+      Andrew Huntwork
+      (<A HREF="mailto:{ash@cs.arizona.edu">ash@cs.arizona.edu</A>)<BR>
+      Edward Carter
+      (<A HREF="mailto:{ecarter@cs.arizona.edu">ecarter@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      Graph Theoretic Watermarking Algorithm embeds a watermark in a
+      control-flow graph.
+    </P>
+    <H2>Example</H2>
+    <H2>Configuration</H2>
+    <P>
+       The GTW algorithm takes the watermark number and splits it up into
+       several smaller numbers which are then used as watermark pieces. 
+       There are two methods of splitting supported by GTW; one uses partial sums
+       and the other uses the Chinese Remainder Theorem. The "Use CRT Splitter" option 
+       in the algorithm's configuration parameters is used to toggle between these two methods.
+       When using the CRT Splitter, an extra Blowfish cryptographic key is needed and stored
+       in a separate file. The "Key File" parameter is the name of the keyfile to be written/read
+       during the embedding/recognition phase of the algorithm. A keyfile is not needed for the
+       partial sums splitter, and the value of this parameter will be ignored.
+    </P>
+    <H2>References</H2>
+    <P>
+    <ul>
+      <li>
+      Venkatesan, Vazirani, and Sinha: "A graph theoretic approach to
+      software watermaking", Information Hiding 2001, pages 157-168.<BR>
+      <A HREF="http://www.cc.gatech.edu/fac/Vijay.Vazirani/water.ps">http://www.cc.gatech.edu/fac/Vijay.Vazirani/water.ps</A>
+      <li>
+      Christian Collberg, Andrew Huntwork, Edward Carter, and Gregg Townsend,
+      Graph Theoretic Software Watermarks: Implementation, Analysis, and Attacks,
+      University of Arizona Technical Report, 
+      <a href="http://www.cs.arizona.edu/research/reports.html"> TR04-06
+      </a>
+      <li>
+      Christian Collberg, Andrew Huntwork, Edward Carter, and Gregg Townsend,
+      Graph Theoretic Software Watermarks: Implementation, Analysis, and Attacks,
+      Information Hiding 2004 (to appear).
+      </a>
+    </ul>
+    </P>
+  </BODY>
+</HTML>

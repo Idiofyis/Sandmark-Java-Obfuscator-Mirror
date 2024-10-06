@@ -1,0 +1,57 @@
+\section{Dynamic Class Loading}
+Dynamic class loading is used in several places in sandmark to allow
+for extensibility.  The major problem in dynamic class loading in sandmark
+is finding classes to load.  In particular, sandmark can be run from a 
+directory or a jar file, and it may or may not know the location of that 
+directory or jar file or even which of the two it is running from.  
+
+All of this detail is abstracted by sandmark.util.classloading.ClassFinder.
+ClassFinder allows a caller to specify one of a small number of classes 
+(defined in sandmark.util.classloading.IClassFinder), and
+ClassFinder will return the names of all classes derived from that class.  For example,
+the following code prints to standard output all classes derived from
+sandmark.Algorithm.
+
+\begin{listing}{1}
+java.util.Collection c = 
+   sandmark.util.classloading.ClassFinder.getClassesWithAncestor
+      (sandmark.util.classloading.IClassFinder.ALGORITHM);
+java.util.Iterator it = c.iterator();
+while(it.hasNext()) {
+   String className = (String)c.next();
+   System.out.println(className);
+}
+\end{listing}
+
+The class names returned by ClassFinder are those returned by
+an implementor of \\sandmark.util.classloading.IClassFinder.  ClassFinder 
+uses the first implementation in the following list
+whose default constructor does not throw an exception:
+
+\begin{enumerate}
+\item \textbf{FileClassFinder} This class reads class names and from which 
+of the interfaces in \\sandmark.util.classloading.IClassFinder they derive
+from a file call \textbf{Algorithms.txt}.  This file is opened by a call to \\
+\textbf{ClassLoader.getSystemClassLoader().getResourceAsStream(``Algorithms.txt'')}.
+If this call fails, FileClassFinder's default constructor throws an exception.
+
+\item \textbf{JarClassFinder} This class searches through all entries in the
+jar file named by \\System.getProperty(``SMARK\_PATH''), 
+loads all class files contained therein, and determines from 
+which classes in IClassFinder each of these classes derives. If opening
+the jar file for reading throws an exception, JarClassFinder's default 
+constructor throws an exception.
+
+\item \textbf{DirClassFinder} This class is similar to JarClassFinder, but 
+it searches through the file system hierarchy rooted at 
+System.getProperty(``SMARK\_ROOT'').  Its default constructor throws an exception
+if the contents of SMARK\_ROOT cannot be read.
+\end{enumerate}
+
+
+
+
+
+
+
+

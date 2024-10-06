@@ -1,0 +1,66 @@
+\algorithm{The ConstantString Static Watermarking Algorithm}%
+          {C. Collberg}
+
+\section{Introduction}
+This is a trivial algorithm that embeds a string 
+\begin{center}
+   {\tt sm\$watermark={\em WATERMARK}}
+\end{center}
+in the constant pool of the application. {\em WATERMARK}
+is the string to be embedded. The code of this algorithm
+resides in \url{sandmark.watermark.constantstring}.
+
+
+\section{Embedding}
+To embed the watermark we pick one of the user's
+classes at random and adds the appropriate string:
+\begin{listing}{1}
+   String jarInput  = props.getProperty("WM_Embed_JarInput");
+   String jarOutput = props.getProperty("WM_Embed_JarOutput");
+   String watermark = props.getProperty("WM_Encode_Watermark");
+
+   sandmark.util.ClassFileCollection cfc =
+      new sandmark.util.ClassFileCollection(jarInput);
+
+   java.util.Iterator classes = cfc.classes();
+   String className = (String) classes.next();
+   org.apache.bcel.classfile.JavaClass origClass = cfc.getClass(className);
+   org.apache.bcel.generic.ClassGen cg = new org.apache.bcel.generic.ClassGen(origClass);
+
+   org.apache.bcel.generic.ConstantPoolGen cp = cg.getConstantPool();
+   int stringIndex = cp.addString("sm$watermark" + "=" + watermark);
+
+   org.apache.bcel.classfile.JavaClass newClass = cg.getJavaClass();
+   cfc.addClass(newClass);
+   cfc.saveJar(jarOutput);
+\end{listing}
+
+
+\section{Recognition}
+During recognition we go through every class in the 
+watermarked jar-file looking for a string in the 
+constant pool that starts with {\tt "sm\$watermark"}:
+\begin{listing}{1}
+   String jarInput  = props.getProperty("WM_Recognize_JarInput");
+   sandmark.util.ClassFileCollection cfc =
+       new sandmark.util.ClassFileCollection(jarInput);
+   java.util.Iterator classes = cfc.classes();
+   while (classes.hasNext()) {
+      String className = (String) classes.next();
+      org.apache.bcel.classfile.JavaClass clazz = cfc.getClass(className);
+      org.apache.bcel.classfile.ConstantPool cp = clazz.getConstantPool();
+      for (int i=0; i<cp.getLength(); i++) {
+         org.apache.bcel.classfile.Constant c = cp.getConstant(i);
+         if (c instanceof org.apache.bcel.classfile.ConstantString) {
+             org.apache.bcel.classfile.ConstantString s = 
+                (org.apache.bcel.classfile.ConstantString) c;
+             String v = (String)s.getConstantValue(cp);
+             if (v.startsWith("sm$watermark")) {
+                String w = v.substring("sm$watermark".length()+1);
+                // w is the watermark
+             }
+         }
+      }
+   }
+   cfc.close();
+\end{listing}

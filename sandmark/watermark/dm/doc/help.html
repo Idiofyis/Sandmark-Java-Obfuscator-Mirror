@@ -1,0 +1,42 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>The Davidson-Myhrvald Watermarking Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>The Davidson-Myhrvald Watermarking Algorithm</H1>
+    <H2>Authors</H2>
+    <P>
+      Zach Heidepriem
+      (<A HREF="mailto:{zachary@cs.arizona.edu">zachary@cs.arizona.edu</A>)<BR>    
+    </P>
+    <H2>Description</H2>
+    <P>
+    A signature is embedded into the executable via  a reordering of basic blocks. The signature is unique to each authorized copy of the code.
+    </P>
+    <H2>Example</H2>
+    <p>
+    The watermark, a string, is encoded into a permutation, for example "hi" may be encoded into {2,1,3}. The watermarker will find a method in the input jar file with at least three basic blocks. It will rearrange these blocks so that the second block is first, the first is second, and the second is third, as prescribed by {2,1,3}. The recognizer uses the original jar file to recover the ordering from the watermarked jar. This ordering is then decoded into the original watermark (a string).
+    </p>
+    <H2>Configuration</H2>
+    <H2>References</H2>
+    <P>
+      Patent #5,559,884, Sep. 24, 1996 (by the Microsoft Corporation).     
+    </P>
+  </BODY>
+</HTML>

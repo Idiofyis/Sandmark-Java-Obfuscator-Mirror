@@ -1,0 +1,63 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Code Obfuscation in SandMark</TITLE>
+  </HEAD>
+<BODY>
+
+<H1>Code Obfuscation in SandMark</H1>
+
+<P> Fingerprinting a program leaves you open to <em> collusive </em>
+attacks. In this figure Sally buys two differently fingerprinted
+copies of Alice's program, compares them for differences, 
+locates the fingerprinting code, and is able to remove the
+fingerprint from one of the copies:
+<center>
+<img src="Collusion.gif">
+</center>
+
+<P> To prevent collusive attacks, SandMark provides
+several types of code obfuscations that will scramble
+a fingerprinted program. This way you can distribute
+two differently fingerprinted copies of your program
+without fear that simple differential attacks will
+reveal the location of the fingerprints:
+
+<center>
+<img src="Obfuscation.gif">
+</center>
+
+<P> The output of the obfuscator is a new watermarked
+jar-file <b>prog<em>_obf</em>.jar</b>. This
+is the program that you would normally distribute and
+which will serve as input to the recognizer.
+
+<P> To obfuscate a program you should:
+<ol>
+   <li> Package the program up as a jar file.
+   <li> Go to SandMark's obfuscate pane.
+   <li> Click on the <b>Configure</b> button. This allows
+        you to choose which parts of your program should
+        be obfuscated.
+   <li> Choose the obfuscation algorithm.
+   <li> Press the <b>Obfuscate</bf> button.
+</ol>
+A special algorithm (the <em>Obfuscation Loop</em>) will 
+autmatically choose a sequence of obfuscation algorithms.
+
+</BODY></HTML>

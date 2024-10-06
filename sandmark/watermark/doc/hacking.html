@@ -1,0 +1,226 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Adding a Watermarker</TITLE>
+  </HEAD>
+<BODY>
+
+<h1>Adding a Watermarker</h1>
+Adding a new watermarking algorithm is similar to adding an
+obfuscator. Algorithms are loaded dynamically at run-time, so 
+there is no need to explcitly link them into the system.
+
+To create a new watermarking algorithm <code> wm</code> you
+<ol>
+   <li> create a new directory <code>sandmark.watermark.wm</code>,
+   <li> create a new class <code>sandmark.watermark.wm.WM</code>
+         which extends <code>sandmark.watermark.StaticWatermarker</code>
+         or <code>sandmark.watermark.DynamicWatermarker</code>.
+   <li> Create a file <code>sandmark/watermark/wm/doc/help.html</code>
+        documenting your work.
+</ol>
+
+<h2> Static Watermarking </h2>
+         To build a new static watermarker you just have to
+         implement two methods, one to embed the watermark
+         into a jarfile and the other to extract it.
+<pre>
+package sandmark.watermark.mywatermarker;
+
+public class MyWatermarker extends sandmark.watermark.StaticWatermarker {
+
+    public ConstantString() {}
+
+    public String getShortName() {
+        return "MyWatermarker";
+    }
+
+    public String getLongName() {
+        return "Embed a watermark somewhere in the program";
+    }
+
+    public String getAuthor(){
+        return "Jane Doe";
+    }
+
+    public String getAuthorEmail(){
+        return "doe@cs.arizona.edu";
+    }
+
+    public String getDescription(){
+        return "Embed a watermark...";
+    }
+
+    /*
+     *  Get the HTML codes of the About page for ConstantString
+     */
+    public java.lang.String getAlgHTML(){
+        return "...";
+    }
+
+    /*
+     *  Get the URL of the Help page for ConstantString
+     */
+    public java.lang.String getAlgURL(){
+        return "sandmark/watermark/mywatermarker/doc/help.html";
+    }
+
+/*************************************************************************/
+/*                               Embedding                               */
+/*************************************************************************/
+
+public void embed(sandmark.watermark.StaticEmbedParameters params)
+    throws sandmark.watermark.WatermarkingException {
+   // The actual code goes here!
+}
+
+
+/*************************************************************************/
+/*                              Recognition                              */
+/*************************************************************************/
+
+class Recognizer implements java.util.Iterator {
+    public Recognizer(sandmark.watermark.StaticRecognizeParameters params) {
+       ...
+    }
+
+    public boolean hasNext() {
+      ...
+    }
+
+    public java.lang.Object next() {
+       ...
+    }
+
+    public void remove() {}
+}
+
+public java.util.Iterator recognize(sandmark.watermark.StaticRecognizeParameters params)
+      throws sandmark.watermark.WatermarkingException {
+    return new Recognizer(params);
+}
+} 
+</pre>
+<ol>
+   <li> Use <code> BCEL</code> to implement your watermarker.
+         Have a look at the trivial static watermarker 
+         <code>sandmark.watermark.constantstring.ConstantString</code> for an example.
+   <li> Type <code> make</code> at the top-level sandmark directory (<code>smark</code>).
+         The new watermarker should be loaded automagically at runtime.
+</ol>
+
+<h2>Dynamic Watermarking</h2>
+Implementing a dynamic watermarker is more complex,
+since you have to provide methods for running the
+application during tracing and recognition:
+<pre>
+package sandmark.watermark.mywatermarker;
+
+public class MyWatermarker extends sandmark.watermark.DynamicWatermarker{
+
+   private sandmark.watermark.DynamicRecognizeParameters mRecognizeParams;
+   private sandmark.watermark.DynamicTraceParameters mTraceParams;
+
+   /**
+    * Returns this watermarker's short name.
+    */
+   public String getShortName(){
+      return "...";
+   }
+
+   /**
+    * Returns this watermarker's long name.
+    */
+   public String getLongName() {
+        return "...";
+   }
+
+   public String getAuthor(){
+      return "Jane Doe";
+   }
+
+   public String getAuthorEmail(){
+      return "doe@cs.arizona.edu";
+   }
+
+   public String getDescription(){
+      return  "....";
+   }
+
+   public sandmark.config.ModificationProperty[] getMutations()
+    {
+        return null;
+    }
+
+   public java.lang.String getAlgHTML(){
+      return "...";
+   }
+
+   /*
+    *  Get the URL of the Help page for DynamicAA
+    */
+   public java.lang.String getAlgURL(){
+      return "...";
+   }
+
+/***********************************************************************/
+/*                              Tracing                                */
+/***********************************************************************/
+   public void startTracing(sandmark.watermark.DynamicTraceParameters params)
+      throws sandmark.util.exec.TracingException {
+       ...
+   }
+
+   public void endTracing()
+      ...
+   }
+
+   public void stopTracing() throws sandmark.util.exec.TracingException {
+      tracer.STOP();
+   }
+
+/***********************************************************************/
+/*                              Embedding                              */
+/***********************************************************************/
+   public void embed(sandmark.watermark.DynamicEmbedParameters params) {
+       ...
+   }
+
+/***********************************************************************/
+/*                            Recognition                              */
+/***********************************************************************/
+   public void startRecognition (sandmark.watermark.DynamicRecognizeParameters params) 
+      ...
+   }
+
+   public java.util.Iterator watermarks() {
+      ...
+   }
+
+   public void stopRecognition() throws sandmark.util.exec.TracingException {
+      ...
+   }
+
+   public void waitForProgramExit() {
+      ...
+   }
+}
+</pre>
+
+</body>
+</html>

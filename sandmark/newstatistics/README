@@ -1,0 +1,36 @@
+
+Authors: Christian Collberg ( collberg@cs.arizona.edu )
+         Balamurgan Chirtsabesan ( balamc@cs.arizona.edu )
+	 Tapas Ranjan Sahoo      ( tapas@cs.arizona.edu )
+
+
+ This directory contains modules that have been designed to obtain various 
+ complexity measures of the target code. In addition to all these complexity 
+ measures, several other modules have been implemented. This analyzer module 
+ performs various sorting operations in application, package, class or method 
+ levels based on the complexity measure data obtained from the earlier
+ statistic modules.
+
+
+The directory contains the following files:
+
+   package.html
+   Makefile
+   README
+
+   Halstead.java
+   HalsteadMeasures.java
+   HarrisonMagel.java
+   Metric.java
+   NestingLevelComplexity.java
+   Statistics.java
+   StatisticsRecord.java
+   Stats.java
+   analyzer.java
+   ckOOmetric.java
+   kafura.java
+   mcCabe.java
+   munson.java
+
+   doc directory: help.html file
+

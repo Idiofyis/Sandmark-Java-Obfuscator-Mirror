@@ -1,0 +1,91 @@
+//  dynwm.smash -- 
+//  Author          : Jasvir Nagra <jas@cs.auckland.ac.nz>
+//  Created On      : Thu Jul 3 00:05:23 2003
+//  Last Modified   : <03/07/31 02:41:55 jas>
+//  Description     : Initialization script for smash
+//  Keywords        : smash init
+//  PURPOSE
+//  	| Sandmark project |
+
+public boolean algorithmSelected(String str)
+{
+    if(sandmark.smash.Smash.algo==null||sandmark.smash.Smash.algo.equals("")) {
+	print("Algorithm not yet selected; "+str+" Failed");
+	return false;
+    }
+    return true;
+}
+
+public void setTraceFile(String trace) {
+    if(!algorithmSelected("setTraceFile"))
+        return;
+    sandmark.watermark.DynamicWatermarker.getProperties().setProperty("Trace File", trace);
+}
+
+public void setClassPath(String path) {
+    if(!algorithmSelected("setClassPath"))
+        return;
+    sandmark.watermark.DynamicWatermarker.getProperties().setProperty("Class Path", path);
+}
+
+public void setMainClass(String main) {
+    if(!algorithmSelected("setMainClass"))
+        return;
+    sandmark.watermark.DynamicWatermarker.getProperties().setProperty("Main Class", main);
+}
+
+public void setArguments(String args) {
+    if(!algorithmSelected("setArguments"))
+        return;
+    sandmark.watermark.DynamicWatermarker.getProperties().setProperty("Arguments", args);
+}
+
+public void setArguments(String[] args) {
+    String finalargs = "";
+    for(int i=0; i<args.length; i++)
+        finalargs = finalargs + args[i] + " ";
+    setArguments(finalargs);
+}
+
+public void startTrace() {
+    if(!algorithmSelected("startTrace"))
+        return;
+    sandmark.smash.Smash.traceInProgress = true;
+    sandmark.program.Application app = new sandmark.program.Application
+       (sandmark.smash.Smash.inputJar);
+    ((sandmark.watermark.DynamicWatermarker)sandmark.smash.Smash.algo).startTracing
+    	(sandmark.watermark.DynamicWatermarker.getTraceParams(app));
+}
+
+public void stopTrace() {
+    if(!algorithmSelected("stopTrace"))
+        return;
+    if(!sandmark.smash.Smash.traceInProgress) {
+        print("No trace in progress!");
+        return; 
+    }
+    ((sandmark.watermark.DynamicWatermarker)sandmark.smash.Smash.algo).stopTracing();
+    sandmark.smash.Smash.traceInProgress = false;
+}
+
+public void endTrace() {
+    if(!algorithmSelected("endTrace"))
+        return;
+    if(!sandmark.smash.Smash.traceInProgress) {
+        print("No trace in progress!");
+        return; 
+    }
+    ((sandmark.watermark.DynamicWatermarker)sandmark.smash.Smash.algo).endTracing();
+    sandmark.smash.Smash.traceInProgress = false;
+}
+
+public void waitForProgramExit() {
+    ((sandmark.watermark.DynamicWatermarker)sandmark.smash.Smash.algo).waitForProgramExit();
+}
+
+//  Emacs bunkum
+//  Local Variables:
+//  mode: jde
+//  time-stamp-start: "Last Modified[ \t]*:[ 	]+\\\\?[\"<]+"
+//  time-stamp-end:   "\\\\?[\">]"
+//  End:

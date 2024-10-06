@@ -1,0 +1,336 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Scripting SandMark</TITLE>
+  </HEAD>
+<BODY>
+
+<h1>Scripting SandMark</h1>
+</center>
+SandMark can be run through a CLI interface, or from a shell prompt.<br>
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+Use the following command to run CLI: <br>
+java -cp sandmark.jar sandmark.smash.SandmarkCLI -options <br>
+<br>
+<b>CLI options:</b> <br>
+-U : Usage<br>
+-S : Display static watermark list<br>
+-D : Display dynamic watermark list<br>
+-R : Display obfuscator list<br>
+-L &lt;level&gt; : Specify obfuscator level to be displayed -
+'app'/'class'/'method'<br>
+-A &lt;algoName&gt; : Specify algorithm<br>
+-H : Get algorithm help<br>
+-i &lt;inputJar&gt; : Specify input jar file<br>
+-o &lt;outputJar&gt; : Specify output jar file<br>
+-w &lt;watermark&gt; : Specify watermark value<br>
+-k &lt;key&gt; : Specify key value<br>
+-E : Perform embedding<br>
+-R : Perform recognizing<br>
+-O : Perform obfuscation<br>
+-P &lt;prefixStr&gt; : Specify prefix string(for ConstantString
+watermark)<br>
+<br>
+<b> Dynamic Watermark specific options:</b><br>
+-t <tracefile>: Specify trace file<br>
+-c <classpath>: Set ClassPath<br>
+-m <mainclass>: Set MainClass<br>
+-a <arguments>: Set Arguments<br>
+-T : start Trace<br>
+-N <encodestr>&lt;encodeStr&gt; : Specific parameters for CT/DynamicAA
+algorithm.<br>
+</encodestr></arguments></mainclass></classpath></tracefile>
+<ul>
+encodeStr format - <br>
+  <ul>
+    <li>CT:
+&lt;nodetype&gt;#&lt;storewhat&gt;#&lt;storemethods&gt;#&lt;storelocation&gt;#&lt;protectionmethods&gt;#&lt;encoding&gt;#&lt;components&gt;#&lt;encodeInline(true/false)&gt;#&lt;encodeReplace(true/false)&gt;#&lt;dumpIR(true/false)&gt;</li>
+    <li>DynamicAA/ Arboit Algorithm:&nbsp;&nbsp;
+&lt;minWMparts&gt;#&lt;encodeConsts(true/false)&gt;#&lt;useopaquemethods(true/false)&gt;#&lt;reusemethods(true/false)&gt;</li>
+  </ul>
+</ul>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+Use the following command to start up SandMark shell:<br>
+java <span style="font-style: italic;">-cp sandmark.jar</span>
+sandmark.smash.Smash<br>
+<br>
+At the <span style="font-weight: bold; font-style: italic;">$smash</span>
+prompt, you can give the following shell commands:<br>
+<ul>
+  <li><span style="font-weight: bold;">help();</span> -<small>Get help
+for various options</small></li>
+  <li><span style="font-weight: bold;">swm(); </span><span
+ style="font-weight: bold;"></span>- <small>Display static watermark
+algorithm list</small></li>
+  <li><span style="font-weight: bold;">dwm();</span><span
+ style="font-weight: bold;"> </span>- <small>Display dynamic watermark
+algorithm list</small></li>
+  <li><span style="font-weight: bold;">obf(level);</span> - <small>Display
+obfuscation algorithm&nbsp; list at 'app', 'class' or 'method' level.</small></li>
+  <li><span style="font-weight: bold;">addOptions();</span> - <small>Display
+additional options;</small>&nbsp;</li>
+  <li><span style="font-weight: bold;">setInputFile(jarfile);</span> - <small>Set
+the input jar file name, specifying its fullpath&nbsp;</small></li>
+  <li><span style="font-weight: bold;">setOutputFile(jarfile);</span> - <small>Set
+the output jar file name; if not set, the default is in_wm.jar for
+watermark and in_obf.jar for obfuscation, where in.jar is the input file.</small></li>
+  <li><span style="font-weight: bold;">setKey(key);</span> -<small>Set
+the key value for the watermark algorithm</small></li>
+  <li><span style="font-weight: bold;">setWM(watermark)</span><span
+ style="font-weight: bold;">;</span> - <small>Set the watermark value</small></li>
+  <li><span style="font-weight: bold;">selectAlg(algoName)</span><span
+ style="font-weight: bold;">; </span>- <small>Select the
+algorithm&nbsp;</small></li>
+  <li><span style="font-weight: bold;">getAlgDesc()</span><span
+ style="font-weight: bold;">;</span> - <small>Get description of the
+current algorithm selected; selectAlg() must be run before this.</small></li>
+  <li><span style="font-weight: bold;">getAlgDesc(algoName);</span> -<small>Get
+description of algorithm specified</small></li>
+  <li><span style="font-weight: bold;">embed();</span> &nbsp;- <small>Perform
+embed operation</small></li>
+  <li><span style="font-weight: bold;">recognize();</span> - <small>Perform
+recognition operation</small></li>
+  <li><span style="font-weight: bold;">getNextWM();</span> - <small>Retrieve
+the next watermark after recognition</small></li>
+  <li><span style="font-weight: bold;">setTraceFile(tracefile);</span> - <small>Specify
+the file of trace-points generated during tracing&nbsp;</small></li>
+  <li><span style="font-weight: bold;">setClassPath(classpath);</span><span
+ style="font-weight: bold;"> </span>- <small>Specify user defined
+ClassPath additions used during tracing or recognition</small></li>
+  <li><span style="font-weight: bold;">setMainClass(mainclass);</span> - <small>Specify
+mainClass where execution starts during tracing or recognition</small></li>
+  <li><span style="font-weight: bold;">setArguments(args);</span> - <small>Set
+arguments during tracing or recognition</small></li>
+  <li><span style="font-weight: bold;">startTrace();</span> - <small>start
+tracing</small>&nbsp;</li>
+  <li><span style="font-weight: bold;">stopTrace();</span> - <small>stop
+tracing</small>&nbsp;</li>
+  <li><span style="font-weight: bold;">endTrace();</span> - <small>terminate
+tracing</small></li>
+  <li><span style="font-weight: bold;">ct_encode(nodetype, storeWhat,
+storeMethods, storeLoc, protectionMethods, encoding, components);</span>
+- <small>specify encoding paramters for CT algorithm.</small></li>
+  <li><span style="font-weight: bold;">set_ct_encode_inline(arg);</span>
+- <small>Specify whether to inline the methods for creating the
+watermark at the call point; set to true/false</small></li>
+  <li><span style="font-weight: bold;">set_ct_e</span><span
+ style="font-weight: bold;">nco</span><span style="font-weight: bold;">de_replace(arg);</span>
+- <small>Allow sandmark to automatically choose a class that best
+represents the watermark graph node; set to true/false</small></li>
+  <li><span style="font-weight: bold;">set_ct_dumpIR(arg);</span> - <small>Print
+out the intermediate code; set to true/false</small></li>
+  <li><span style="font-weight: bold;">set_min_wmparts(numparts);</span>
+- <small>Specify number of parts the watermark is to be broken.</small></li>
+  <li><span style="font-weight: bold;">set_encode_consts(arg);</span><span
+ style="font-weight: bold;"> </span>- <small>Encode the watermark
+wither as constants in the opaque predicate or using the rank; set to
+true/false</small></li>
+  <li><span style="font-weight: bold;">set_use_opaque_methods(arg);</span><span
+ style="font-weight: bold;"> </span>- <small>Encode the watermark
+either as an inserted opaque method or as an inserted opaque predicate;
+set to true/false</small></li>
+  <li><span style="font-weight: bold;">set_reuse_methods(arg);</span> - <small>Reuse
+opaque methods when the rank is used to encode the value of watermark;
+set to true/false</small></li>
+  <li><span style="font-weight: bold;">setPrefix(prefixStr);</span><span
+ style="font-weight: bold;"> </span>- <small>The prefix of the string
+in which we hide the ConstantString watermark.</small></li>
+  <li><span style="font-weight: bold;">exit();</span> - <small>Exit
+SandMark shell.</small><br>
+  </li>
+</ul>
+Additional options:<br>
+<ul>
+  <li><span style="font-weight: bold;">runEmbed(jarString);</span> - <small>Embed
+a watemark on multiple input jar files; Specify jarString in the format
+&lt;jar1:jar2: ... :jarN&gt;</small></li>
+  <li><span style="font-weight: bold;">runRecognizeWM(jarString);</span>
+- <small>Run recognition on multiple jar files; Specify jarString in
+the format &lt;jar1:jar2: ... : jarN&gt;</small></li>
+  <li><span style="font-weight: bold;">embedMultipleWM(</span><span
+ style="font-weight: bold;">algoWmarkStr);</span> - <small>Run multiple
+watermark algorithm embed operations on an input jar file. The output of
+the first embedding is fed as the input to the next embedding in
+sequence. Specify algoWmarkStr in the format</small> <small>&lt;algo1.wmark1&gt;:&lt;algo2.wmark2&gt;:
+... :&lt;algoN.wmarkN&gt;</small></li>
+  <li><span style="font-weight: bold;">recognizeMultipleWM(algoStr);</span>
+- <small>Run <span style="font-weight: bold;"></span> multiple
+algorithm recognition on a single input jar file; Specify algoStr in the
+format &lt;algo1:algo2: ... :algoN&gt;</small></li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4> <a href="scripting.html#sample_CLI">Sample_Scripts for SandMark
+CLI&nbsp;</a></h4>
+<ul>
+  <li> <a href="scripting.html#CLIScript1">Script1-Statically Embedding
+a watermark</a></li>
+  <li> <a href="scripting.html#CLIScript2">Script2-Dynamically
+Embedding a watemark</a></li>
+  <li> <a href="scripting.html#CLIScript3">Script3-Obfuscation</a></li>
+  <li> <a href="scripting.html#CLIScript4">Script4-Running a recognition</a></li>
+</ul>
+<hr style="width: 100%; height: 2px;">&nbsp;<br>
+&nbsp; &nbsp; &nbsp; <a name="sample_CLI"></a>&nbsp;# &nbsp; setenv
+sandmarkCLI&nbsp; "java -classpath sandmark.jar
+sandmark.smash.SandmarkCLI"
+<ul>
+  <li>&nbsp;<a name="CLIScript1"></a><b>Statically embedding a watermark</b></li>
+</ul>
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;$sandmarkCLI -A
+AddMethField -i TTT.jar -o outputTTT.jar -w 1234 -E -k 1111<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &gt;
+Embed 1234 &nbsp;in TTT.jar using the static watermark algorithm
+AddMethField and key value 1111; <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;outputTTT.jar is the watermarked jar file.<br>
+<ul>
+  <li><a name="CLIScript2"></a><b>Dynamically embedding a watermark</b></li>
+</ul>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; $sandmarkCLI -A CT -i
+TTT.jar -o TTT.tra -m TTTApplication -T<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &gt; Create a trace
+file TTT.tra from the input file TTT.jar; TTTApplication is the main
+class specified <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; $sandmarkCLI -A CT -i
+TTT.jar -t TTT.tra -w 12345 -E<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &gt; Embed the
+wateramark 12345 in TTT.jar using the tracefile TTT.tra. The default
+watermaked file is TTT_wm.jar<br>
+<ul>
+  <li><a name="CLIScript3"></a><b>Obfuscation</b></li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; $sandmarkCLI -A
+Method2RMadness -i TTT.jar&nbsp;&nbsp; -O<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &gt; &nbsp;Run the
+Method2RMadness obfuscation on TTT.jar ; TTT_obf.jar is the default
+obfuscated jar file created.&nbsp;
+<ul>
+  <li><a name="CLIScript4"></a><b>Running a recognition</b> </li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; $sandmarkCLI -A
+AddMethField -i outputTTT.jar -k 1111 -R<big> </big><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &gt; Run the
+recognition for AddMethField algorithm on outputTTT.jar file with key
+value 1111.<br>
+<br>
+<br>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a href="scripting.html#sample_SHELL">Sample_Scripts for SandMark
+shell</a></h4>
+<ul>
+  <li> <a href="scripting.html#shell1">Script1-Statically Embedding a
+watermark</a></li>
+  <li> <a href="scripting.html#shell2">Script2-Dynamically Embedding a
+watemark</a></li>
+  <li> <a href="scripting.html#shell3">Script3-Obfuscation</a></li>
+  <li> <a href="scripting.html#shell4">Script4-Run multiple watermark
+algorithms on a jar file in sequence</a></li>
+  <li><a href="scripting.html#shell5">Script5-Run a recognition</a><br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;">&nbsp; &nbsp; &nbsp; &nbsp;<a
+ name="sample_SHELL"></a># java -classpath sandmark.jar
+sandmark.smash.Smash<br>
+&nbsp; &nbsp; &nbsp; &nbsp;&gt; Initialize and start sandmark shell. A <span
+ style="font-weight: bold;">smash</span><span style="font-weight: bold;">$</span>
+prompt will be displayed.<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp;<br>
+<ul>
+  <li><a name="shell1"></a><b>Statically Embedding a watermark</b></li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="font-weight: bold;">
+&gt;</span> selectAlg("ConstantString");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold;">&gt; </span>setInputFile("TTT.jar");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold;">&gt;</span> setKey("9876");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold;">&gt;</span> setWM("12345");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold;">&gt;</span> setPrefix("sm$");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold;">&gt;</span>embed();<br>
+<br>
+<ul>
+  <li><a name="shell2"></a><b>Dynamically Embedding a watermark</b></li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="font-weight: bold;">
+&gt;</span> selectAlg("DynamicAA");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold;">&gt; </span>setInputFile("TTT.jar");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold;">&gt;</span> setTraceFile("TTT.tra");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold;">&gt;</span> setMainClass("TTTApplication");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold;">&gt;</span> startTrace();<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold;">&gt;</span> set_min_wparts("2");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold;">&gt; </span>set_encode_as_constants("true");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold;">&gt;</span> set_use_opaque_methods("true");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold;">&gt;</span> set_reuse_methods("false");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold;">&gt;</span>embed();<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp;
+<ul>
+  <li><a name="shell3"></a><b>Obfuscation</b></li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style="font-weight: bold;">&gt;</span>
+selectAlg("Buggy Code");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style="font-weight: bold;">&gt;</span>
+setInputFile("Ackermann.jar");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style="font-weight: bold;">&gt;</span>
+setOutputFile("AckermannOutput.jar");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style="font-weight: bold;">&gt;</span>
+obfuscate();<br>
+<br>
+<ul>
+  <li><a name="shell4"></a><b>Run multiple watermark algorithms on jar file in sequence</b></li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="font-weight: bold;">
+&gt;</span> setInputFile("TTT.jar");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold;">&gt;</span>
+embedMultipleWM("AddMethField.1234:BogusExpression.56789:HatTrick.4444");<br>
+<br>
+<ul>
+  <li><a name="shell5"></a><b>Run a recognition</b></li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="font-weight: bold;">
+&gt;</span> setInputFile("TTT_wm.jar");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold;">&gt;</span> selectAlg("BogusInitializer");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold;">&gt;</span> setKey("1111");<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span
+ style="font-weight: bold;">&gt;</span> recognize();<br>
+<br>
+<br>
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+</body>
+</html>

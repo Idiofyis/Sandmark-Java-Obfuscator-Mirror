@@ -1,0 +1,128 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      PRE {margin-left:3cm}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>PromoteLocals Static Obfuscating Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>PromoteLocals Static Obfuscating Algorithm</H1>
+    <H2>Authors</H2>
+    <P>
+      Danny Mandel
+      (<A HREF="mailto:dmandel@cs.arizona.edu">dmandel@cs.arizona.edu</A>)<BR>
+      Anna Segurson
+      (<A HREF="mailto:segurson@cs.arizona.edu">segurson@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      This algorithm replaces all the local <tt>int</tt> variables in a
+      function with local <tt>java.lang.Integer</tt>. This is possible through
+      byte code manipulation of the all of the instructions that depend on
+      retrieving and storing <tt>int</tt> values.
+    </P>
+    <P>
+      The following is a list of changes to the byte code:
+    </P>
+    <P></P>
+    <center>
+      <table border=1>
+	  <tr>
+	    <td> Original byte code </td>
+	    <td> Replacement byte code </td>
+	  </tr>
+
+	  <tr>
+	    <td> <tt> istore &lt;index&gt; </tt> </td>
+	    <td> <tt> new Ljava/lang/Integer; <br>
+		dup_x1 <br>
+		dup_x1 <br>
+		pop <br>
+		invokespecial java/lang/Integer/&lt;init&gt;(I)V <br>
+		astore &lt;index&gt;
+	      </tt> </td>
+	  </tr>
+
+	  <tr>
+	    <td> <tt> iload &lt;index&gt; </tt> </td>
+	    <td> <tt>
+		aload &lt;index&gt; <br>
+		invokevirtual java/lang/Integer/intValue(V)I 
+	      </tt> </td>
+	  </tr>
+	  <tr>
+	    <td> <tt> iinc &lt;index&gt; &lt;num> </tt> </td>
+	    <td> <tt>
+		new Ljava/lang/Integer; <br>
+		dup <br>
+		ldc &lt;num&gt; <br>
+		aload &lt;index&gt; <br>
+		invokevirtual java/lang/Integer/intValue(V)I <br>
+		iadd <br>
+		invokespecial java/lang/Integer/&lt;init&gt;(I)V <br>
+		astore &lt;index&gt; 
+	      </tt> </td>
+	  </tr>
+
+      </table>
+    </center>
+    <H2>Example</H2>
+    <P>
+      To apply this obfuscation we circulate through the byte code of a given
+      method and if the instruction is one of the ones in the table above we
+      replace that instruction with the corresponding replacement byte code.
+      For example, this simple class:
+    </P>
+    <PRE>
+public class VerySimp {
+   public static void main(String[] args) {
+      int a,b,c;
+      a = 1;
+      b = 22;
+      c = a + b;
+      for (int i = 0; i &lt; 3; i++) {
+         a+=2;
+      }
+   }
+}
+    </PRE>
+    <P>
+      is obfuscated to the following class:
+    </P>
+    <PRE>
+public class VerySimp {
+   public static void main(String[] args)
+   {
+      Integer integer2 = new Integer( 1 );
+      Integer integer3 = new Integer( 22 );
+      Integer integer4 = new Integer(integer2.intValue() + integer3.intValue());
+      Integer integer1 = null;
+      for( integer1 = new Integer( 0 ); integer1.intValue() &lt; 3;
+           integer1 = new Integer( 1 + integer1.intValue() ) )
+         integer2 = new Integer( 2 + integer2.intValue() );
+   }
+}
+    </PRE>
+    <H2>Configuration</H2>
+    <P>
+      There are no extra configuration parameters necessary to run this
+      obfuscator.
+    </P>
+    <H2>References</H2>
+    <BR>
+  </BODY>
+</HTML>

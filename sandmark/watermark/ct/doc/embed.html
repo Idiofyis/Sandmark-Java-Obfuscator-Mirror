@@ -1,0 +1,137 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+	<TITLE>Embedding Watermarks in SandMark</TITLE>
+</HEAD>
+
+<P> Once you have generated a trace file from SandMark's
+<b> TRACE</b> tab you can start embedding watermarks.
+You can either provide your own watermarks or generate a random
+numeric watermark. 
+
+<P> The output of the embedder is a new watermarked
+jar-file <b>prog<em>_wm</em>.jar</b>. Several other files
+are also generated:
+<ul>
+   <li> <code>Watermark.dot</code> is the watermark
+        graph (in the dot format) embedded into the application.
+   <li> <code>TraceForest*.dot</code> are the call-graphs 
+        generated during tracing.
+   <li> <code>Watermark.java</code> is the class file that
+        contains the watermark-building methods.
+</ul> 
+It is prudent to save these files for any future legal proceedings.
+
+<h2>Example</h2>
+Here is a view of SandMark embedding the watermark <code>WILDCATS</code>
+in the TTT application shown in <a href="annotate.html"> here </a>:
+<img src="embed-screenshot.jpg">
+Note that the graphs that SandMark generates can be viewed by clicking
+on the <code>Graphs</code> button.
+
+<H2>Configuration</H2>
+Several options steer the embedding of the mark. In most cases you
+can leave the defaults in place.
+
+<ul>
+	    <li> <code>Storage Policy</code>
+                 <table><tr><td>
+                    Either 'root' or 'all'. 'root' means that only roots of subgraphs  
+                    are stored globally (or passed around in formal parametrs. 
+                    'all' means that all graph nodes are stored.
+                 </td></tr></table>
+	    <li> <code>Storage Method</code>
+                  <table><tr><td>
+                   A colon-separated list of 'vector', 'array', 'pointer', and 'hash'.  
+                    These are the types of storage containers in which subgraph nodes  
+                    are stored.
+                    <ol>  
+                    <li> 'vector' means 'java.util.Vector'  
+                    <li> 'array' means 'Watermark[]'.  
+                    <li> 'hash' means 'java.util.Hashtable.  
+                    <li> 'pointer' means 'Watermark n1,n2,....  
+                    </ol>
+                    NOTE: 'pointer' currently doesn't work!
+                 </td></tr></table>
+	    <li> <code>Storage Location</code>
+                 <table><tr><td>
+                    Either 'global' or 'formal'.  
+                    <ol>  
+                    <li> 'global' means that subgraph nodes are stored in global static  
+                          variables. 
+                    <li> 'formal' means that subgraph nodes are passed around in method parameters. 
+                    </ol>
+	         </td></tr></table>
+	    <li> <code>Protection Method</code>
+                 <table><tr><td>
+                    Colon-separated list of 'if', 'safe', 'try'.  
+                    <ol>  
+                    <li> 'if' means that we protect against null pointers using 'if(n!=null)...'. 
+                    <li>  'safe' means that we use 'n=(n!=null)?n:new Watermark'.  
+                    <li> 'try' means that we use 'try{...}catch(...){}'.
+                    </ol>
+	         </td></tr></table>
+	    <li> <code>Graph Type</code>
+                  <table><tr><td>
+                    Select the type of graph to use to encode the watermark:
+                    <ol>  
+                    <li>  '*' means that we choose an encoding randomly.
+                    <li>  <code>RadixGraph</code>s have a high data rate.
+                    <li>  <code>PlantedPlaneCubicTree</code>s have some
+                          error-correction properties.
+                    <li> <code>PermuationGraph</code> are similar to
+                         <code>RadixGraph</code>s.
+                    <li> <code>ReduciblePermutationGraph</code>s have a low
+                         data rate but high resilience to attack.
+                    </ol>
+                 </td></tr></table>
+	    <li> <code>Subgraph Count</code>
+                 <table><tr><td>
+                    An integer describing the number of subgraphs the graph should be broken up into.
+	         </td></tr></table>
+	    <li> <code>Dump Intermediate Code</code>
+                 <table><tr><td>
+                    Print out the intermediate code.
+	         </td></tr></table>
+	    <li> <code>Numeric Watermark</code>
+                 <table><tr><td>
+                    Pure numeric watermarks are encoded more efficiently than watermarks that
+                    can be arbitrary strings. NOTE: If you check this you
+                    must also check the same box during recognition.
+	         </td></tr></table>
+	    <li> <code>Use Cycle Graph</code>
+                 <table><tr><td>
+                 To protect against node-splitting attacks, transform the underlying
+                 graph such that every node becomes a 3-cycle. Any node split will
+                 just expand the length of the cycle. During recognition, the cycles
+                 are contracted to generate the original graph.
+	         </td></tr></table>
+	    <li> <code>Inline Code</code>
+                 <table><tr><td>
+                 Inline the methods for creating the watermark.
+	         </td></tr></table>
+	    <li> <code>Replace Watermark Class</code>
+                 <table><tr><td>
+		 Choose a class that would best represent a watermark graph
+                 node rather than creating a new class from scratch.
+	         </td></tr></table>
+	    <li> <code>Dump Intermediate Code</code>
+                 <table><tr><td>
+		 Print out the intermediate code used to generate the watermark class.
+	         </td></tr></table>
+</ul>
+</BODY></HTML>

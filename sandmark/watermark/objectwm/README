@@ -1,0 +1,35 @@
+Authors: Balamurgan Chirtsabesan ( balamc@cs.arizona.edu )
+         Tapas Ranjan Sahoo      ( tapas@cs.arizona.edu  )
+
+
+This directory contains a static watermarker that embeds the watermark in the
+code as an instruction group frequency vector. The overall scheme is based on the Stern's
+robust object watermark algorithm. The watermark instruction vector is formed out of
+some code profiling information. Various embedding techinques such as code substitution, 
+instruction group insertion, etc are used to build the watermark in the code.
+
+The recognition procedure follows a different approach. Instead of retrieving the 
+watermark directly from the target code, the recognizer is provided with both the 
+original code and the new code along with the watermark. The recognizer then answers
+with a 'yes/no' whether the particular watermark exists in the code.
+
+The directory contains the following files:
+
+   package.html
+   Makefile
+   README
+
+   CodeBook.java
+   Config.java
+   Insertion.java	
+   InstructionEmbedUtil.java
+   MethodCopyUtil.java
+   ObjectHelper.java
+   ObjectUtil.java
+   ObjectWatermark.java
+   SubstitutionUtil.java
+   VectorExtraction.java
+   VectorUpdateCtrl.java
+
+   doc directory: help.HTML file
+

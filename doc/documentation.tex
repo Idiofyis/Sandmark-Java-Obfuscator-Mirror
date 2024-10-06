@@ -1,0 +1,27 @@
+\section{Documentation}
+To document a new obfuscator or watermarker, do the following:
+\begin{enumerate}
+    \item create a new file {\tt {\em name}.tex} in \url{smark/doc}:
+\begin{verbatim}
+   \algorithm{The ... Algorithm}{Authors}
+    ....
+\end{verbatim}
+    Where {\tt Authors} is a comma-separated list of authors
+    of this algorithm implementation.
+    \item add an {\tt input}-statement to \url{smark/manual.tex}:
+\begin{verbatim}
+   \part{\SM\ Algorithms}
+   \input{CollbergThomborson}
+   ...
+   \input{name.tex}
+\end{verbatim}
+   \item Update \url{smark/makefile}:
+\begin{verbatim}
+SECTIONS = \
+   ...
+   CollbergThomborson.tex\
+   ...
+   name.tex \
+\end{verbatim}
+   \item Type {\tt make}.
+\end{enumerate}

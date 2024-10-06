@@ -1,0 +1,142 @@
+make DumpAllTest
+   Dumps everything about the program hello.java.
+
+make AnnoTracerTest
+   Does an annotation trace of the program AnnoTester.java.
+   Output in AnnoTester.out
+
+make HeapDumperTest
+   Dumps the heap after 'hello' has finished executing.
+   Output in Heap.out.
+
+Annotator.java and AnnoTester.java are analogues of those
+in the 'annot' directory.
+
+Trace.java is the baseclass for all tracers. A new tracer is
+built by filling in the appropriate actions in onMethodEntry,
+onMethodExit, and onProgramExit, below. Also, 'excludes' *or*
+'includes' should list the classes we're interested in.
+----------------------------------------------------------------------
+class MyHandler extends EventHandler{
+
+   public MyHandler(String[] includeClasses,String[] excludeClasses) {
+      super(includeClasses,excludeClasses);
+   }
+
+   public void onMethodEntry (
+      VirtualMachine vm, PrintWriter writer, com.sun.jdi.Method method,
+      String methodName, String typeName,long objectID,
+      long callerCodeIndex, long callerLineNumber, String callerName, String callerSourceName,
+      long calleeCodeIndex, long calleeLineNumber, String calleeName, String calleeSourceName,
+      String threadName, long threadID) {
+   }
+
+   public void onMethodExit (
+      VirtualMachine vm, PrintWriter writer, com.sun.jdi.Method method,
+      String methodName, String typeName,long objectID,
+      long callerCodeIndex, long callerLineNumber, String callerName, String callerSourceName,
+      long calleeCodeIndex, long calleeLineNumber, String calleeName, String calleeSourceName,
+      String threadName, long threadID) {
+   }
+
+   public void onProgramExit (
+      VirtualMachine vm,
+      PrintWriter writer) {
+   }
+}
+
+public class MyDumper extends Trace {
+    public static void main(String argv[])
+        throws com.sun.jdi.connect.VMStartException, 
+               java.io.IOException,
+               com.sun.jdi.connect.IllegalConnectorArgumentsException {
+       int traceFlags = VirtualMachine.TRACE_NONE;
+       String[] excludes = {"java.*", "javax.*", "sun.*", "com.sun.*"};
+       String[] includes = {};
+
+       HeapHandler handler = new MyHandler(includes, excludes);
+       PrintWriter writer = // a file to write to.
+       VirtualMachine vm = createVM(argv, traceFlags);
+       startVM(vm, handler, writer);
+   }
+}
+----------------------------------------------------------------------
+
+
+This works by subscribing to trace events for all method
+entries (except for standard Java classes)
+and method exit events from the main class
+(so we can catch the end of the execution.)
+When the end of the program is reached we
+walk all threads, all stack-frames within
+these threads, and all static variables, and print
+out the object graph. Primitive values are
+not printed. We use the "uniqueID()" of each
+method as its name.
+
+Dumping local variables doesn't seem to always
+work. When we reach the end of "main" and
+walk the stack-frames to look for local variables
+an "absentInformationException" is thrown. 
+Compiling with '-g' helps a bit, but we still
+don't get all the locals.
+
+uniqueID is weakly related to allocation-order,
+but not enough for us to be able to rely on
+it. 
+
+----------------------------------------------------------------------
+The annotator log file has changed slightly:
+
+#  Watermarker Log File
+
+INIT	at main(AnnoTester.java:8) # 0
+----	at main(AnnoTester.java:9) # 3
+3	at main(AnnoTester.java:11) # 20
+"arg1"	at main(AnnoTester.java:12) # 26
+4	at main(AnnoTester.java:11) # 20
+"arg2"	at main(AnnoTester.java:12) # 26
+0	at main(AnnoTester.java:11) # 20
+"arg3"	at main(AnnoTester.java:12) # 26
+1	at main(AnnoTester.java:11) # 20
+"arg4"	at main(AnnoTester.java:12) # 26
+----	at main(AnnoTester.java:14) # 38
+
+The number after the #-mark is the bytecode index
+corresponding to the linenumber. So, Mausam, you
+can use this when making your changes to the code,
+when line-numbers are not available.
+
+
+----------------------------------------------------------------------
+The heap-dumper output has also changed:
+# ---------- OBJECT ALLOCATION ORDER ----------
+
+ALLOC 0 : -1
+ALLOC 1 : 46
+ALLOC 2 : 47
+ALLOC 3 : 48
+ALLOC 4 : 49
+ALLOC 5 : 50
+ALLOC 6 : 51
+
+# ---------- OBJECT REFERENCE TOPOLOGY ----------
+
+56 args:[Ljava/lang/String;
+46 hello.t:Lhello; 47
+220 hello.a:[Lhello; 49 50
+47 :Lhello; 48
+49 :Lhello;
+50 :Lhello;
+48 :Lhello; 47
+
+The first part gives the allocation order of the
+objects on the heap (actually, all objects ever
+created will be listed here, even those that
+are not live.) Object 47, for example, was the
+second object to be allocated.
+
+The second part gives the object graph, as before.
+I've included names of variables, when available,
+before a ":". The type comes after the ":".
+

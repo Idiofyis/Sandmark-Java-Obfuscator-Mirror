@@ -1,0 +1,63 @@
+\section{Coding standard}
+\begin{itemize}
+    \item Don't use tab characters.
+    \item Indent by typing three (3) blanks.
+    \item Put the left brace ({\bf{\{}}) on
+          same line as preceding statement. I.e.
+          format an if-statement like this:
+\begin{verbatim}
+   if () {
+      ...
+   }
+\end{verbatim}
+        not like this:
+\begin{verbatim}
+   if ()
+   {
+     ...
+   }
+\end{verbatim}
+        or like this:
+\begin{verbatim}
+   if ()
+      {
+        ...
+      }
+\end{verbatim}
+     \item Don't use {\tt import}-statements. 
+           Instead, always use fully qualified names.
+           For example, say 
+\begin{verbatim}
+   java.util.Properties p = new java.util.Properties();
+\end{verbatim}
+           instead of
+\begin{verbatim}
+   import java.util.*;
+   ...
+   Properties p = new Properties();
+\end{verbatim}
+          In a large system like \SM\ it is difficult to
+          read the code when you don't know where the
+          a particular name is declared. In \SM\ we use
+          deep package hierarchies to organize the code
+          and always refer to every object using its 
+          fully qualified name. This also prevents name
+          clashes.
+   \item We make one exception: you are allowed to say
+         {\tt String} rather than {\tt java.lang.String}!
+   \item We use the following naming strategy:
+         \begin{itemize}
+            \item Package names are short and in lower case.
+                  We favor deep package hierarchies over
+                  packages with many classes.
+            \item Class names are typically long and descriptive.
+                  They start with an uppercase letter.
+            \item Method names start with a lowercase letter.
+         \end{itemize}
+   \item We make an effort to write methods that pass the ``hand test''.
+	 The ``hand test'' passes if a method is short enough
+	 to be completely covered by the programmer's hand placed horizontally
+	 with fingers together on the screen.  (``Horizontally'' means that the
+	 fingers are pointed to a side of the monitor, not toward the top or bottom.)
+\end{itemize}
+

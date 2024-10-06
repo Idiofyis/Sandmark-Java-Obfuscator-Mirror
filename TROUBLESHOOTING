@@ -1,0 +1,51 @@
+Q: Why do my mark()-calls get mysteriously purged from the call-graph?
+A: You didn't compile sandmark (or, more precisely, sandmark.trace.Annotator)
+   with '-g'.
+
+Q: Why do I get lots of compilation errors involving
+   sun.com.jdi*?
+A: The JDK variable in the Makedefs file has not been
+   set correctly. It must point to the directory where
+   the jdk lives, so we can pick up the path to the
+   rt.jar library.
+
+Q: Why do I get a compilation error involving
+   sun.com.jdi.request.VMDeathRequest?
+A: You are not running jdk1.4.
+
+Q: I get lots of errors when I run 'make test'. What
+   should I do?
+A: Don't run 'make test'.
+
+Q: I get a com/sun/jdi/connect/IllegalConnectorArgumentsException when
+   tracing using the CT algorithm.  What's going wrong?  
+A: You don't have tools.jar set correctly in your path.  Verify that
+   tools.jar exists in a subdirectory of jdk1.4 home and that the
+   classpath is correctly set to point to it.
+
+Q: I'm adding a new obfuscation/watermarking algorithm, type "make",
+   type "make run", everything works except my algorithm doesn't
+   show up in the gui? What's going on here?
+A: You must add the directory name to sandmark/obfuscate/Makefile or
+   sandmark/watermark/Makefile.
+Q: OK, it still doesn't work.
+A: Did you remember to set the "package sandmark...." right?
+Q: OK, it still doesn't work.
+A: Do you have a constructor? There must be a default public 
+   constructor.
+Q: It works!
+A: I know.
+
+Q: I added a new image to sandmark/html but it doesn't seem
+   to get included in sandmark.jar.
+A: Try "make clean; make"
+
+Q: I added a new image to sandmark/html but it doesn't seem
+   to get included in sandmark.jar.
+A: Try "make clean; make"
+
+Q: I added a new image to sandmark/html but it doesn't seem
+   to get included in sandmark.jar.
+A: Try "make clean; make"
+
+----------------------------------------------------------------------------

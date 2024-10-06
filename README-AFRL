@@ -1,0 +1,132 @@
+CHANGES 3.3 to 3.4
+
+sandmark.CLI:  killed a lot of useless code
+sandmark.Console: killed a lot of useless code
+sandmark.Scripting:  remove bad scripting support
+sandmark.analysis.callgraph:  added a callgraph implementation that
+analyses virtual method invocation using Rapid Type Analysis
+
+sandmark.analysis:  many of these packages were moved from sandmark.util.
+
+sandmark.analysis.classhierarchy:  allowed CH to contain Class's in
+multiple Applications.  fix a bunch of bugs. moved from
+sandmark.util.classhierarchy.  Use the new graph classes.
+
+sandmark.analysis.controlflowgraph: moved from
+sandmark.util.controlflowgraph.  Use the new graph classes.  Annotate
+a few types of flow edges.  Various fixes and performance
+improvements.  Make RegisterAllocator use the new code analyses
+instead of the really slow ad-hoc algorithm previously used.  Add
+TopoMaintainingCallGenerator, similar to CallingCallGenerator, that
+doesn't change the structure of the caller's CFG.
+
+sandmark.analysis.defuse:  new reaching definitions analysis
+
+sandmark.analysis.initialized:  new analysis to tell whether a
+variable has been initialized along all paths at a certain instruction
+
+sandmark.analysis.interference:  new interference graph analysis
+
+sandmark.analysis.liveness:  new liveness analysis
+
+sandmark.analysis.stacksimulator:  massive performance improvements
+through the use of immutable Contexts, bug fixes
+
+sandmark.diff:  moved a bunch of gui code to sandmark.gui.diff.  add
+more code comparison methods.  moved some methods (like
+BakerAlgorithm) to a new package.
+
+sandmark.gui:  basically a complete rewrite.  make things resizable,
+change the layout.  add a graph visualization component, a slicing
+component, and some more bytecode view options.  move the diff gui
+from sandmark.diff to sandmark.gui.diff.  
+
+sandmark.newstatistics:  add cfg statistics
+
+sandmark.obfuscate.dynamicinliner:  add an obfuscation that inlines
+virtual method calls
+
+sandmark.obfuscate.interleavemethods:  add an obfuscation that mixes
+the code for several methods into one big method
+
+sandmark.obfuscate.interproceduralop:  generate opaque predicates that
+scatter their code through the program instead of computing the entire
+opaque predicate value in one place
+
+sandmark.obfuscate.irreducibility:  add an obfuscation that causes
+methods to have irreducible control flow graphs by adding goto's
+inside opaque predicates through the method.
+
+sandmark.obfuscate.loop:  clean up this code.  make it work with
+sandmark.program objects instead of building its own wrappers.
+massively simplify everything.
+
+sandmark.obfuscate.methodmadness:  rewrite this.  move much of the
+code into generic classes in sandmark.util.
+
+sandmark.obfuscate.nameoverloading:  move field renaming from Name
+Obfuscator to here, and do it right.
+
+sandmark.obfuscate.paramalias:  new obfuscation that adds a shadow
+global copy of some random parameter to a method.
+
+sandmark.obfuscate.scalarmerger:  new obfuscation that combines 2
+integer local variables into a single long local variable and accesses
+the long in an obfuscated way
+
+sandmark.program.util:  implement field renaming.  
+
+sandmark.smash:  implement scripting and a CLI
+
+sandmark.util.ConfigProperties:  make properties typed and make CP
+objects form a rooted tree.  make properties apply only to certain
+phases of operation, like watermarking embedding vs. recognition
+
+sandmark.util.MethodCaller,MethodMerger,MethodReceiver,MethodSignatureChanger,
+ParamReorderer,SignatureBludgneoner,StaticSplit,:
+new utility classes to find method callers and callees, merge to method
+together, and change method signatures
+
+sandmark.util.graph.graphview:  new graph visualization code
+
+sandmark.util.newexprtree.ComputeExprTree,NodeInfo:  copied from
+sandmark.util.exprtree
+
+sandmark.util.newgraph:  new immutable graph implementation, plus
+MutableGraph wrapper
+
+sandmark.util.opaquepredicatelib:  new dynamic-data-structure-based
+opaque predicates
+
+sandmar.util.outliner:  new code outlining implementation
+
+sandmark.util.primitivepromotion:  new code that promotes eg int's to
+Integer's in a variety of situations
+
+sandmark.util.splitint:  move int splitter from sandmark.util to
+here.  new CRTSplitter that can lose many of the values it produces and
+still successfully combine the remainder
+
+sandmark.watermark.arboit:  new implementations of static and dynamic
+watermarks proposed by Arboit
+
+sandmark.watermark.ct:  add new code to inline the watermark graph
+building code into its callsites
+
+sandmark.watermark.execpath:  a start at implementing a new dynamic watermark
+based on the branch execution order
+
+sandmark.watermark.gtw:  make the random walk algorithm in
+ClusterGraph more uniform.  Use the TopoMaintainingCallGenerator to
+draw edges between watermark nodes.  Don't use a ProgramCFG after the
+clustergraph is built so as to allow the memory to be freed.
+
+sandmark.watermark.mondenwmark:  improve code generated to embed wmark
+
+sandmark.watermark.util.MD5Marker:  new implementation of a keyed,
+fragile basic block marker
+
+
+
+
+

@@ -1,0 +1,454 @@
+\section{\SM\ Packages}
+\SM\ is a large application. Currently it is made
+up of some 29000 lines of java code distributed over
+200 classes. The code is organized in a fairly deep 
+package hierarchy.
+
+\subsection{sandmark}
+Classes at the top level:
+\begin{description}
+   \item[sandmark.Console:] 
+         The main entry point to \SM. It contains code
+         that starts up the GUI and acts as an interface
+         between the GUI and the rest of the application.
+   \item[sandmark.CLI:]
+         The command line interpreter.
+   \item[sandmark.Scripting:]
+         The script interpreter.
+\end{description}
+
+\subsection{sandmark.gui}
+\url{sandmark.gui} contains the code that
+build up the graphical interface.
+\begin{description}
+   \item[sandmark.gui.AboutDialog:]
+   \item[sandmark.gui.ButtonRenderer:]
+   \item[sandmark.gui.CodeDialog:]
+   \item[sandmark.gui.EmbedConfigDialog:]
+   \item[sandmark.gui.ExtensionFileFilter:]
+   \item[sandmark.gui.GUIListener:]
+   \item[sandmark.gui.HelpFrame:]
+   \item[sandmark.gui.IntegerInput:]
+   \item[sandmark.gui.LayoutConstraints:]
+   \item[sandmark.gui.LightRenderer:]
+   \item[sandmark.gui.MultiHeaderRenderer:]
+   \item[sandmark.gui.ObTableModel:]
+   \item[sandmark.gui.ObfuscateConfigDialog:]
+   \item[sandmark.gui.RelativeLayout:]
+   \item[sandmark.gui.SandMarkFrame:]
+   \item[sandmark.gui.SandMarkGUIConstants:]
+   \item[sandmark.gui.SkinPanel:]
+   \item[sandmark.gui.StatDialog:]
+   \item[sandmark.gui.StatTableModel:]
+   \item[sandmark.gui.TablePanel:]
+   \item[sandmark.gui.SMarkGUIConstants:]
+   \item[sandmark.gui.SandMarkOSConstants:]
+\end{description}
+
+\subsection{sandmark.html}
+{\tt Html} help files are kept here.
+
+
+\subsection{sandmark.obfuscate}
+Each obfuscation lives in its own subdirectory
+in \url{sandmark.obfuscate}. 
+\url{sandmark.obfuscate.setfieldspublic}, for 
+example, is an obfuscator that sets all fields 
+to {\tt public}.
+\begin{description}
+   \item[sandmark.obfuscate.AllClassesObfuscator:]
+   \item[sandmark.obfuscate.AppObfuscator:]
+        The abstract base-class from which any obfuscator
+        that works on an entire application should inherit.
+        It inherits from \url{sandmark.obfuscate.GeneralObfuscator}.
+   \item[sandmark.obfuscate.ClassObfuscator:]
+        The abstract base-class from which any obfuscator
+        that works on a single class should inherit.
+        It inherits from \url{sandmark.obfuscate.GeneralObfuscator}.
+   \item[sandmark.obfuscate.GeneralObfuscator:]
+        The top-level abstract class for an obfuscator.
+   \item[sandmark.obfuscate.MethodObfuscator:]
+        The abstract base-class from which any obfuscator
+        that works on a single method should inherit.
+        It inherits from \url{sandmark.obfuscate.GeneralObfuscator}.
+   \item[sandmark.obfuscate.NameOverloadObfuscator:]
+        An advanced name obfuscator based on Paul Tyma's patent.
+   \item[sandmark.obfuscate.Obfuscate:]
+        This class handles the incoming obfuscation 
+        requests from the GUI. It is called by \url{sandmark.Console}.
+   \item[sandmark.obfuscate.Obfuscator:]
+        The top-level obfuscator that decides on overall
+        strategy -- which algorithms should be applied to
+        which pieces of code.
+\end{description}
+
+\subsection{sandmark.obfuscate.setfieldspublic}
+An obfuscator that sets all fields and methods to public.
+\begin{description}
+   \item[sandmark.obfuscate.setfieldspublic.SetFieldsPublic:]
+\end{description}
+
+\subsection{sandmark.obfuscate.splitclass}
+An obfuscator that splits a class in two pieces.
+Non-functional.
+\begin{description}
+   \item[sandmark.obfuscate.splitclass.DummyClass:]
+   \item[sandmark.obfuscate.splitclass.Obf:]
+   \item[sandmark.obfuscate.splitclass.SplitClass:]
+\end{description}
+
+\subsection{sandmark.obfuscate.util}
+\url{sandmark.obfuscate.util} contains classes of
+interest to all obfuscators.
+
+
+\subsection{sandmark.optimise}
+Routines to optimize Java programs. Currently based
+solely on the BLOAT package.
+\begin{description}
+   \item[sandmark.optimise.Optimise:]
+   \item[sandmark.optimise.Main:]
+   \item[sandmark.optimise.Optimiser:]
+\end{description}
+
+
+\subsection{sandmark.util}
+\url{sandmark.util} contains classes of interest
+to all \SM\ tools.
+\begin{description}
+   \item[sandmark.util.Compile:]
+   \item[sandmark.util.BCEL:]
+      Utility routines to work with the \BCEL\ (formerly {\tt JavaClass})
+      package.
+   \item[sandmark.util.ByteCodeLocation:]
+      Represents a location within a Java application.
+      Essentially a tuple 
+      $$\langle \mbox{\url{sandmark.util.MethodID}}, {\tt lineNumber}, {\tt byteCodeIndex}\rangle.$$
+   \item[sandmark.util.CallGraphNode:]
+      The node in a call graph.
+   \item[sandmark.util.CircularBuffer:]
+      A bounded buffer of arbitrary objects.
+   \item[sandmark.util.ClassFileCollection:]
+      Routines for loading the classes of the
+      program to be watermarked, obfuscated, etc.
+      A class can be parsed into a \BCEL\ or a {\tt BLOAT} object.
+   \item[sandmark.util.ClassHierarchy:]
+      A package for building the complete class hierarchy
+      from a jarfile. There are many routines for querying the
+      hierarchy, such as which methods override a particular
+      method, which classes extend a particular class, etc.
+   \item[sandmark.util.DependencyGraph:]
+      Used by \url{sandmark.obfuscate.splitclass.SplitClass}.
+   \item[sandmark.util.Editor:]
+      Utility class for use with {\tt BLOAT}.
+   \item[sandmark.util.EditedClass:]
+      A class for maintaining a cache of classes and methods
+      edited with \BCEL.
+   \item[sandmark.util.FileClassLoader:]
+      Used to load classes on the fly.
+   \item[sandmark.util.FindClassFiles:]
+      Used to load classes on the fly.
+   \item[sandmark.util.GraphViewer:]
+      Graphical display of \url{sandmark.util.graph.Graph}.
+   \item[sandmark.util.InstructionTree:]
+   \item[sandmark.util.LabeledGrid:]
+   \item[sandmark.util.Log:]
+      Routines for printing out messages (both to a file
+      and to the screen) to the user.
+   \item[sandmark.util.MethodID:]  
+      Represents a method within a Java application.
+      Essentially a tuple 
+      $$\langle {\tt name}, {\tt signature}, {\tt className}\rangle.$$
+   \item[sandmark.util.MethodNode:]
+   \item[sandmark.util.Misc:]
+   \item[sandmark.util.Options:]
+      Routines for cracking command line parameters.
+   \item[sandmark.util.PriorityQueue:]
+   \item[sandmark.util.SparseVector:]
+      A specialized version on \url{java.util.Vector}.
+   \item[sandmark.util.StackFrame:]
+      Used to build call graphs.
+   \item[sandmark.util.StatisticsRecord:]
+   \item[sandmark.util.Stats:]
+   \item[sandmark.util.StringInt:]
+      A routine to package up an int inside a string.
+   \item[sandmark.util.TempDir:]
+      Routines to manage temporary directories.
+   \item[sandmark.util.Time:]
+      Routines for timing Java programs.
+\end{description}
+
+\subsection{sandmark.util.exec}
+\url{sandmark.util.exec} contains classes that allow
+\SM\ to run another Java application under 
+debugging. This uses Java's JDI package. JDI
+allows you to start up a Java program, set
+breakpoints, trace method calls, examine 
+variables, etc. We use this in the 
+implementation of the trace and recognition 
+steps of the dynamic watermarking algorithms.
+\begin{description}
+   \item[sandmark.util.exec.Breakpoint:]
+       A class for creating breakpoints.
+   \item[sandmark.util.exec.DumpAll:]
+   \item[sandmark.util.exec.EventHandler:]
+   \item[sandmark.util.exec.EventThread:]
+   \item[sandmark.util.exec.Heap:]
+       A class for iterating through all the objects on the heap.
+   \item[sandmark.util.exec.HeapData:]
+       Objects returned by \url{sandmark.util.exec.Heap}.
+   \item[sandmark.util.exec.MethodCallData:]
+   \item[sandmark.util.exec.Output:]
+       A class that handles input and output from the
+       application being executed.
+   \item[sandmark.util.exec.Overseer:]
+      Extend this class to run a program under JDI.
+   \item[sandmark.util.exec.TracingException:]
+\end{description}
+
+
+\subsection{sandmark.util.graph}
+Many watermarking algorithms make use of graphs.
+This package contains a multigraph package
+\url{sandmark.util.graph.Graph} as well as operations
+on such graphs, such as all-pairs-shortest-path,
+depth-first-search, etc.
+\begin{description}
+   \item[sandmark.util.graph.GraphOp:]
+      Additional algorithms on graphs.
+   \item[sandmark.util.graph.Dfs:]
+      Classify the edges of a graph as 
+      {\tt tree}, {\tt cross}, and {\tt back}.
+   \item[sandmark.util.graph.Edge:]
+      Edge objects of a \url{sandmark.util.graph.Graph}.
+   \item[sandmark.util.graph.Graph:]
+      A class for constructing multi-graphs.
+   \item[sandmark.util.graph.Matrix:]
+      A class where graphs are represented as an adjacency matrix.
+   \item[sandmark.util.graph.Node:]
+      Node objects of a \url{sandmark.util.graph.Graph}.
+   \item[sandmark.util.graph.Path:]
+      A class for representing a path in a \url{sandmark.util.graph.Graph}.
+\end{description}
+
+\subsection{sandmark.util.graph.codec}
+This package implements various algorithms for
+embedding a number into the topology of a graph. 
+\begin{description}
+   \item[sandmark.util.graph.codec.DecodeFailure:]
+   \item[sandmark.util.graph.codec.GraphCodec:]
+      Base-class for graph codecs.
+   \item[sandmark.util.graph.codec.PPCT:]
+      Non-functional.
+   \item[sandmark.util.graph.codec.PermutationGraph:]
+      A permutation graph encoding.
+   \item[sandmark.util.graph.codec.RadixGraph:]
+      A radix graph encoding.
+\end{description}
+
+\subsection{sandmark.util.javagen}
+\url{sandmark.util.javagen} contains classes
+for building up Java methods and classes.
+It is essentially a layer on top of 
+\BCEL. \url{sandmark.util.javagen}
+allows you to build up a Java AST and
+then turn that into bytecode.
+\begin{description}
+   \item[sandmark.util.javagen.AssignField:]
+   \item[sandmark.util.javagen.AssignIndex:]
+   \item[sandmark.util.javagen.AssignStatic:]
+   \item[sandmark.util.javagen.Block:]
+   \item[sandmark.util.javagen.Cast:]
+   \item[sandmark.util.javagen.Class:]
+   \item[sandmark.util.javagen.Comment:]
+   \item[sandmark.util.javagen.CondNotNullExpr:]
+   \item[sandmark.util.javagen.Discard:]
+   \item[sandmark.util.javagen.EmptyStatement:]
+   \item[sandmark.util.javagen.Expression:]
+   \item[sandmark.util.javagen.Field:]
+   \item[sandmark.util.javagen.FieldRef:]
+   \item[sandmark.util.javagen.Formal:]
+   \item[sandmark.util.javagen.IfNotNull:]
+   \item[sandmark.util.javagen.Java:]
+   \item[sandmark.util.javagen.List:]
+   \item[sandmark.util.javagen.LiteralInt:]
+   \item[sandmark.util.javagen.LiteralString:]
+   \item[sandmark.util.javagen.LoadIndex:]
+   \item[sandmark.util.javagen.Local:]
+   \item[sandmark.util.javagen.LocalRef:]
+   \item[sandmark.util.javagen.Method:]
+   \item[sandmark.util.javagen.MyClass:]
+   \item[sandmark.util.javagen.New:]
+   \item[sandmark.util.javagen.NewArray:]
+   \item[sandmark.util.javagen.Null:]
+   \item[sandmark.util.javagen.Return:]
+   \item[sandmark.util.javagen.Statement:]
+   \item[sandmark.util.javagen.StaticCall:]
+   \item[sandmark.util.javagen.StaticFunCall:]
+   \item[sandmark.util.javagen.StaticRef:]
+   \item[sandmark.util.javagen.Test:]
+   \item[sandmark.util.javagen.Try:]
+   \item[sandmark.util.javagen.VirtualCall:]
+   \item[sandmark.util.javagen.VirtualFunCall:]
+\end{description}
+
+\subsection{sandmark.watermark}
+This package contain all the watermarking algorithms.
+Each algorithm resides in its own directory.
+\begin{description}
+   \item[sandmark.watermark.DynamicEmbed:]
+      Handles the embedding phase of a dynamic watermarker.
+   \item[sandmark.watermark.DynamicRecognize:]
+      Handles the recognition phase of a dynamic watermarker.
+   \item[sandmark.watermark.DynamicTrace:]
+      Handles the tracing phase of a dynamic watermarker.
+   \item[sandmark.watermark.DynamicWatermarker:]
+      The base-class for all dynamic watermarkers.
+   \item[sandmark.watermark.GeneralWatermarker:]
+      The base-class of all watermarkers
+   \item[sandmark.watermark.StaticWatermarker:]
+      The base-class for all static watermarkers.
+   \item[sandmark.watermark.StaticEmbed:]
+      Handles the embedding phase of a static watermarker.
+   \item[sandmark.watermark.StaticRecognize:]
+      Handles the recognition phase of a static watermarker.
+   \item[sandmark.watermark.WatermarkingException:]
+   \item[sandmark.watermark.Watermarking:]
+\end{description}
+
+\subsection{sandmark.watermark.CT}
+This package implements the Collberg-Thomborson dynamic
+watermarking algorithm.
+\begin{description}
+   \item[sandmark.watermark.CT.CT:]
+      The main class for the Collberg-Thomborson 
+      algorithm. Extends \url{sandmark.watermark.DynamicWatermarker}.
+\end{description}
+
+\subsection{sandmark.watermark.CT.embed}
+This package implements the embedding of a graph
+into a Java program. This is part of the 
+Collberg-Thomborson watermarking algorithm.
+\begin{description}
+   \item[sandmark.watermark.CT.embed.AddParameters:]
+   \item[sandmark.watermark.CT.embed.CallGraphPath:]
+   \item[sandmark.watermark.CT.embed.DeleteMarkCalls:]
+   \item[sandmark.watermark.CT.embed.EmbedData:]
+   \item[sandmark.watermark.CT.embed.Embedder:]
+   \item[sandmark.watermark.CT.embed.InsertStorageCreators:]
+   \item[sandmark.watermark.CT.embed.PrepareTrace:]
+   \item[sandmark.watermark.CT.embed.ReplaceMarkCalls:]
+\end{description}
+
+\subsection{sandmark.watermark.CT.encode}
+This package implements the encoding of a graph
+into a Java program. This is part of the 
+Collberg-Thomborson watermarking algorithm.
+\begin{description}
+   \item[sandmark.watermark.CT.encode.Encoder:]
+   \item[sandmark.watermark.CT.encode.Graph2IR:]
+   \item[sandmark.watermark.CT.encode.Split:]
+\end{description}
+
+\subsection{sandmark.watermark.CT.encode.ir}
+This package implements the encoding of a graph
+into a simple intermediate code. This is part of the 
+Collberg-Thomborson watermarking algorithm.
+\begin{description}
+   \item[sandmark.watermark.CT.encode.ir.AddEdge:]
+   \item[sandmark.watermark.CT.encode.ir.Build:]
+   \item[sandmark.watermark.CT.encode.ir.Construct:]
+   \item[sandmark.watermark.CT.encode.ir.Create:]
+   \item[sandmark.watermark.CT.encode.ir.CreateNode:]
+   \item[sandmark.watermark.CT.encode.ir.CreateStorage:]
+   \item[sandmark.watermark.CT.encode.ir.Debug:]
+   \item[sandmark.watermark.CT.encode.ir.Destroy:]
+   \item[sandmark.watermark.CT.encode.ir.Destruct:]
+   \item[sandmark.watermark.CT.encode.ir.Field:]
+   \item[sandmark.watermark.CT.encode.ir.Fixup:]
+   \item[sandmark.watermark.CT.encode.ir.FollowLink:]
+   \item[sandmark.watermark.CT.encode.ir.Formal:]
+   \item[sandmark.watermark.CT.encode.ir.IR:]
+   \item[sandmark.watermark.CT.encode.ir.Init:]
+   \item[sandmark.watermark.CT.encode.ir.List:]
+   \item[sandmark.watermark.CT.encode.ir.LoadNode:]
+   \item[sandmark.watermark.CT.encode.ir.Method:]
+   \item[sandmark.watermark.CT.encode.ir.NodeStorage:]
+   \item[sandmark.watermark.CT.encode.ir.PrintGraph:]
+   \item[sandmark.watermark.CT.encode.ir.ProtectRegion:]
+   \item[sandmark.watermark.CT.encode.ir.SaveNode:]
+   \item[sandmark.watermark.CT.encode.ir.StaticCall:]
+\end{description}
+
+\subsection{sandmark.watermark.CT.encode.ir2ir}
+This package implements transformations 
+of the intermediate code used in the encoding
+of graphs in the Collberg-Thomborson watermarking algorithm.
+\begin{description}
+   \item[sandmark.watermark.CT.encode.ir2ir.AddFields:]
+   \item[sandmark.watermark.CT.encode.ir2ir.AddFormals:]
+   \item[sandmark.watermark.CT.encode.ir2ir.Builder:]
+   \item[sandmark.watermark.CT.encode.ir2ir.CleanUp:]
+   \item[sandmark.watermark.CT.encode.ir2ir.Debug:]
+   \item[sandmark.watermark.CT.encode.ir2ir.Destructors:]
+   \item[sandmark.watermark.CT.encode.ir2ir.InlineFixups:]
+   \item[sandmark.watermark.CT.encode.ir2ir.Protect:]
+   \item[sandmark.watermark.CT.encode.ir2ir.SaveNodes:]
+   \item[sandmark.watermark.CT.encode.ir2ir.Transformer:]
+\end{description}
+
+\subsection{sandmark.watermark.CT.encode.storage}
+This package implements operations on
+the storage of graph nodes in 
+Collberg-Thomborson watermarking algorithm.
+\begin{description}
+   \item[sandmark.watermark.CT.encode.storage.NodeStorage:]
+   \item[sandmark.watermark.CT.encode.storage.Array:]
+   \item[sandmark.watermark.CT.encode.storage.Hash:]
+   \item[sandmark.watermark.CT.encode.storage.GlobalStorage:]
+   \item[sandmark.watermark.CT.encode.storage.Pointer:]
+   \item[sandmark.watermark.CT.encode.storage.StorageClass:]
+   \item[sandmark.watermark.CT.encode.storage.Vector:]
+\end{description}
+
+\subsection{sandmark.watermark.CT.recognize}
+This package implements the recognition part
+of Collberg-Thomborson's software watermarking
+algorithm. It should be generalized to handle
+recognition in {\em any} dynamic software
+watermarking algorithm.
+\begin{description}
+   \item[sandmark.watermark.CT.recognize.Heap2Graph:]
+   \item[sandmark.watermark.CT.recognize.RecognizeData:]
+   \item[sandmark.watermark.CT.recognize.Recognizer:]
+\end{description}
+
+\subsection{sandmark.watermark.CT.trace}
+This package currently implements the trace part
+of Collberg-Thomborson's software watermarking
+algorithm. It should be generalized to handle
+tracing in {\em any} dynamic software
+watermarking algorithm.
+\begin{description}
+   \item[sandmark.watermark.CT.trace.Annotator:]
+   \item[sandmark.watermark.CT.trace.CallForest:]
+   \item[sandmark.watermark.CT.trace.Preprocessor:]
+   \item[sandmark.watermark.CT.trace.TracePoint:]
+   \item[sandmark.watermark.CT.trace.Tracer:]
+\end{description}
+
+\subsection{sandmark.watermark.constantstring}
+This package implements a trivial static watermarking
+algorithm.
+\begin{description}
+   \item[sandmark.watermark.constantstring.ConstantString:]
+   \item[sandmark.watermark.constantstring.Test:]
+   \item[sandmark.watermark.constantstring.Program:]
+\end{description}
+
+\subsection{sandmark.statistics}
+This package counts all types of elements of a
+Java program.
+\begin{description}
+   \item[sandmark.statistics.Statistics:]
+\end{description}

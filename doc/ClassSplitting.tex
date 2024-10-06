@@ -1,0 +1,152 @@
+\algorithm{Class-Splitting and False Refactoring Obfuscation Algorithms}%
+          {Ashok and Rathna Prabhu}
+
+\section{Introduction}
+According to the Chidamber Metric [1], the complexity of a class  grows with its depth in the inheritance hierarchy and the number of its direct descendents .
+This is an implementation of the class-splitting/False Refactoring obfuscation proposed in [2]. In the class-splitting obfuscation, we analyze the dependences between the fields and methods of a given class. Using this dependence information, the class is split into different classes forming an inheritance hierarchy, thus obfuscating the given class. In the second algorithm, we do refactoring of two unrelated classes i.e we identify some common fields in the two classes and move them into a bogus super class. Now these two classes appear to inherit from a common class. But in reality, the two classes are unrelated. The algorithms are described in the following sections with examples.
+\section{Class Splitting Obfuscation}
+A class C is broken into two classes C1 and C2 ,
+such that C2 inherits from C1 . C1 has fields and methods that
+only refer to themselves, whereas C2 has fields and methods that
+can refer to themselves as well as fields and methods in C1 .
+Bytecode references to C will have to be replaced with references
+to C2.
+Consider the following simple code sample C.java, to which we'll apply the obfuscation technique:
+\begin{listing}{1}
+ class C {
+  float f;
+  int v;
+  public C()  {  }
+  public void P()
+  {
+   f=1.2;
+  }
+  public void Q()
+  {
+     v = 1;
+     P();
+  }
+}
+\end{listing}
+
+Figure~\ref{phases} shows the different phases involved in the algorithm.
+\begin{figure}
+\begin{center}
+\input{EEPIC/phases.eepic}
+\end{center}
+\caption{Phases in the Class-Splitting algorithm}
+\label{phases}
+\end{figure}
+
+\subsection{Dependency Graph Generation}
+We create a dependency graph G for class C .The nodes of G are the members of C. There is an edge from A to B in G, if the declaration of A must be in scope of B.If there is a path from C to Y in G , then Y must be declared in the child class during splitting. If there is a path from X to Y in G , then either X and Y are both declared in the same class or X is declared in the parent class C1.
+Figure~\ref{dep} shows the dependency graph for the given code sample.
+\begin{figure}
+\begin{center}
+\input{EEPIC/dep.eepic}
+\end{center}
+\caption{Dependency Graph}
+\label{dep}
+\end{figure}
+
+
+\subsection{Topological sort of the Dependency Graph}
+We perform a topological sort of the dependency graph to know what methods and variables are to be put in which classes .
+For the dependency graph created, topological sort gives the following results:
+\begin{listing}{1}
+Level 0 : Field f
+Level 1 : Method P
+Level 2 : Method Q
+\end{listing}
+
+From the above results we can decide on the placement of the methods and fields in the inheritance tree. For instance, the method P must be in the scope of the class in which Q is defined. So Q can be put in the same class as P or in some class inheriting from the class defining P. This ensures that the obfuscation is semantics preserving and gives the same results as before.
+
+\subsection{Results}
+The result of applying the algorithm to C.java is as follows :
+\begin{listing}{1}
+class C0 {
+        float f;
+        int v;
+        public C0() { }
+ }
+class C1 extends C0 {
+        public C1() { }
+        public void P() {
+         f=1.2
+         }
+ }
+class C extends C1 {
+        public C() { }
+        public void Q() {
+          v=1;
+          P();
+        }
+ }
+\end{listing}
+ Note that the sub class has been named as C. This makes sure that the references to the original class C, in other java programs are still valid.
+
+\section{False Re-factoring of Classes}
+False refactoring is performed on two classes C1 and C2 that have no common behavior. If both classes have instance variables of the same type, these can be moved into the new parent class C3 . C3 's methods can be buggy versions of some of the methods from C1 and C2 .
+Consider the following sample code
+\begin{listing}{1}
+C1.java
+class C1 {
+        String customerName="";
+        public void process() {
+         //Process customer
+         customerName=...
+        }
+ }
+
+C2.java
+class C2 {
+        String furnitureName="";
+        public int polish(){
+         furnitureName=...
+         //Polish the furniture
+        }
+ }
+\end{listing}
+After false refactoring the classes:
+\begin{listing}{1}
+class SMBaseC1 {
+        String smstring=""
+        public void process() {
+          //Buggy code
+        }
+}
+
+class C1 extends SMBaseC1 {
+        public void process() {
+          smstring=...
+        }
+}
+
+class C1 extends SMBaseC1 {
+        public int  polish() {
+         smstring = ...
+
+        }
+}
+\end{listing}
+
+If one of the classes inherit from some other class other than java.lang.Object, then SMBaseC1 has to be an interface and the two classes have to implement SMBaseC1 instead of extending it.
+
+
+\section{Reference}
+\begin{enumerate}
+\item  Chidamber, S. and C. Kemerer, Towards a Metrics Suite for Object Oriented Design, Proceedings of OOPSLA, July 1991.
+\item Breaking
+Abstractions and Unstructuring Data Structures - Christian Collberg, Clark Thomborson, Douglas Low
+\end{enumerate}
+
+
+
+
+
+
+
+
+
+
+

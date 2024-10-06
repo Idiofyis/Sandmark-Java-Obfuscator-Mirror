@@ -1,0 +1,86 @@
+\newcommand{\SM}{\mbox{\sf SandMark}}
+
+\newcommand{\BCEL}{{\tt BCEL}}
+
+\newcommand{\BLOAT}{{\tt BLOAT}}
+
+\newcommand{\CC}[1]{%
+$\ulcorner$\hspace*{-2pt}%
+{\tt #1}%
+\hspace*{-2pt}$\urcorner$}
+
+%----------------------------------------------------------------
+\newenvironment{CODE}[1]{
+%   \noindent\hrulefill
+%   \begin{small}
+   \begin{listing}{#1}
+}{
+   \end{listing}
+%   \end{small}
+%  \par\noindent\hrulefill
+}
+
+%----------------------------------------------------------------
+% Layout of headers and footers.
+\pagestyle{fancy}
+\renewcommand{\chaptermark}[1]%
+   {\markboth{\large\thechapter.\ #1}{}}
+\renewcommand{\sectionmark}[1]%
+   {\markright{\large\thesection.\ #1}}
+\setlength{\headrulewidth}{1pt}
+\setlength{\footrulewidth}{1pt}
+\newcommand{\helv}{%
+   \fontfamily{phv}\fontseries{b}\fontsize{9}{11}\selectfont}
+\lhead[\helv \thepage]{\bf \rightmark}
+\rhead[\helv \leftmark]{\bf \thepage}
+\cfoot{}
+\lfoot{\today}
+
+\newcommand{\hacker}[1]{\rfoot{#1}}
+
+%----------------------------------------------------------------
+% Layout of chapter headings for the Algorithms part.
+% Copied from book.cls.
+\makeatletter
+\newcommand\algorithm{
+   \if@openright\cleardoublepage\else\clearpage\fi
+                    \thispagestyle{plain}%
+                    \global\@topnum\z@
+                    \@afterindentfalse
+                    \secdef\@algorithm\@schapter}
+
+\def\@algorithm[#1]#2#3{\ifnum \c@secnumdepth >\m@ne
+                       \if@mainmatter
+                         \refstepcounter{chapter}%
+                         \typeout{\@chapapp\space\thechapter.}%
+                         \addcontentsline{toc}{chapter}%
+                                   {\protect\numberline{\thechapter}#1}%
+                       \else
+                         \addcontentsline{toc}{chapter}{#1}%
+                       \fi
+                    \else
+                      \addcontentsline{toc}{chapter}{#1}%
+                    \fi
+                    \chaptermark{#1}%
+                    \addtocontents{lof}{\protect\addvspace{10\p@}}%
+                    \addtocontents{lot}{\protect\addvspace{10\p@}}%
+                    \if@twocolumn
+                      \@topnewpage[\@makealgorithmhead{#2}{#3}]%
+                    \else
+                      \@makealgorithmhead{#2}{#3}%
+                      \@afterheading
+                    \fi}
+
+\def\@makealgorithmhead#1#2{%
+ \hacker{#2}
+ % \vspace*{50\p@}%
+  {\centering\parindent \z@ \normalfont
+    \ifnum \c@secnumdepth >\m@ne
+      \if@mainmatter
+        \Large\bfseries \@chapapp\space \thechapter\par\medskip\ 
+      \fi
+    \fi
+    {\Large \bfseries #1}\par{\normalsize #2}\nobreak
+    \vskip 40\p@
+  }}
+%----------------------------------------------------------------

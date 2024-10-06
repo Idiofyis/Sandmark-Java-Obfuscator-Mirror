@@ -1,0 +1,22 @@
+<body>
+
+This package implements the tracing part of
+the Collberg-Thomborson software watermarking algorithm. 
+
+<UL>
+   <LI> <code>Tracer.java</code> is the main class that
+        gets called by the GUI when the user invokes tracing.
+   <LI> The result of the trace is a list <code>TracePoint.java</code>-objects.
+   <LI> The class <code>Preprocessor.java</code> adds extra code
+        to the users application to prepare for a tracing run.
+   <LI> <code>Mark()</code>-methods in <code>Annotator.java</code>
+        are called by the user's application during tracing.
+        They indicate places in the user's code where watermarks
+        may be inserted.
+   <LI> The package <code>callforest</code> takes a list
+        <code>TracePoint.java</code>-objects
+        and turns it into a forest of call-graphs. This
+        graph is used to locate suitable <code>mark()</code>-locations.
+</UL>
+
+</body>

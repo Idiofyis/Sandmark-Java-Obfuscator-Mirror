@@ -1,0 +1,36 @@
+/algorithm{NodeSplitting Obfuscation}%
+	{RathnaPrabhu Rajendran}
+/section{Introduction}
+The NodeSplitting obfuscation algorithm obfuscates a class file 
+by splitting a node into two, i.e. some of the fields from the class are moved
+into a newly created class and all references to those fields in the given class are modified to reflect the changes.
+/section{Code Sample}
+
+Consider the following code:
+/begin{verbatim}
+class A {
+	int i;
+	private float f;
+	public A(){ }
+	public void dummy() {
+		i=10;
+		f=12.2;
+	}
+}
+
+After Obfuscation :
+class A {
+	int i;
+	A1 next;
+	public A() {
+		next = new A1();
+	}
+	public void dummy() {
+		i=10;
+		next.f = 12.2;
+	}
+}
+class A1 {
+	public float f;
+	public A1() { }
+}

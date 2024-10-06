@@ -1,0 +1,82 @@
+\algorithm{The PromoteLocals Obfuscating Algorithm}%
+          {Danny Mandel and Anna Segurson}
+
+\section{Introduction}
+This is an algorithm that changes all of the local \texttt{int} 
+variables in a method to local \texttt{java.lang.Integer} variables.
+
+For this to work every reference to the old local \texttt{int} has
+to be replaced by the appropriate reference to the new local
+\texttt{java.lang.Integer}. We identified three java byte code instructions
+that needed to be modified to make this change. The following table lists the 
+necessary modifications:
+
+\begin{center}
+\begin{tabular}{| l | l |}
+   \hline
+   Old Byte Code & Replacement Byte Code \\
+   \hline
+   \texttt{istore \textless index\textgreater} & \texttt{new Ljava/lang/Integer;} \\ 
+      & \texttt{dup\_x1} \\
+      & \texttt{dup\_x1} \\
+      & \texttt{pop} \\
+      & \texttt{invokespecial java/lang/Integer/\textless init\textgreater(I)V} \\
+      & \texttt{astore \textless index\textgreater} \\
+   \hline
+   \texttt{iload \textless index\textgreater} & \texttt{aload \textless index\textgreater} \\
+      & \texttt{invokevirtual java/lang/Integer/intValue(V)I} \\
+   \hline
+   \texttt{iinc \textless index\textgreater \textless num \textgreater} 
+      & \texttt{new Ljava/lang/Integer;}  \\
+      & \texttt{dup}  \\
+      & \texttt{ldc \textless num\textgreater}   \\
+      & \texttt{aload \textless index\textgreater}   \\
+      & \texttt{invokevirtual java/lang/Integer/intValue(V)I}  \\
+      & \texttt{iadd}  \\
+      & \texttt{invokespecial java/lang/Integer/\textless init\textgreater (I)V } \\
+      & \texttt{astore \textless index\textgreater}  \\
+   \hline
+\end{tabular}
+\end{center}
+The code of this algorithm
+resides in \url{sandmark.watermark.promotelocals}.
+
+
+\section{Apply}
+To apply this obfuscation we circulate through the byte code of a 
+given method and if the
+instruction is one of the ones in the table above we replace that instruction
+with the corresponding replacement byte code.
+
+For example, this simple class:
+\begin{listing}{1}
+public class VerySimp {
+   public static void main(String[] args) {
+      int a,b,c;
+      a = 1;
+      b = 22;
+      c = a + b;
+      for (int i = 0; i < 3; i++) {
+         a+=2;
+      }
+   }
+}
+\end{listing}
+
+is obfuscated to the following class:
+\begin{listing}{1}
+public class VerySimp {
+   public static void main(String[] as)
+   {
+      Integer integer2 = new Integer( 1 );
+      Integer integer3 = new Integer( 22 );
+      Integer integer4 = new Integer(integer2.intValue() + integer3.intValue());
+      Integer integer1 = null;
+      for( integer1 = new Integer( 0 ); integer1.intValue() < 3;
+           integer1 = new Integer( 1 + integer1.intValue() ) )
+         integer2 = new Integer( 2 + integer2.intValue() );
+   }
+}
+
+\end{listing}
+

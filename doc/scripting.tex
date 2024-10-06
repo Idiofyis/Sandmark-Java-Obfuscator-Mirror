@@ -1,0 +1,177 @@
+\section{Scripting \SM}
+\SM\ can be scripted. Either start \SM\ from the command line
+with the {\tt -f} option:
+\begin{verbatim}
+    > smark -f file.script
+\end{verbatim}
+or enter the script file in \SM's {\tt file} pull-down
+menu.
+
+\begin{itemize}
+  \item You can select a panel using the command
+\begin{verbatim}
+   select PANEL      
+\end{verbatim}
+  Panel can be one of the following: DWM, SWM, OBF, OPT, VIEW, STAT 
+ \begin{verbatim}
+   Example:
+   # The following command sets SWM to be the current panel
+   select SWM
+\end{verbatim}
+\item You can choose an algorithm using the command
+\begin{verbatim}
+   alg Name      
+\end{verbatim}
+  This makes the specified algorithm to be the current one. The algorithm should be present in the panel selected
+ \begin{verbatim}
+   Example: 
+   # The following command sets Method Renamer to be the current algorithm
+   alg Method Renamer
+\end{verbatim}
+  \item You can set a property value using the command
+\begin{verbatim}
+   set PROPERTY VALUE       
+\end{verbatim}
+      The following property values are recognized:
+      \begin{description}
+          \item[DWM\_CT\_AnnotatorClass:]         
+          \item[DWM\_CT\_Encode\_NodeType:]
+          \item[DWM\_CT\_Encode\_ParentClass:]      
+          \item[DWM\_CT\_Encode\_ClassName:]
+          \item[DWM\_CT\_Encode\_AvailableEdges:]   
+          \item[DWM\_CT\_Encode\_StoreWhat:]
+          \item[DWM\_CT\_Encode\_StoreMethods:]    
+          \item[DWM\_CT\_Encode\_StoreLocation :]    
+          \item[DWM\_CT\_Encode\_ProtectionMethods:]
+          \item[DWM\_CT\_Encode\_IndividualFixups:]
+          \item[DWM\_CT\_Encode\_Encoding:]
+                Should be one of {\tt perm} or {\tt radix}.
+                 {\tt "*"} picks a random encoding method.
+          \item[DWM\_CT\_Encode\_Components:]       
+          \item[DWM\_CT\_Encode\_Package:]
+          \item[DWM\_MaxTracePoints:]          
+          \item[DWM\_CT\_Encode\_StoreLocation:]
+              One of {\tt formal} or {\tt global}.
+          \item[DWM\_CT\_DumpIR:]               
+          \item[DWM\_ClassPath:]
+        \end{description}
+    
+  \item To run tracing use the command
+\begin{verbatim}
+   trace input.jar trace.tra MAINCLASS ARGUMENTS 
+\end{verbatim}
+     The classpath is set through the command
+\begin{verbatim}
+   set ClassPath ...
+\end{verbatim}
+  Tracepoints are written to the {\tt trace.tra} file.
+  Note: Tracing can be performed only in Dynamic Watermark Panel
+\begin{verbatim}
+  Example: 
+  # The following command creates the trace file TTT.tra by running the application
+  # TTT.jar where the mainclass is TTTApplication 
+  trace TTT.jar TTT.tra TTTApplication
+\end{verbatim}
+  
+  \item Embed watermark in input.jar using the command embed
+\begin{verbatim}
+For Dynamic Watermarking the format is
+     embed input.jar output.jar watermark trace.tra
+     It Reads the tracepoints from the file {\tt trace.tra}.	
+\end{verbatim}
+\begin{verbatim}
+For Static Watermarking the format is
+     embed input.jar output.jar watermark key
+     The key is the same key used for extracting the watermark
+\end{verbatim}
+It embeds the watermark in input.jar using the algorithm selected through the alg command and creates the file output.jar
+
+\begin{verbatim}
+ Example :
+ 1. To embed using Static Watermarker
+      #it embeds the watermark 512828 into Ackermann.jar using the key k123
+       embed Ackermann.jar Ackermann_wm.jar 512828 k123
+   
+ 2. To embed using Dynamic Watermarker
+      #it embeds the watermark 512828 into TTT.jar 
+        embed TTT.jar TTT_wm.jar 512828 TTT.tra
+\end{verbatim}
+
+  \item Obfuscate input.jar, creating output.jar:
+\begin{verbatim}
+   obfuscate input.jar output.jar 
+\end{verbatim}
+    This command obfucates input.jar using the algorithm selected through the alg command
+    and creates the file output.jar
+    
+  \item  The command for extracting the watermark is recognize 
+\begin{verbatim}
+   For Dynamic Watermarker the format is
+	   recognize input.jar watermark_count MAINCLASS ARGUMENTS
+\end{verbatim}
+     The classpath is set through the command
+\begin{verbatim}
+   set ClassPath ...
+\end{verbatim}
+\begin{verbatim}
+   For Static Watermarker the format is
+	   recognize input.jar watermark_count key
+\end{verbatim}
+   This command extracts the watermark from input.jar.
+\begin{verbatim}
+ Example :
+ 1. To extract the watermark from a statically watermarked file
+   # This command extracts the watermark from Ackermann_wm.jar by providing the key k123
+   recognize Ackermann_wm.jar 2 k123
+	
+   
+ 2. To extract the watermark from a dynamically watermarked file
+   # This command extract the watermark from TTT_wm.jar.Here TTTApplication is the mainclass
+   recognize TTT_wm.jar 2 TTTApplication
+   
+\end{verbatim}
+
+\item To finally exit and cleanup any state the command is 
+\begin{verbatim}
+   exit
+\end{verbatim}   
+   
+ \item  If the first non-blank character on a line is \# the rest of
+        the line is ignored.
+ \item  Commands are case insensitive, arguments are case sensitive.
+ \item	Here are some Sample Scripts
+ \begin{verbatim}
+	# Example Script1 for statically embedding into Ackermann.jar                                    
+	# Select the panel  
+	select SWM
+	# change algorithm to the one being tested
+	alg Method Renamer
+	# embed the watermark 512828 into Ackermann.jar using the key k123
+	embed Ackermann.jar Ackermann_wm.jar 512828 k123
+	# now extract the watermark from Ackermann_wm.jar by providing the key k123
+	recognize Ackermann_wm.jar 2 k123
+	
+	# Example Script2 for dynamically embedding into Ackermann.jar                                    
+	# Select the panel  
+	select DWM
+	# change algorithm to the one being tested
+	alg CT
+	# create the trace file TTT.tra by running the application
+	# TTT.jar where the mainclass is TTTApplication 
+	trace TTT.jar TTT.tra TTTApplication
+	# embed the watermark 512828 into TTT.jar 
+	embed TTT.jar TTT_wm.jar 512828 TTT.tra
+	# now extract the watermark from TTT_wm.jar 
+	recognize TTT_wm.jar 2 TTTApplication
+ 	
+ 	# Example Script3 for obfucating Ackermann.jar                                    
+ 	# Select the Obfuscation panel  
+ 	select OBF
+ 	# set Bogus Predicates as the obfuscator
+	alg Bogus Predicates
+	# obfuscate Ackermann.jar creating Ackermann_obf.jar
+	obfuscate Ackermann.jar Ackermann_obf.jar
+   \end{verbatim}
+ 
+ 
+\end{itemize}

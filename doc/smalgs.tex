@@ -1,0 +1,72 @@
+\documentclass{book}
+\usepackage{url}
+\usepackage{graphics}
+\usepackage{fullpage}
+\usepackage{epic}
+\usepackage{eepic}
+\usepackage{amsfonts}
+\usepackage{fancyheadings}
+\usepackage{moreverb}
+
+\title{\SM\ Algorithms}
+\author{Christian Collberg}
+
+\input{definitions}
+
+\begin{document}
+\hacker{Christian Collberg}
+\maketitle
+
+\setcounter{secnumdepth}{1}
+\tableofcontents
+
+\part{Obfuscation Algorithms}
+\hacker{Miklofsky and Myles}
+\input{AddBogusFields}
+\hacker{Ashok and RathnaPrabhu}
+\input{BogusPredicates}
+\hacker{Ashok}
+\input{OpaquePredicates}
+\hacker{Andrew Huntwork and Xiangyu Zhang}
+\input{BoolSplitter}
+\hacker{Ashok and RathnaPrabhu}
+\input{ClassSplitting}
+\hacker{Danny Mandel and Anna Segurson}
+\input{Degrade}
+\hacker{Martin Stepp and Kelly Heffner}
+\input{methodmadness}
+\hacker{Martin Stepp and Kelly Heffner}
+\input{MethodRearranger}
+\hacker{Danny Mandel and Anna Segurson}
+\input{PromoteLocals}
+\hacker{RathnaPrabhu Rajendran}
+\input{nodesplitter}
+
+\part{Watermarking Algorithms}
+\hacker{Miklofsky and Myles}
+\input{AddMethField}
+\hacker{Balamurgan and Tapas}
+\input{BogusExpression}
+\hacker{Ashok and RathnaPrabhu}
+\input{BogusInitializer}
+\hacker{Andrew Huntwork and Xiangyu Zhang}
+\input{bogus_switch}
+\input{ConstantString}
+\input{CollbergThomborson}
+\hacker{Danny Mandel and Anna Segurson}
+\input{HatTrick}
+\hacker{Ginger Myles}
+\input{Potkonjak}
+\hacker{Martin Stepp and Kelly Heffner}
+\input{RenameFieldsMethods}
+\hacker{Balamurugan Chirtsabesan and Tapas Sahoo}
+\input{ROW}
+\end{document}
+
+
+
+
+
+
+
+

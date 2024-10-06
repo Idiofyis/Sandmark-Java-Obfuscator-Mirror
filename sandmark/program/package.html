@@ -1,0 +1,39 @@
+<body>
+
+Provides classes for manipulating components of a Java program.
+An application is represented as a hierarchy of
+{@link sandmark.program.Object program objects}.
+Different objects represent:
+<UL>
+<LI>the entire {@link sandmark.program.Application application}
+<LI>Java {@link sandmark.program.Class classes},
+    {@link sandmark.program.Method methods},
+    and {@link sandmark.program.Field fields}
+<LI>other {@link sandmark.program.File files} stored in the jar file
+</UL>
+An {@link sandmark.program.Application} object can be exported
+to produce an executable jar file.
+
+<P> Program objects are built atop the BCEL
+byte code engineering library and provide wrappers for BCEL methods.
+Finer-level components such as instruction lists are manipulated
+by calling BCEL methods directly.
+Code that makes direct BCEL calls must also call the
+{@link sandmark.program.Object#mark() mark()} method
+of the enclosing program object to inform it of the change.
+
+<P> Program objects support caching by associating a
+<DFN>version</DFN> counter with each object.
+The counter is incremented automatically by the methods in this package
+or manually by calling the
+{@link sandmark.program.Object#mark() mark()} method.
+The caching system is used to improve performance
+by this package and by external packages such as
+{@link sandmark.metric metrics}.
+
+<P> The methods in this package act locally:
+For example, renaming a method does not alter any references to the method.
+Some heavyweight methods with global effect are provided in the
+{@link sandmark.program.util sandmark.program.util} package.
+
+</body>

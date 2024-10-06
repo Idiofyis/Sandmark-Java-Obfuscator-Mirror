@@ -1,0 +1,221 @@
+//  init.smash -- 
+//  Author          : Jasvir Nagra <jas@cs.auckland.ac.nz>
+//  Created On      : Wed Jul 30 21:36:37 2003
+//  Last Modified   : <03/07/31 03:30:23 jas>
+//  Description     : Initialization script for smash
+//  Keywords        : smash init
+//  PURPOSE
+//      | Sandmark project |
+
+void print ( String args ) {
+    System.out.println ( args );
+}
+
+void print ( Object args[] ) {
+    System.out.println("Staring" );
+    
+    if ( args == null ) {
+        System.out.println( "null" );
+    } else {
+        System.out.print( "[" );
+        for ( int i=0; i < args.length; i++ )
+            System.out.print ( args[i] + " " );
+        System.out.print( "]" );
+    }
+}
+
+void print ( int args[] ) {
+    if ( args == null ) {
+        System.out.println( "null" );
+    } else {
+        System.out.print( "[" );
+        for ( int i=0; i < args.length; i++ )
+            System.out.print ( args + " " );
+        System.out.print( "]" );
+    }
+}
+
+void print ( float args[] ) {
+    if ( args == null ) {
+        System.out.println( "null" );
+    } else {
+        System.out.print( "[" );
+        for ( int i=0; i < args.length; i++ )
+            System.out.print ( args + " " );
+        System.out.print( "]" );
+    }
+}
+
+void print ( char args[] ) {
+    if ( args == null ) {
+        System.out.println( "null" );
+    } else {
+        System.out.print( "[" );
+        for ( int i=0; i < args.length; i++ )
+            System.out.print ( args + " " );
+        System.out.print( "]" );
+    }
+}
+
+void print ( double args[] ) {
+    if ( args == null ) {
+        System.out.println( "null" );
+    } else {
+        System.out.print( "[" );
+        for ( int i=0; i < args.length; i++ )
+            System.out.print ( args + " " );
+        System.out.print( "]" );
+    }
+}
+
+void print(Object args) {
+    System.out.println(args);
+}
+
+void source(String file) {
+    sandmark.smash.Smash.source(file);
+}
+
+/*
+void reload() {
+    sandmark.smash.Smash.source(
+        System.getProperty("user.dir")+"/init.smash");
+}
+*/
+
+java.io.BufferedWriter writer = new java.io.BufferedWriter(
+            new java.io.OutputStreamWriter(System.out));
+sandmark.util.Log.addLog((java.io.Writer)writer, 10);
+
+public void help() {
+    print("\nOptions:\n");
+    print("List dynamic watermarks              - dwm();");
+    print("List static watermarks               - swm();");
+    print("List Obfuscators(app/class/method)   - obf(obflevel);");
+    print("Options for a specific algorithm     - help(algoName);");
+
+    print("Select Algorithm                     - selectAlg(algoName);");
+    print("Current Algorithm Description        - getAlgDesc();");
+    print("Algorithm Description                - getAlgDesc(algoName);");
+    print("Specify watermark                    - setWM(watermark);");
+    print("Specify input file                   - setInputFile(jarFile);");
+    print("Specify output file                  - setOutputFile(jarFile);");
+    print("Set KEY value                        - setKey(keyValue);");
+    print("Embed                                - embed();");
+    print("Recognize                            - recognize();");
+    print("Get next Watermark                   - getNextWM();");
+
+    print("Obfuscate                            - obfuscate();");
+    print("Configure(ToBeImplemented)           - configure();");
+    print("Set ObfuscateLevel(ToBeImplemented)  - setobfuscatelevel();");
+    print("Set Multithread(ToBeImplemented)     - setMultiThread(true/false);");
+    print("Set Uses Reflection(ToBeImplemented) - setUsesReflection(true/false);");
+
+    print("Additional Options                   - addOptions();");
+    print("exit smash                           - exit();");
+}
+
+public void addOptions()
+{
+    print("Run embed algo for multiple jar files               - "+
+        "runEmbedWM(jar1:jar2:...);");
+    print("Recognize algo for multiple jar files               - "+
+        "runRecognizeWM(jar1:jar2:...);");
+    print("Run multiple algo in-sequence on a jar file         - "+
+        "embedMultipleWM(<algo1.jar1>:<algo2.jar2>:...);");
+    print("Recognize multiple WMs in single jar file           - "+
+        "recognizeMultipleWM(algo1:algo2:...);");
+    print("Multiple obfuscations in-sequence on single jarfile - "+
+        "multipleObf(algo1:algo2:...);");
+    print("Obfuscation on multiple jar files                   - "+
+        "runObf(jar1:jar2:...);");
+    return;
+}
+
+public String[] dwm() {
+    String dwm[] = 
+        sandmark.smash.Smash.findAlgorithms(
+                        sandmark.util.classloading.IClassFinder.DYN_WATERMARKER);
+    if(dwm!=null)
+        for(int k=0; k<dwm.length; k++)
+            print(sandmark.util.classloading.ClassFinder.getClassShortname(dwm[k]));
+    return dwm;
+}
+
+public String[] swm() {
+    String swm[] = 
+        sandmark.smash.Smash.findAlgorithms(
+                        sandmark.util.classloading.IClassFinder.STAT_WATERMARKER);
+    if(swm!=null)
+        for(int k=0; k<swm.length; k++)
+            print(sandmark.util.classloading.ClassFinder.getClassShortname(swm[k]));
+    return swm;
+}
+
+public String[] obf(String level) {
+    String obf[] = null;
+    if(level.equals("app"))
+        obf = sandmark.smash.Smash.findAlgorithms(
+                        sandmark.util.classloading.IClassFinder.APP_OBFUSCATOR);
+    else if(level.equals("class"))
+        obf = sandmark.smash.Smash.findAlgorithms(
+                        sandmark.util.classloading.IClassFinder.CLASS_OBFUSCATOR);
+    else if(level.equals("method"))
+        obf = sandmark.smash.Smash.findAlgorithms(
+                        sandmark.util.classloading.IClassFinder.METHOD_OBFUSCATOR);
+    else {
+        print("Valid parameters are 'app', 'class' and 'method'");
+        return null;
+    }
+    if(obf!=null)
+        for(int k=0; k<obf.length; k++)
+            print(sandmark.util.classloading.ClassFinder.getClassShortname(obf[k]));
+    return obf;
+}
+
+
+
+public void main() {
+    main (new String[0]);
+}
+
+
+public void main(String args[]) {
+    sandmark.Console.main(args);
+}
+
+public void exit() {
+    print("Exiting smash... \n");
+    System.exit(0);
+}
+
+public void selectTab(int i) {
+    sandmark.Console.getSandMarkFrame().getTabs().setSelectedIndex(i);
+}
+
+
+/*** Done in sandmark.smash.Smash.initScript() currently.
+String staticFile = "";
+java.util.Enumeration en = null;
+try {
+    en = sandmark.smash.Smash.class.getClassLoader().getResources("staticwm.smash");
+}catch(java.io.IOException e) {
+    System.out.println("Exception: "+e);
+}
+if(en.hasMoreElements()) {
+    staticFile = en.nextElement().toString();
+    //System.out.println("1. "+staticFile);
+    staticFile = staticFile.substring(staticFile.indexOf(":")+1);
+}
+source(staticFile);
+source(staticFile.substring(0, staticFile.indexOf("staticwm.smash"))+"dynwm.smash");
+source(staticFile.substring(0, staticFile.indexOf("staticwm.smash"))+"obfuscate.smash");
+***/
+
+
+//  Emacs bunkum
+//  Local Variables:
+//  mode: jde
+//  time-stamp-start: "Last Modified[ \t]*:[    ]+\\\\?[\"<]+"
+//  time-stamp-end:   "\\\\?[\">]"
+//  End:

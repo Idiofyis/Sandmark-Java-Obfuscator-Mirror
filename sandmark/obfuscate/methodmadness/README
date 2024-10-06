@@ -1,0 +1,37 @@
+Algorithms in sandmark/obfuscate/methodmaddness
+    - Method2RMaddness by: Kelly Heffner and Martin Stepp
+      Method2RMaddness runs each of the smaller method signature 
+      scrambling algorithms in sequence for the optimal scrambling.
+    - Method Merger by: Kelly Heffner
+      Method Merger combines static methods with the same signature 
+      into one large method.
+    - Parameter Reorderer by: Martin Stepp
+      Parameter Reorderer permutes the signatures of static methods.
+    - Primitive Promoter by: Martin Stepp and Kelly Heffner
+      Primitive Promoter changes the signatures of each method so that
+      all parameters are reference types descending from java.lang.Object.
+    - Publicizer by: Martin Stepp
+      Publicizer makes all methods in a class public.
+    - Signature Bludgeoner by: Martin Stepp
+      Signature Bludgeoner changes any static method with all
+      reference type parameters and changes the parameter list to 
+      a single array of Objects.
+    - Static Method Bodies by: Kelly Heffner
+      Static Method Bodies creates a new static method for every
+      dynamic method, containing the same method body.  Each dynamic
+      method body is replaced by a call to the static method.
+
+Files sandmark/obfuscate/methodmaddness
+    - MergeInfo.java
+    - MethodMerger.java
+    - PrimitivePromoter.java
+    - SignatureBludgeoner.java
+    - Method2RMadness.java
+    - ParameterReorderer.java
+    - Publicizer.java
+    - StaticSplit.java
+    - package.html
+    - Makefile
+    - README
+    - doc/
+      -  help.html

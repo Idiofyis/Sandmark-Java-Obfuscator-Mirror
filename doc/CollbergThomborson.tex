@@ -1,0 +1,973 @@
+\algorithm{The Collberg-Thomborson Watermarking Algorithm}%
+          {C. Collberg, J. Nagra, G. Townsend}
+
+
+\section{Introduction}
+The Collberg-Thomborson watermarking algorithm (henceforth,
+{\sf CT}) is a dynamic algorithm. The idea is that rather
+than embedding the watermark directly in the {\em code} of 
+the application, code is embedded that {\em builds} the watermark 
+at runtime. The algorithm assumes a secret key $\cal K$ which 
+is necessary to extract the watermark. $\cal K$ is a sequence of inputs 
+$I_0,I_1,\ldots$ to the application. As seen in Figure~\ref{CToverview},
+the watermark (a graph structure) is built by the application
+only when the user runs it with the special input $I_0,I_1,\ldots$.
+Figure~\ref{CTexample2Java} shows a simple example of a what
+a program may look like after having been watermarked.
+
+\begin{figure}
+\begin{center}
+\input{EEPIC/CToverview.eepic}
+\end{center}
+\caption{Overview of how the {\sf CT} algorithm recognizes
+         a watermark $\cal W$. At runtime the watermarked 
+         application will -- given the special secret input 
+         key sequence $I_0,I_1,\ldots$ -- traverse certain 
+         points in the program. At these points code has 
+         been inserted which builds a graph $G_{\cal W}$ 
+         on the heap. The topology of the graph embeds 
+         the watermark $\cal W$.}
+\label{CToverview}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\input{EEPIC/CTalgorithm.eepic}
+\end{center}
+\caption{Overview of how the {\sf CT} algorithm watermarks an
+         application. First, the user adds {\em annotation points}
+         ({\tt mark()}-calls) to the application. These are locations
+         where watermarking code may be inserted. Secondly, the
+         application is run with a secret input sequence,
+         $I_0,I_1,\ldots$ and the trace of {\tt mark()}-calls
+         hit during this run is recorded. Finally, code is 
+         embedded into the application (at certain {\tt mark()}-call
+         locations) that builds a graph $G_W$ at runtime. The
+         topology of $G_{\cal W}$ embeds the watermark $\cal W$.}
+\label{CTalgorithm}
+\end{figure}
+
+\begin{figure}
+\begin{listing}{1}
+public class Simple {
+   static void P(String i) {
+      System.out.println("Hello " + i);
+   }
+   public static void main(String args[]) {
+      P(args[0]);
+   }
+}
+
+public class Simple_W {
+   static void P(String i) {
+      if (i.equals("World")) Watermark.Create_G4();
+      System.out.println("Hello " + i);
+   }
+   public static void main(String args[]) {
+      Watermark.Create_G2();
+      P(args[0]);
+   }
+}
+
+public class Watermark extends java.lang.Object {
+  public Watermark edge1;
+  public Watermark edge2;
+  public static java.util.Hashtable sm$hash = new java.util.Hashtable();
+  public static Watermark[] sm$array = new Watermark[4];
+
+  public static void Create_G2 () {
+     Watermark n3 = new Watermark();       
+     Watermark n2 = new Watermark();      
+     Watermark.sm$array[1] = n2;          
+     n2.edge1 = n3;                       
+     n2.edge2 = n3;                       
+  }
+  public static void Create_G4 () {
+     Watermark n1 = new Watermark();      
+     Watermark n4 = new Watermark();      
+     Watermark.sm$hash.put(new java.lang.Integer(4), n4);   
+     n4.edge1 = n1;        
+     Watermark n2 = Watermark.sm$array[1]; 
+     n1.edge1 = n2;                        
+     Watermark n3 = (n2 != null)?n2.edge1:new Watermark(); 
+     n3.edge1 = n1; 
+  }
+}
+\end{listing}
+\caption{Simple watermarking example. The class {\tt Simple} is
+         modified into {\tt Simple\_W} by adding calls into the
+         generated watermark class {\tt Watermark}. 
+         The static methods {\tt Watermark.Create\_G2()} and
+         {\tt Watermark.Create\_G4()} are only called when
+         the application is run with the secret input argument
+         {\tt "World"}. When this happens, the watermark graph
+         is built on the heap.}
+\label{CTexample2Java}
+\end{figure}
+
+
+In the \SM\ implementation of {\sf CT}, watermark embedding
+and extraction runs in several steps (See Figure~\ref{CTalgorithm}):
+\begin{description}
+   \item[Annotation:] Before the watermark can be embedded
+       the user must add {\em annotation} (or {\em mark})
+       points into the application to be watermarked. These
+       are calls of the form
+\begin{listing}{1}
+   sandmark.trace.Annotate.mark();
+   String S = ...;
+   sandmark.trace.Annotate.mark(S);
+   long L = ...;
+   sandmark.trace.Annotate.mark(L);
+\end{listing}
+       The {\tt mark()} calls perform no action. They 
+       simply indicate to the watermarker locations in
+       the code where (part of) a watermark-building 
+       code can be inserted. The argument to the {\tt mark()}
+       call can be any string or integer expression
+       that (directly or indirectly) depends on user
+       input to the application.
+   \item[Tracing:] When the application has been annotated
+      the user should do a {\em tracing} run of the program. 
+      The application is run with the chosen secret input sequence,
+      $\cal K$. During the run one or more annotation points are hit. 
+      Some of these points will be the locations where watermark-building 
+      code will later be inserted.  
+   \item[Embedding:] 
+      During the embedding stage the user enters a watermark,
+      a string or an integer. A string is converted to an integer.
+      From this number a graph is generated, such that the
+      topology of the graph embeds the number. The graph is
+      split into a number of subgraphs, depending on the
+      number of locations where watermarking code should be
+      inserted. Each subgraph is converted to Java bytecode
+      that builds the graph. The relevant {\tt mark()}-calls 
+      are replaced with this graph-building code.
+   \item[Recognition:] 
+      During recognition the application is again run with
+      the secret input sequence as input. The same 
+      {\tt mark()}-locations will be hit as during the
+      tracing run. Now, however, these locations 
+      will contain code for building the watermark graph.
+      When the last part of the input has been entered,
+      the heap is examined for graphs that could 
+      potentially be watermark graphs. The graphs are
+      decoded and the resulting watermark number or
+      string is reported to the user.
+\end{description}
+
+\section{Annotation}
+The {\sf CT} watermark consists of dynamic data-structures.
+This means that the code inserted in the application will look 
+like this:
+\begin{listing}{1}
+   Node n1 = new Node();
+   Node n2 = new Node();
+   n1.edge = n2;
+   ...
+\end{listing}
+Hence, we should prefer mark locations that
+\begin{itemize}
+    \item allocate objects and manipulate pointers, and
+    \item directly depend on user input.
+\end{itemize}
+We should avoid mark locations that
+\begin{itemize}
+    \item are hot-spots, and
+    \item are executed non-deterministically.
+\end{itemize}
+In other words, {\tt mark()}-calls should be added
+to locations where the resulting watermark code
+will be fit in (is {\em stealthy}), won't affect performance,
+and will be executed consistently from run to run,
+depending only on user actions.
+
+For example, the following code is undesirable
+since {\tt Math.random()} may generate different
+values during different runs of the program:
+\begin{listing}{1}
+   if (Math.random() < 0.5) {
+      ...
+      sandmark.trace.Annotate.mark();
+   }
+\end{listing}
+Similarly, if thread scheduling, network activity, 
+processor load, etc. can affect the order in
+which some locations are executed, these locations are
+not valid annotations points and should be avoided.
+
+
+\section{Tracing}
+\SM\ makes heavy use of Java's {\tt JDI} ({\em Java Debugging
+Interface}) framework. During tracing and recognition \SM\
+starts up the user's application as a subprocess running under
+debugging. This allows \SM\ to set breakpoints, examine variables,
+and step through the application -- all the operations that 
+can be done under an interactive debugger. During tracing we
+are interested in obtaining a trace of the {\tt mark()}-calls that are
+hit while the user enters their secret input. We also want
+to know the argument to the {\tt mark()}-call and the stack
+trace at the point of the call.
+
+Unfortunately, {\tt JDI} is not yet a perfect product and
+we have to jump through a couple of hoops to make it do
+what we want. First of all, examining the value of the
+argument to the {\tt mark()}-call may or may not work.
+Examining static global variables seems to work, however,
+so we always start by storing the argument in a global,
+and then call the placeholder method {\tt MARK()}. See
+Figure~\ref{Annotate.java}. During tracing we only have
+to put a breakpoint on the {\tt MARK()} method.
+
+\begin{figure}
+\begin{listing}{1}
+package sandmark.trace;
+public class Annotator {
+   static String VALUE = "";
+   public static long stackFrameNumber=0;
+   public static void MARK(){}
+   public static void mark() {
+      long sm$stackID = sandmark.trace.Annotator.stackFrameNumber++;
+      VALUE = "----";
+      MARK();
+   }
+   public static void mark(String s) {
+      long sm$stackID = sandmark.trace.Annotator.stackFrameNumber++;
+      VALUE = "\"" + s + "\"";
+      MARK();
+   }
+   public static void mark(long v) {
+      long sm$stackID = sandmark.trace.Annotator.stackFrameNumber++;
+      VALUE = Long.toString(v);
+      MARK();
+   }
+}
+\end{listing}
+\caption{The class \protect\url{sandmark.trace.Annotate}.}
+\label{Annotate.java}
+\end{figure}
+
+The second problem is that we need a stack trace at
+the point of each {\tt mark()}-call. This trace is
+used during embedding to compute an accurate call-graph 
+of the program at each {\tt mark()} location. The call 
+graph allows us to compute ways to pass information 
+between {\tt mark()}-calls in method parameters.
+While {\tt JDI} allows us to examine the stack frames
+at any point in the program, it is not possible to
+tell if two stack-frames are {\em the same}. That is,
+JDI stack-frames do not have unique identities. To
+solve this problem we add the following statement
+to the beginning of every method in the program:
+\begin{listing}{1}
+    long sm$stackID = sandmark.trace.Annotator.stackFrameNumber++;
+\end{listing}
+This is done prior to tracing in \url{sandmark.trace.Preprocessor}.
+
+When, during tracing, a {\tt mark()}-call is hit we 
+walk the stack, collecting the {\tt sm\$stackID}s in
+each frame.
+
+At the end of tracing run we have gathered a list of
+\url{sandmark.trace.TracePoint}-objects. Each object
+represents a {\tt mark()}-call that was hit during
+the trace and contains three pieces of information:
+\begin{enumerate}
+   \item the location in the bytecode where the {\tt mark()}
+         was located (a \url{sandmark.util.ByteCodeLocation});
+   \item the value that the user supplied as an argument to
+         the {\tt mark()}-call (a {\tt String});
+   \item a list of the stack-frames active when the {\tt mark()}-call
+         was hit (\url{sandmark.util.StackFrame[]}).
+\end{enumerate}
+
+\subsection{An Example}
+Consider the following example application:
+\begin{listing}{1}
+   public class SimpleA {
+      static void P(int i) {
+         sandmark.trace.Annotator.mark(6*i+9);
+      }
+      public static void main(String args[]) {
+         P(3);
+      }
+   }
+\end{listing}
+After tracing we will have found only one trace point. It is described
+by a structure like this:
+$$
+\langle 
+   {\tt value=27},
+   {\tt location}=\langle {\tt P},{\tt pc}=8\rangle, 
+   {\tt stack}=[
+      \langle {\tt P},{\tt pc}=8,{\tt frame}=1\rangle,
+      \langle {\tt main},{\tt pc}=8,{\tt frame}=0\rangle
+   ]
+\rangle
+$$
+We have stored the argument to the {\tt mark()} call
+({\tt value=27}), the bytecode location where that call 
+was made ({\tt pc=8}), and complete stack trace 
+(with unique identifiers for each frame) at this location.
+
+
+\subsection{Choosing {\tt mark()}-Locations}
+The tracing phase will have generated one or more
+{\tt mark()}-locations. However, cannot be used 
+to build the watermark graph and have to be removed.
+Also, we need $k$ locations to insert code to
+build a $k$-component graph, and any extra
+locations should be deleted.
+
+\url{sandmark.watermark.CT.embed.PrepareTrace} examines
+the trace to find a set of {\tt mark()}-locations that
+can be used to build the watermark graph.
+An annotation point $\langle\mathit{value},\mathit{location}\rangle$
+is valid if
+\begin{enumerate}
+      \item there is exactly one trace point at {\em location}, or
+      \item there are multiple trace points at {\em location},
+            but they all have unique {\em value}s.
+\end{enumerate}
+For example, consider the following {\tt mark()}-points:
+$$
+\begin{array}{l}
+\langle -,L_0\rangle \\
+\langle 1,L_1\rangle \\
+\langle 1,L_1\rangle \\
+\langle 10,L_2\rangle \\
+\langle 11,L_2\rangle \\
+\langle 12,L_2\rangle \\
+\end{array}
+$$
+${\tt value=}-$ is used for {\tt mark()}-calls that take no argument.
+$\langle -,L_0\rangle$ is valid, because it is the only
+{\tt mark()}-point at location $L_0$.
+$\langle 1,L_1\rangle$ is not valid because there are
+two identical annotation values at this location. If
+we were to insert watermark-building code at this
+location we would not be able to tell the difference
+between the first and the second time we arrive.
+$\langle 10,L_2\rangle, \langle 11,L_2\rangle, \langle 12,L_2\rangle$
+are valid because the {\em value}s are unique. If there is
+one unique value at a location, this {\tt mark()}-call is
+said to be {\tt LOCATION}-based, otherwise it is {\tt VALUE}-based.
+
+
+\section{Embedding}
+Once the application has been traced we can finally start
+embedding the watermark. The input to this phase is 
+tracing information (as described in the previous section),
+a watermark $\cal W$ to be embedded, and a jar-file 
+containing the classfiles in which to embed the mark. 
+The embedding is divided into five phases:
+\begin{enumerate}
+   \item First we generate a graph $G$ whose topology embeds $\cal W$.
+   \item Next, we split $G$ into $k$ subgraphs $\langle G_1,\ldots,G_k\rangle$.
+   \item From each subgraph $G_i$ we generate an {\em intermediate
+         code} $C_i$ that builds this graph and connects it to
+         the subgraphs $\langle G_1,\ldots,G_{i-1}\rangle$.
+   \item We translate each intermediate code $C_i$ into a Java method
+         $M_i$ that, when executed, will build $G_i$.
+   \item Finally, based on the tracing information, we replace some
+         of the {\tt mark()}-calls with calls to one of the $M_i$-methods. 
+         The remaining {\tt mark()}-calls are removed.
+\end{enumerate}
+The result is a new jar-file that when executed with the special
+input sequence will execute the methods $\langle M_1,\ldots,M_k\rangle$ 
+(in this order), and, consequently, build the watermark graph
+$G$ on the heap.
+
+\subsection{Building the Graph}
+Eventually we hope to have a whole library of algorithms
+for building watermark graphs. Currently, only two have
+been implemented. The algorithms are located in 
+\url{sandmark.util.graph.codec}. See Section~\ref{AddingCodecs} for
+a description of how to add a new {\em Graph Codec} to
+\SM. 
+
+{\em Radix Encoding} is the simplest algorithm. The 
+codec is in \url{sandmark.util.graph.codec.RadixGraph}.
+Figure~\ref{EncodingWatermarkFig} illustrates the idea
+of a Radix-$k$ encoding using a circular linked list. 
+An extra pointer field encodes a base-$k$ digit in the 
+length of the path from the node  back to itself. 
+A null-pointer encodes a 0, a self-pointer a 1, a 
+pointer to the next node encodes a 2, etc. 
+
+\begin{figure}
+\begin{center}
+\input{EEPIC/Embed.eepic}
+\end{center}
+\caption{Radix-$6$ encoding. The right pointer 
+         field holds the {\tt next} field, the left 
+         pointer encodes a base-$k$ digit.
+}
+\label{EncodingWatermarkFig}
+\end{figure}
+
+The {\em Permutation Encoding} codec is in
+\url{sandmark.util.graph.codec.PermuationGraph}. The idea
+is to represent the watermark $\cal W$ by a permutation 
+of the numbers $\langle 0,\ldots,n-1\rangle$. For
+example, the number
+$$
+   1024
+$$
+could be represented by the permutation
+$$
+   \langle9,6,5,2,3,4,0,1,7,8\rangle
+$$
+of the numbers
+$$
+   \langle0,1,2,3,4,5,6,7,8,9\rangle.
+$$
+A permutation of length $n$ is encoded into
+a graph structure similar to the one in
+Figure~\ref{EncodingWatermarkFig}. The nodes
+of the graph form a circular linked list and
+a pointer from node $i$ to node $j$ represents
+the fact that $i$ has been permuted with $j$.
+
+It should be noted that the graphs we use in the
+{\sf CT} algorithm are, in fact, hyper-graphs.
+They are implemented by the package \url{sandmark.util.graph}.
+
+
+\subsection{Splitting the Graph}
+When the watermark graph has been built it needs to be
+split into pieces. This is done in the package
+\url{sandmark.watermark.CT.encode.Split}. There should be one
+graph component per {\tt mark()}-location that
+we intend to use. There are three things to consider
+when we split the graph:
+\begin{enumerate}
+   \item The subgraphs should be of roughly equal size.
+         (It is actually not quite clear that this is
+          a reasonable requirement. For stealth reasons
+          it might be better if the components are of
+          random size. The current implementation, however,
+          splits in equal-size pieces.)
+   \item The splitting of $G$ should be done in such a way 
+         that each subgraph has a root, a special node from which
+         all other nodes in the graph can be reached. This allows us
+         to store only pointers to root nodes to prevent the garbage 
+         collector from collecting the subgraphs. (More about this
+         later.)
+   \item We should attempt to split $G$ in such a way that
+         the number of edges between subgraphs is minimized.
+         The reason for this restriction is that the more edges 
+         there are between subgraphs, the more Java code we will 
+         have to generate in order to connect the subgraphs into
+         the complete graph $G$. 
+\end{enumerate}
+
+We use a graph-splitting algorithm by Kundu and Misra. It would,
+for example, split the graph on the left into the two components
+on the right:
+\begin{center}
+\input{EEPIC/split.eepic}
+\end{center}
+Root nodes have been shaded and inter-component edges have been dashed.
+
+
+\subsection{Generating Intermediate Code}
+We could, of course, generate Java code directly from the 
+graph components. However, it turns out to be advantageous
+to insert one intermediate step. From each graph component
+we generate a list of {\em intermediate code instructions},
+much in the same way a compiler might generate an intermediate
+representation of a program, in anticipation of code generation
+and optimization. In a compiler, the intermediate code 
+separates the front-end from the back-end, improving
+retargetability, and also providing a target-independent
+representation for optimizing transformations. Similarly,
+our intermediate representation provides
+\begin{enumerate}
+   \item retargetability, in case one day we may want to
+         generate C++ or C\# code; and
+   \item transformability, i.e. the ability to optimize
+         or otherwise transform the intermediate code
+         prior to generating Java code.
+\end{enumerate}
+In fact, we start by generating very simple intermediate
+code, and then run several transformations 
+(in \url{sandmark.watermark.CT.encode.ir2ir}) over the code to 
+optimize it, etc.
+
+The intermediate code instructions are defined in the package
+\url{sandmark.watermark.CT.encode.ir}. The main operations are given in
+Table~\ref{IRops}.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|l|p{10cm}|}\hline
+\sc Instruction & \multicolumn{1}{|c|}{\sc Description} \\\hline\hline
+\tt AddEdge($G_i$,$G_j$,$n\stackrel{{\tt edge}}{\longrightarrow}m$) & 
+    Add an edge from node $n$ in subgraph $G_i$ to node $m$ in $G_j$. 
+    Since the graphs are multi-graphs the out-edges are named. \\\hline
+\tt CreateNode($G_i$,$n$) & Create node $n$ in subgraph $G_i$. \\\hline
+\tt CreateStorage($G$,$S$) & Create the global storage structure $S$. \\\hline
+\tt Debug({\em msg}) & Insert debugging code.\\\hline
+\tt FollowLink($G_i$,$n\stackrel{{\tt edge}}{\longrightarrow}m$) & Return $m$ by
+     following the edge {\tt edge} from $n$.\\\hline
+\tt LoadNode($G_i$,$n$,$L$) & Load node $n$ from global storage location $L$.\\\hline
+\tt PrintGraph() & Insert code for printing the graph. Used for debugging.\\\hline
+\tt ProtectRegion({\em ops}) & The instructions {\em ops} may generate runtime
+                               errors, such as {\tt null} dereference. Protect
+                               against such errors by, for example, putting
+                               {\em ops} inside a {\tt try}-block. \\\hline
+\tt SaveNode($G_i$,$n$,$L$) & Save node $n$ in global storage location $L$. \\\hline
+\end{tabular}
+\end{center}
+\caption{Intermediate code instructions.}
+\label{IRops}
+\end{table}
+
+\begin{figure}
+\begin{center}
+\input{EEPIC/CTexample1.eepic}
+\end{center}
+\caption{Two graph components $G_2$ and $G_4$. Components are 
+         named after their (shaded) root nodes.}
+\label{CTexample1}
+\end{figure}
+
+Consider the two graph components $G_2$ and $G_4$ in 
+Figure~\ref{CTexample1}. The following intermediate 
+code is generated from $G_2$:
+\begin{tt}
+\begin{tabbing}
+create($G_2$) \\
+XXX\=\kill
+\>   $n_3$ = CreateNode($G_2$) \\
+\>   $n_2$ = CreateNode($G_2$) \\
+\>   SaveNode($n_2$, $G_2$, '$n_2$:Array/global') \\
+\>   AddEdge($n_2\stackrel{{\tt edge1}}{\longrightarrow}n_3$, $G_2$, $G_2$) \\
+\>   AddEdge($n_2\stackrel{{\tt edge2}}{\longrightarrow}n_3$, $G_2$, $G_2$) 
+\end{tabbing}
+\end{tt}
+Nodes are named $n_1,n_2$, etc. The {\tt SaveNode} instruction
+is used to store the root node of a graph component in a 
+global structure such as a hash table, vector, etc. We do this
+for two reasons:
+\begin{enumerate}
+   \item Suppose we have two subgraphs $G_1$ and $G_2$,
+         where $G_1$ is created first. After $G_2$ has
+         been created, the two graphs need to be connected.
+         At this point we need (at least) pointers to
+         both their root nodes, so that we can access and
+         link any two nodes in the graphs. 
+   \item Every node in every subgraph must, at all times, 
+         be live or it may be deleted by the garbage 
+         collector.
+\end{enumerate}
+As we will see later, we can often do away with these
+global pointers by passing root nodes as method
+arguments. This is much stealthier since most programs
+have few global variables but many method parameters.
+
+Here is the intermediate code generated from the subgraph
+component $G_4$ in Figure~\ref{CTexample1}:
+\begin{tt}
+\begin{tabbing}
+XXX\=\kill
+create($G_4$) \\
+\>   $n_1$ = CreateNode($G_4$) \\
+\>   $n_4$ = CreateNode($G_4$) \\
+\>   SaveNode($G_4$, $n_4$, '$n_4$:Hash/global') \\
+\>   AddEdge($G_4$, $G_4$, $n_4\stackrel{{\tt edge1}}{\longrightarrow}n_1$) \\
+\>   $n_2$ = LoadNode($G_4$, '$n_2$:Array/global') \\
+\>   AddEdge($G_4$, $G_2$, $n_1\stackrel{{\tt edge1}}{\longrightarrow}n_2$) \\
+\>   $n_3$ := FollowLink($G_2$, $n_2\stackrel{{\tt edge1}}{\longrightarrow}n_3$) \\
+\>   AddEdge($G_2$, $G_4$, $n_3\stackrel{{\tt edge1}}{\longrightarrow}n_1$)
+\end{tabbing}
+\end{tt}
+Note how node $n_2$ from graph $G_2$ as been loaded from global storage
+in order to connect $n_1$ to $n_2$. Note also how the {\tt FollowLink}
+instruction is used to traverse $G_2$ from $n_2$ to get to node
+$n_3$, which can then be connected to $n_1$.
+
+To generate intermediate code from a subgraph $G_i$ we
+perform a depth-first search from the root of the graph.
+This is done in \url{sandmark.watermark.CT.encode.Graph2IR}.
+{\tt CreateNode($n$)}-instructions are generated from
+each node, in a reverse topological order. That is,
+leaves are generated first and the root node last. 
+We can issue an
+{\tt AddEdge($G_i$, $G_i$, $n\stackrel{{\tt edge}}{\longrightarrow}m$)}-instruction
+as soon as {\tt CreateNode($m$)} and {\tt CreateNode($n$)} have 
+both been generated. 
+
+The code for $G_i$ must also contain
+instructions connecting $G_i$ to all the previous
+subgraphs $G_0,\ldots,G_{i-1}$. If there is an inter-subgraph
+edge $m\stackrel{{\tt edge}}{\longrightarrow}n$ from
+$G_k$ to $G_i$ (i.e. $m$ is a node in $G_k$ and 
+$n$ is in $G_i$) then we must generate
+\begin{enumerate}
+   \item one or more {\tt FollowLink()}-instructions to 
+         reach node $m$ by traversing $G_k$ 
+         starting at its root node,
+   \item and a final {\tt AddEdge()} instruction to
+         link $m$ to $n$.
+\end{enumerate}
+This is done by finding the shortest path from
+$k$ (the root of subgraph $G_k$) and $m$ and
+issuing a {\tt FollowLink()}-instruction for each.
+
+\url{sandmark.watermark.CT.encode.Graph2IR} generates the basic list of 
+intermediate instructions. These ``programs'' are then optimized 
+and transformed in various ways by the transformers in 
+\url{sandmark.watermark.CT.encode.ir2ir.*}. Some of the more important ones
+are 
+\begin{description}
+   \item[sandmark.watermark.CT.encode.ir2ir.AddFields:]
+   \item[sandmark.watermark.CT.encode.ir2ir.AddFormals:] 
+       Add parameters to the {\tt Create\_$G_i$}
+       methods to allow graph roots to be passed
+       in formals rather than globals. (This will be
+       described in more detail in Section~\ref{CTFormals}).
+   \item[sandmark.watermark.CT.encode.ir2ir.CleanUp:]
+       {\tt LoadNode()}-instructions are added
+       (in \url{sandmark.watermark.CT.encode.ir2ir.SaveNodes}.
+       We do this in a greedy way, and the 
+       \url{CleanUp} transformer removes redundant
+       loads.
+   \item[sandmark.watermark.CT.encode.ir2ir.Debug:]
+       Add {\tt Debug()}-instructions. These will
+       print out trace messages as the watermark graphs
+       are built at runtime.
+   \item[sandmark.watermark.CT.encode.ir2ir.Destructors:]
+       Create bogus graph builders/destroyers that
+       can be inserted in various places in the code.
+       The destructors are created by modifying copies
+       of the creator codes.
+   \item[sandmark.watermark.CT.encode.ir2ir.InlineFixups:]
+       \url{sandmark.watermark.CT.encode.Graph2IR} generates special
+       methods (called {\tt Fixup\_$G_i$\_$G_j$}) which add the
+       inter-graph links that connect too subgraphs $G_i$ and $G_j$.
+       Normally these are inlined into the code for $G_j$ by this
+       transformer.
+   \item[sandmark.watermark.CT.encode.ir2ir.Protect:]
+       Add protection code when this is necessary to prevent
+       {\tt FollowLink()}-instructions from throwing unwanted
+       exceptions at runtime.
+   \item[sandmark.watermark.CT.encode.ir2ir.SaveNodes:]
+       Add code to load and store graph roots into global, static
+       storage.
+\end{description}
+
+
+\subsection{Generating Java Code}
+Generating Java code from the intermediate representation
+is relatively straight-forward. We use the {\tt BCEL}
+library to generate a bytecode class {\tt Watermark}.
+We can generate Java source also, but this is mostly
+used for debugging.
+
+The intermediate code from the previous section is
+translated into the Java class in Figure~\ref{CTexample1Java}.
+Method {\tt Create\_G2} builds subgraph $G_2$ and
+{\tt Create\_G4} subgraph $G_4$.
+Note, in particular, the statements
+\begin{listing}{1}
+   Watermark n2 = Watermark.sm$array[1]; 
+   Watermark n3 = (n2 != null)?n2.edge1:new Watermark(); 
+   n3.edge1 = n1;
+\end{listing}
+which link nodes $n_3$ and $n_1$. To get access to 
+$G_2$'s node $n_3$ we follow the edge from $G_2$'s 
+root node $n_2$ to $n_3$. This will work provided
+$G_2$ has been created at this point. However, if
+we're not doing a recognition run (i.e. the input
+sequence in {\em not} $I_0,I_1,\ldots$) then 
+$G_2$ may not have been created in which case
+{\tt n2} may be {\tt null}. We can protect against
+this in a variety of ways:
+\begin{enumerate}
+   \item if {\tt n2} is {\tt null} we create a
+         new node and assign it to {\tt n2}
+         (as above);
+   \item we can enclose the entire code segment
+         in a {\tt try-catch}-block:
+\begin{listing}{1}
+   Watermark n2 = Watermark.sm$array[1];
+   try { 
+      Watermark n3 = n2.edge1;
+      n3.edge1 = n1;
+   } catch (Exception e){}
+\end{listing}
+   ; or
+   \item we may simply not do the assignment if {\tt n2} is {\tt null}:
+\begin{listing}{1}
+   Watermark n2 = Watermark.sm$array[1];
+   if (n2 != null) { 
+      Watermark n3 = n2.edge1; 
+      n3.edge1 = n1;
+   }
+\end{listing}
+\end{enumerate}
+It is useful to have a whole library of such protection
+mechanisms to prevent attacks by pattern matching.
+
+\begin{figure}
+\begin{listing}{1}
+public class Watermark extends java.lang.Object {
+  public Watermark edge1;
+  public Watermark edge2;
+  public static java.util.Hashtable sm$hash;
+  public static Watermark[] sm$array;
+
+  public static void Create_G2 () {
+     Watermark n3 = new Watermark();       // n3 = CreateNode(G2)
+     Watermark n2 = new Watermark();       // n2 = CreateNode(G2)
+     Watermark.sm$array[1] = n2;           // SaveNode(n2, G2, 'n2:Array/global')
+     n2.edge1 = n3;                        // AddEdge(G2, G2, n2-edge1->n3)
+     n2.edge2 = n3;                        // AddEdge(G2, G2, n2-edge2->n3)
+  }
+
+  public static void Create_G4 () {
+     Watermark n1 = new Watermark();       // n1 = CreateNode(G4)
+     Watermark n4 = new Watermark();       // n4 = CreateNode(G4)
+     Watermark.sm$hash.put(
+         new java.lang.Integer(4), n4);    // SaveNode(n4, G4, 'n4:Hash/global')
+     n4.edge1 = n1;                        // AddEdge(G4, G4, n4-edge1->n1)
+     Watermark n2 = Watermark.sm$array[1]; // n2 = LoadNode(G4, 'n2:Array/global')
+     n1.edge1 = n2;                        // AddEdge(G4, G2, n1-edge1->n2)
+     Watermark n3 =                        // n3 := FollowLink(G2, n2-edge1->n3) 
+        (n2 != null)?n2.edge1:new Watermark(); 
+     n3.edge1 = n1;                        // AddEdge(G2, G4, n3-edge1->n1)
+  }
+}
+\end{listing}
+\caption{Java code generated from the graph components in Figure~\protect\ref{CTexample1}.}
+\label{CTexample1Java}
+\end{figure}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|l|p{10cm}|}\hline
+\sc Instruction & \multicolumn{1}{|c|}{\sc Java} \\\hline\hline
+\tt AddEdge($G_i$,$G_j$,$n\stackrel{{\tt edge}}{\longrightarrow}m$) & 
+    \tt n.edge = m \\\hline
+\tt CreateNode($G_i$,$n$) & 
+    \tt Watermark n = new Watermark() \\\hline
+\tt CreateStorage($G$,$S$) & 
+One of
+\begin{enumerate}
+   \item {\tt static java.util.Hashtable sm\$hash = new java.util.Hashtable()};
+   \item {\tt static Watermark sm\$array = new Watermark[$m$]};
+   \item {\tt static java.util.Vector sm\$vec = new java.util.Vector($m$); sm\$vec.setSize($m$)};
+   \item {\tt static Watermark sm\$n1,sm\$n2,...;}
+\end{enumerate} 
+     where $m$ is the number of nodes in the graph and {\tt sm\$n1,sm\$n2,...}
+     are the root nodes of the subgraphs.
+\\\hline
+\tt FollowLink($G_i$,$n\stackrel{{\tt edge}}{\longrightarrow}m$) & 
+\tt Watermark m = n.edge
+\\\hline
+\tt LoadNode($G_i$,$n$,$S$) & 
+One of
+\begin{enumerate}
+   \item {\tt Watermark $n$ = (Watermark) sm\$hash.get(new java.lang.Integer($k$))};
+   \item {\tt Watermark $n$ = Watermark.sm\$arr[$k-1$]};
+   \item {\tt Watermark $n$ = (Watermark) sm\$vec.get($k-1$)};
+   \item {\tt Watermark $n$ = Watermark.sm\$n$k$}
+\end{enumerate} 
+     depending on how $n$ is stored. $k$ is $n$'s node number.
+\\\hline
+\tt ProtectRegion({\em ops}) & 
+   \tt try \{ {\em ops} \} catch (Exception $e$) \{\}  \\\hline
+\tt SaveNode($G_i$,$n$,$L$) &
+One of
+\begin{enumerate}
+   \item {\tt sm\$hash.put(new java.lang.Integer($k$), $n$)};
+   \item {\tt Watermark.sm\$arr[$k-1$] = $n$};
+   \item {\tt (Watermark) sm\$vec.set($k-1$, $n$)};
+   \item {\tt Watermark.sm\$n$k$ = $n$}
+\end{enumerate} 
+     depending on how $n$ is stored. $k$ is $n$'s node number.
+\\\hline
+\end{tabular}
+\end{center}
+\caption{Translation from intermediate code instructions to Java.}
+\label{IRops2Java}
+\end{table}
+
+
+\subsection{Inserting the Java Code}
+\url{sandmark.watermark.CT.embed.Embedder} is the main class for 
+modifying the Java program to be watermarked.
+
+The chosen {\tt mark()}-locations are replaced by calls to 
+{\tt Watermark.Create\_$G_i$}. (We're relying on the {\tt BLOAT} 
+optimizer to eventually inline these calls and remove the
+{\tt Watermark} class.) Remaining {\tt mark()}-calls are deleted.
+
+As usual, this process is done in several passes over the code:
+\begin{enumerate}
+   \item \url{sandmark.watermark.CT.embed.ReplaceMarkCalls} replaces the
+         {\tt mark()}-calls with calls to {\tt Watermark.Create\_$G_i$}.
+         There are two cases, depending on whether the
+         {\tt mark()}-call is {\tt LOCATION}-based or {\tt VALUE}-based.
+         A {\tt LOCATION}-based {\tt mark()}-call is simply replaced
+         by a call
+\begin{listing}{1}
+   Watermark.Create_Gi();
+\end{listing}
+         A {\tt VALUE}-based {\tt mark(expr)}-call is replaced by the call
+\begin{listing}{1}
+   if (expr==value)
+      Watermark.Create_Gi();
+\end{listing}
+   \item  \url{sandmark.watermark.CT.embed.AddParameters} adds formal parameters
+         in order to be able to pass graph root nodes in formals
+         rather than in globals. See Section~\ref{CTFormals} for
+         more details.
+   \item \url{sandmark.watermark.CT.embed.InsertStorageCreators} inserts code
+         to create hashtables, arrays, vectors, etc. that are used
+         to store subgraph root nodes.
+   \item \url{sandmark.watermark.CT.embed.DeleteMarkCalls} removes any traces
+         of the {\tt mark()}-calls from the application.
+\end{enumerate}
+
+
+\section{Recognition}
+\url{sandmark.watermark.CT.recognize.Recognizer} starts up the watermarked
+application as a subprocess under debugging, again 
+using Java's JDI debugging framework. The user enters their
+secret input sequence $I_0,I_i,\ldots$ exactly as they did
+during the tracing phase. This causes the methods
+{\tt Watermark.Create\_$G_i$} to be executed and the 
+watermark graph to be constructed on the heap. When the
+last input has been entered it is the recognizer's task
+to locate the graph on the heap, decode it, and present
+the watermark value to the user.
+
+There may, of course, be an enormous number of objects on
+the heap and it would be impossible to examine them all.
+To cut down the search space we rely on the observation
+that the root node of the watermark graph will be one
+of the very last objects to be added to the heap. Hence,
+a good strategy would likely be to examine the heap objects 
+in reverse allocation order. Unfortunately, {\tt JDI} 
+does not yet provide support for examining the heap
+in this way. 
+
+An elegant and efficient approach would be to modify
+the constructor for \url{java.lang.Object} to include
+a counter:
+\begin{listing}{1}
+package java.lang;
+public class Object {
+    public static long objCount = 0;                      
+    public long allocTime;                                
+    public Object() {allocTime = objCount++;} 
+}
+\end{listing}
+Since every constructor must call \url{java.lang.Object.<init>}
+this means that we've assigned an allocation order to
+the objects on the heap at the cost of only an extra add and 
+assign per allocation.
+
+We've shied away from this approach, however, since it would
+require modifying the Java runtime system. Also, some Java
+compilers optimize away calls to \url{java.lang.Object.<init>}
+under the assumption that this constructor does nothing.
+
+Instead, we rely on a more heavyweight but portable solution.
+Using {\tt JDI} we add a breakpoint to every constructor
+in the program. Whenever an allocation occurs we add a
+pointer to the new object to a circular linked buffer,
+\url{sandmark.util.CircularBuffer}. This way, we always
+have the last 1000 (say) allocated objects available.
+The downside is a fairly substantial slowdown due to the 
+overhead incurred by handling the breakpoints.
+
+\begin{figure}
+\begin{center}
+\input{EEPIC/CTexample2.eepic}
+\end{center}
+\caption{A view of memory during recognition. A circular linked
+         buffer holds the last allocated objects. The recognizer
+         examines the objects in reverse allocation order and extracts
+         the subgraph reachable from each object. This is
+         decoded into the watermark.}
+\label{CTexample2}
+\end{figure}
+
+The recognition algorithm is as follows (see \url{sandmark.watermark.CT.recognize.Recognizer} and Figure~\ref{CTexample2}):
+\begin{listing}{1}
+   static int kidMaps[][] = {{1,2},{2,1},{1,3},{3,1},{2,3},{3,1}};
+   for every object O on sandmark.util.CircularBuffer, starting with the last allocated do {
+       G := the graph consisting of the nodes reachable from O;
+       for every graph decoder D do {
+          for every kidmap K do {
+             W := decode G using D, assuming K;
+             print W;
+          }
+       }
+   }
+\end{listing}
+The kidmaps are used to select 2 pointers out of each
+object as our outgoing pointers. The decoding is done
+by the codecs in \url{sandmark.util.graph.codec}. The class 
+\url{sandmark.watermark.CT.recognize.Heap2Graph} is used to convert
+a heap structure to a \url{sandmark.util.graph.Graph}
+object. Note that the decoding can fail for a number 
+of reasons. Some of the objects on the circular buffer
+may no longer be alive, the graph structure extracted
+from the heap may not be of the form expected by any
+of the codecs, etc. For this reason, we catch all 
+possible exceptions (such as {\tt null}-dereferences)
+and ignore any structures for which errors occur.
+
+
+\section{Passing Roots in Formal Parameters}
+\label{CTFormals}
+In the descriptions above we have assumed that
+the roots of subgraphs are stored in static,
+global variables. In Figure~\ref{CTexample2}, 
+for example, the root of each subgraph is stored
+in a global array {\tt sm\$array}. This is obviously 
+un-stealthy since programs typically only contain 
+a few globals. Instead, we would like to pass 
+roots in the formal parameters of methods.
+This means we are going to have to find paths
+through the call-graphs from one {\tt mark()}-call
+to the next.
+
+However, before that we need to identify the node where the StorageCreators can be created. This is
+done as follows 
+\begin{itemize}
+\item  From the tracepoints we get the callforest using the class \url{sandmark.watermark.ct.trace.callforest.Forest}. 
+ We only consider the last graph in the callforest. In this graph we determine the dominator nodes. This nodes are those which dominate all the {\tt sm\$mark()} nodes in the graph. 
+\item  Among the set of dominator nodes we choose the latest node as the candidate for storing the StorageCreators. We then embed the code for creating the storagecreators in the method represented by this node. This is done using the class \url{sandmark.watermark.ct.embed.InsertStorageCreators}.It is necessary to choose a dominator node  because it allows the StorageCreators to be passed as method parameters from the dominator node to all the chosen {\tt mark()} calls.
+\end{itemize}
+
+Next, the question arises is which of the {\tt mark()} calls need to be selected. For that we add weights
+to the nodes and edges in the callforest. This is done using the class
+\url{sandmark.watermark.ct.trace.callforest.Decorate}. The weights added to a {\tt mark()} node are a
+measure of  how stealthy it would be to insert watermarking code in the method represented by the
+node. This depends on the type of instructions present in the method.
+Also weight is computed based on the stealthiness of adding a storage creator argument to a
+method. This depends on factor such as the number of arguments the method has and the types of
+these arguments. In general, adding yet another argument to a method that already has several
+should be good. Also, since we're adding a reference argument it's probably stealthy if the method
+already has one or more reference parameters.
+
+The class \url{sandmark.watermark.ct.embed.InsertionPoints} is then used to select the {\tt mark()} calls
+based on the node weight, the path weight and how far apart is the mark() node from other selected {\tt mark()} nodes. It selects {\tt DWM\_CT\_Encode\_Components} number of {\tt mark()} points if that many are present. Here {\tt DWM\_CT\_Encode\_Components} represents the number of subgraph components into which the watermark is split. Thus each {\tt mark()} call could be replaced by the call to create the corresponding  subgraph component.
+However if only few {\tt mark()} nodes are present then a single {\tt mark()} point can have more than one {\tt Watermark.Create\_Graphi()}calls. Once this set of {\tt mark()} nodes are identified we replace them with calls to {\tt Watermark.Create\_Graphi()}. 
+Since we are passing storage creators as formals we need to identify all the methods that appear in the path
+between the domNode and the selected {\tt mark()} node. The signature of this methods are modified accordingly so that the StorageCreator could be passed as formal arguments. This is done using tha class \url{sandmark.watermark.ct.embed.AddParameters}. Further all invocation of this methods are modified to pass the  storage creators as actual arguments in addition to their existing arguments.
+
+\section{Inlining Calls to Watermark Methods}
+A feature is provided to inline all the calls of type {\tt Watermark.Create\_Graphi()} as wells as those calls that are used to create the StorageCreators. This is done using the class \url{sandmark.watermark.ct.Inliner}. Once a method is inlined it is not needed in the Watermark class and hence it is removed from the corresponding Watermark Class.
+
+\section{Replacing the Watermark Class}
+An another feature to increase the stealth is to replace the Watermark class with an already existing
+class in an application. It is not such a good idea to have a separate Watermark class to represent the watermark graph node as it is not very stealthy. It would appear as disjointed from the rest of the application and hence an attacker could easily identify it.  The \url{sandmark.watermark.ct.embed.ReplaceWMClass} class is used to select a class that closely represents the Watermark class from the application jarfile. A class that has fields that references itself could be used instead of a separate Watermark class. Ideally we would like to have a class that has two such fields so that it has a tree structure similar to the Watermark class. Ties are broken based on which class is used more frequently. This is calculated by doing a static analyis on all the classes (By calculating the number of new calls on all the classes).
+  However if no such class exist then we add new fields to one of the existing classes and use it to represent the Watermark class. It then shifts all the methods in Watermark class to this class. Further all references pointing to the old Watermark class are modified to point the new class. Hence there is no need to have the Watermark class once this step is performed and so we remove the watermark class.
+

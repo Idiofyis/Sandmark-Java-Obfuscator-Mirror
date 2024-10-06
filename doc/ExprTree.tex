@@ -1,0 +1,100 @@
+\algorithm{ExprTree Utility}%
+          {Kamlesh Kantilal}
+
+\section{Introduction}
+This is an utility that creates expression trees for the instructions within each basic block of a method. The code of this algorithm resides in \url{sandmark.util.exprtree}.
+
+\section{Apply}
+For each instruction it encounters in the basic block it finds out how many elements from the stack are consumed by that instruction.
+Next, it uses the stacksimulator class which resides in {sandmark.util.stacksimulator} to find out which instructions had put those elements on the stack. Then the algorithm adds an edge between the instruction that consumed the elements and the instructions that produced those elements.
+If the element is produced by an instruction outside the basic block (such as in exception handlers and ?: operator) then it creates a dummy null instruction as a producer for that element.
+It applies this algorithm for each method in a class and all the basic blocks in that method.
+
+
+
+The original byte code was
+\begin{listing}
+\item /     0 bipush 100
+\item /     2 istore_1
+\item /     3 sipush 10000
+\item /     6 istore_2
+\item /     7 lconst_1
+\item /     8 lstore_3
+\item /     9 ldc2_w #2 <Long 65535>
+\item /    12 lstore 5
+\item /    14 ldc2_w #4 <Double 2.2>
+\item /    17 dstore 7
+\item /    19 bipush 24
+\item /    21 iload_2
+\item /    22 imul
+\item /    23 istore_1
+\item /    24 iconst_3
+\item /    25 iload_1
+\item /    26 imul
+\item /    27 i2l
+\item /    28 lload_3
+\item /    29 lmul
+\item /    30 l2i
+\item /    31 istore_2
+\item /    32 return
+
+\item /The expression tree list  as a result of our algorithm is 
+
+          
+\item /     2: istore 1[60](1)
+\item /          --   0: bipush[16](2) 100
+\item /     
+\item /     End Tree
+\item /        6: istore 2[61](1)
+\item /            -- 3: sipush[17](3) 10000
+     
+\item /     End Tree
+\item /        8: lstore 3[66](1)
+\item /            -- 7: lconst 1[10](1)
+     
+\item /     End Tree
+\item /       12: lstore[55](2) 5
+\item /            -- 9: ldc2_w[20](3) 2
+     
+\item /     End Tree
+\item /       17: dstore[57](2) 7
+\item /            -- 14: ldc2_w[20](3) 4
+     
+\item /     End Tree
+\item /       23: istore_1[60](1)
+\item /              ----   21: iload 2[28](1)
+\item /            -- 22: imul[104](1)
+\item /              ----   19: bipush[16](2) 24
+
+\item /     End Tree
+\item /       31: istore 2[61](1)
+\item /            --30: l2i[136](1)
+\item /               	 ------   28: lload 3[33](1)
+\item /              ----   29: lmul[105](1)
+\item /                  ------   27: i2l[133](1)
+\item /                            ----------    25: iload 1[27](1)
+\item /                           --------26: imul[104](1)
+\item /                           ----------    24: iconst 3[6](1)
+     
+\item /     End Tree
+\item /       32: return[177](1)
+     
+\item /     End Tree
+\item /     ---------End of BLk---------
+
+\end{listing} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,23 @@
+<body>
+
+This package implements the Collberg-Thomborson software
+watermarking algorithm. 
+<UL>
+   <LI> <code>CT.java</code> is the main class that invokes the
+        <code>trace</code>, <code>encode</code>, <code>embed</code>, 
+        and <code>recognize</code> functions.
+   <LI> The <code>trace</code> package starts to run the application under
+        debugging and records the execution locations where the 
+        watermark could be inserted.
+   <LI> The <code>encode</code> package converts a watermark (a string or a
+        number) into a graph, and that graph into Java code
+        that builds the graph.
+   <LI> The <code>embed</code> package adds the graph-building code to
+        application.
+   <LI> <code>recognize</code> package again runs the application
+        under debugging and prints out any watermarks it
+        finds.
+   <LI> The <code>doc</code> directory contains documentation.
+</UL>
+
+</body>

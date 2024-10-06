@@ -1,0 +1,18 @@
+authors: balamc@cs.arizona.edu
+         tapas@cs.arizona.edu
+
+
+	 This directory contains a simple obfuscator that inserts a buggy code into the CFG
+of a random methods taken from a classfile. The obfuscator takes a random basic block and 
+makes a copy of the basic block and introduces a bogus jump to it through an opaque predicate.
+The bug codes are introduced in the new basic block by tampering with the local variables in
+the method.  
+
+The directory contains the following files:
+
+   README
+   Makefile
+   package.html
+
+   BugCode.java
+   doc (directory) - help.html

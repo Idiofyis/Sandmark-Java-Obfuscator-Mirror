@@ -1,0 +1,81 @@
+//  obfuscate.smash -- 
+//  Author          : Jasvir Nagra <jas@cs.auckland.ac.nz>
+//  Created On      : Thu Jul 3 00:05:23 2003
+//  Last Modified   : <03/07/31 00:21:58 jas>
+//  Description     : Initialization script for smash
+//  Keywords        : smash init
+//  PURPOSE
+//  	| Sandmark project |
+
+public void obfuscate()
+{
+    if(!algorithmSelected("obfuscate"))
+        return;
+    
+    if(sandmark.smash.Smash.outputJar==null ||
+	sandmark.smash.Smash.outputJar.equals("")) {
+        /* set the outJar to default inJar_obf.jar */
+	sandmark.smash.Smash.outputJar = 
+            sandmark.smash.Smash.inputJar.substring(
+		0, sandmark.smash.Smash.inputJar.indexOf(".jar"))+"_obf.jar";
+	System.out.println(" Default outputJar: "+sandmark.smash.Smash.outputJar);
+    }
+
+    sandmark.program.Application app = 
+	new sandmark.program.Application(sandmark.smash.Smash.inputJar);
+    try {
+	sandmark.obfuscate.Obfuscator.runObfuscation(app, sandmark.smash.Smash.algo);
+	app.save(sandmark.smash.Smash.outputJar);
+    } catch(Throwable t) {
+	System.out.println("ERROR: " + t);
+	t.printStackTrace();
+    }
+}
+
+/* Run multiple obfuscations in-sequence on single input Jar file;
+   pass param in format <algo1>:<algo2>: ... :<algoN>
+*/
+public void multipleObf(String algoStr)
+{
+    if(sandmark.smash.Smash.inputJar==null || sandmark.smash.Smash.inputJar.equals("")) {
+ 	print("ERROR: Input jarfile not set; multipleObf failed");
+	return;
+    }
+    else
+        print("Running multiple obfuscations on : "+sandmark.smash.Smash.inputJar);
+
+    java.util.StringTokenizer input = new java.util.StringTokenizer(algoStr, ":");
+    for(int k=0; k<input.countTokens(); k++) {
+	sandmark.smash.Smash.outputJar = 
+	    sandmark.smash.Smash.inputJar.substring(
+		0, sandmark.smash.Smash.inputJar.indexOf(".jar")) +"_obf.jar";
+	selectAlg(input.nextToken());
+	obfuscate();
+	sandmark.smash.Smash.inputJar = sandmark.smash.Smash.outputJar;
+    }
+    return;
+}
+
+/* Run single obfuscation on multiple input Jar files;
+   pass param in format <jar1>:<jar2>: ... :<jarN>
+*/
+public void runObf(String jarStr)
+{
+    if(!algorithmSelected("runObf"))
+        return;
+    java.util.StringTokenizer input = new java.util.StringTokenizer(jarStr, ":");
+    for(int k=0; k<input.countTokens(); k++) {
+        setInputFile(input.nextToken());
+        obfuscate();
+    }
+    return;
+}
+
+
+
+//  Emacs bunkum
+//  Local Variables:
+//  mode: jde
+//  time-stamp-start: "Last Modified[ \t]*:[ 	]+\\\\?[\"<]+"
+//  time-stamp-end:   "\\\\?[\">]"
+//  End:

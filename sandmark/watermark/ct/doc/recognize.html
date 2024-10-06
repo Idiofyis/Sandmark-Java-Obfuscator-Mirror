@@ -1,0 +1,66 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+	<TITLE>Recognizing Watermarks in SandMark</TITLE>
+</HEAD>
+
+<P> If you are able to obtain a copy of your program that
+you believe has been illegally copied, you run a watermark
+recognizer to extract the watermark/fingerprint from the
+program.
+
+<h2>Example</h2>
+Here is a view of SandMark recognizing the watermark <code>WILDCATS</code>
+in the TTT application shown in <a href="annotate.html"> here </a>:
+<img src="recognize-screenshot.jpg">
+<p>
+Note that the graphs that SandMark generates can be viewed by clicking
+on the <code>Graphs</code> button:
+<img src="view-recognized-graph.jpg">
+
+<H2>Configuration</H2>
+Several options steer the recognition of the mark. In most cases you
+can leave the defaults in place.
+
+<ul>
+	    <li> <code>Graph Type</code>
+                  <table><tr><td>
+                    Select the type of watermark graph we look for.
+                    <ol>  
+                    <li>  '*' means that we will look for every type of graph.
+                    <li>  Selecting one of <code>RadixGraph</code>s,
+                          <code>PlantedPlaneCubicTree</code>s,
+                          <code>PermuationGraph</code>,
+                          <code>ReduciblePermutationGraph</code>s, means
+                          we will only look for this type of graph.
+                    </ol>
+                 </td></tr></table>
+	    <li> <code>Numeric Watermark</code>
+                 <table><tr><td>
+                    Pure numeric watermarks are encoded more efficiently than watermarks that
+                    can be arbitrary strings. NOTE: If you check this you
+                    must also have checked the same box during embedding.
+	         </td></tr></table>
+	    <li> <code>Use Cycle Graph</code>
+                 <table><tr><td>
+                 To protect against node-splitting attacks, the underlying
+                 graph has been expanded such that every node becomes a 3-cycle. Any node split will
+                 just expand the length of the cycle. During recognition, the cycles
+                 are contracted to generate the original graph.
+	         </td></tr></table>
+</ul>
+</BODY></HTML>

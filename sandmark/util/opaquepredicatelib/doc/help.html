@@ -1,0 +1,129 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Opaque Predicate Library</TITLE>
+  </HEAD>
+<BODY>
+
+
+
+<body>
+<bgcolor ="#FFFFFF" text="#221100" link="#884400" alink="#EE7700"
+ vlink="#442200"> </bgcolor>
+<h1>Opaque Predicate Library</h1>
+<p> Opaque predicates are the major building blocks in the design of
+obfuscating control transformations. An opaque predicate library exists
+in the     sandmark.util.opaquepredicatelib package which will help
+Obfuscation Algorithms     in constructing OpaquePredicates. Current
+versions available for usage are<br>
+</p>
+<ul>
+  <li>Algebraic Predicates</li>
+  <li>RuntimeInteger Predicates</li>
+  <li>RuntimeString Predicates</li>
+  <li>RuntimeIsNull Predicates</li>
+  <li>DynamicStructure Predicates</li>
+  <li>Thread Contention based Predicates<br>
+  </li>
+</ul>
+<p> </p>
+The API is <a href="http://sandmark.cs.arizona.edu/API/3.4.0/sandmark/util/opaquepredicatelib/package-summary.html"> here </a>
+<p> </p>
+
+<h2>Basic insertion technique</h2>
+<img src="alg.gif"><br>
+<br>
+The user specifies the basic block before which the predicate has to be
+inserted. The final result of the operation<br>
+is a 1 or 0 being pushed into the stack. This value can be popped from
+the stack and then used to create an <br>
+&nbsp;'opaquely true' , 'opaquely false' or 'opaquely
+non-deterministic' predicate.<br>
+From implementation point of view, the predecessors of the
+'bb_ins_before' &nbsp;block are redirected to point to the <br>
+predicate block.<br>
+<br>
+<ul style="font-weight: bold;">
+  <li>Algebraic Predicates</li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp;This predicate embeds opaquely true or false
+constructs based on algebraic properties and know facts in <br>
+&nbsp; &nbsp; &nbsp; &nbsp; mathematics. As an example, the expression <span
+ style="font-style: italic;">(x(x+1)%2==0)</span> is opaquely true.<br>
+<ul style="font-weight: bold;">
+  <li>Runtime Integer Predicates</li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp;This predicate creates run time
+deterministic predicates at the required bytecode position. For
+example, if <br>
+&nbsp; &nbsp; &nbsp; &nbsp; <span style="font-style: italic;">x</span>
+is an integer variable passed as parameter to a method, <span
+ style="font-style: italic;">(x &gt;,&lt;,&gt;=,&lt;=,==,!= RandomInt)</span>
+is inserted at <br>
+&nbsp; &nbsp; &nbsp; &nbsp; the desired position.<br>
+<ul>
+  <li><span style="font-weight: bold;">Runtime String Predicates</span></li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp;This predicate creates run time
+deterministic predicate based on the length of the string. If x is a
+String variable<br>
+&nbsp; &nbsp; &nbsp; &nbsp; passed as parameter to some method, then <span
+ style="font-style: italic;">(x.length &gt;.&lt;.&gt;=.&lt;=,==,!=
+RandomInt)</span> is inserted.<br>
+&nbsp;<br>
+<ul>
+  <li><span style="font-weight: bold;">Runtime IsNull Predicates &nbsp;</span>
+&nbsp; &nbsp;</li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp;Used to create a (?null) opaque predicate,
+for example, if x is an object passed as method parameter, then at the <br>
+&nbsp; &nbsp; &nbsp; &nbsp;requested bytecode position in the method, <span
+ style="font-style: italic;">(x==,!=null)</span> is inserted. <br>
+<ul>
+  <li><span style="font-weight: bold;">Dynamic Data Structure Predicates</span><br>
+  </li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp;The basic technique used in the construction
+of DynamicStructure Predicates is as follows:<br>
+<ul>
+  <ul>
+    <li>Add to the obfuscated application code which builds a set of
+complex data structures.</li>
+    <li>Keep a set of pointers to these structures.</li>
+    <li>Based on request by the user to generate a specific type of
+predicate, i.e. opaquely true/false or &nbsp; non-deterministic, do
+some operations like merging/splitting node groups, inserting node
+groups, moving node pointers, but maintaining certain invariants used
+in the construction of these opaque predicates such as 'pointers p,q
+will never refer to the same memory' and so on.&nbsp; &nbsp; &nbsp;</li>
+  </ul>
+</ul>
+<ul>
+  <li><span style="font-weight: bold;">Thread Contention
+Predicates&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span>&nbsp; &nbsp;
+&nbsp; &nbsp;</li>
+</ul>
+&nbsp; &nbsp; &nbsp; &nbsp;This predicate creates run time
+deterministic predicate based on &nbsp;<span style="font-style: italic;">race
+condition</span>. Multiple instances of a thread class are <br>
+&nbsp; &nbsp; &nbsp; &nbsp;created that access a common class field.
+The final value of the field depends on the exact sequence of thread
+access.&nbsp; <br>
+<br>
+</body>
+</html>

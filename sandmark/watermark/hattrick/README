@@ -1,0 +1,9 @@
+This directory contains a very simple watermarker
+that ....
+
+The directory contains the following files:
+   MyAlgorithm.java     -- The watermarking code.
+   Test.java            -- A main wrapper to test the watermarker.
+   Makefile             -- Commands to run the test code.
+
+

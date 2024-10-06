@@ -1,0 +1,35 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: packimports(3) 
+
+import java.io.*;
+
+public class SMBaseProgram1
+{
+
+    public SMBaseProgram1()
+    {
+    }
+
+    public static void sm$method()
+    {
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        try
+        {
+            System.out.print("Hey! I'm the new Method added!!\nEnter the first number to add ");
+            int x = Integer.parseInt(in.readLine());
+            System.out.print("Enter the second number to add ");
+            int y = Integer.parseInt(in.readLine());
+            x += y;
+            System.out.print("The sum is :");
+            System.out.println(x);
+        }
+        catch(IOException _ex)
+        {
+            System.out.println("Exception Thrown");
+            return;
+        }
+    }
+
+    public String str;
+}

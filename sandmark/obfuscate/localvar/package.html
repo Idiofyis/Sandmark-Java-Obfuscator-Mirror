@@ -1,0 +1,8 @@
+<body>
+Contains an obfuscator that scrambles the local variables used in 
+a method.  This obfuscator performs live range analysis for each
+of the local variables in a method, and then performs a register
+allocation based on those live ranges.  As a result, variables
+that were not the same variable will merge, and previously merged
+variables will be split apart.
+</body>

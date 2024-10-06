@@ -1,0 +1,21 @@
+\algorithm{The AddBogusFields Obfuscation Algorithm}%
+          {Miriam Miklofsky and Ginger Myles}
+
+\section{Introduction}
+AddBogusFields is an Obfuscation algorithm that will work on a class file. It inserts assignments to a bogus field in specific places throughout the code. These locations are identified by choosing a ``sister'' field.
+The code of this algorithm
+resides in \url{sandmark.obfuscate.addbogusfields}.
+
+
+\section{Apply}
+To obfuscate the code a new field in added to the class and then assignments are made to this field. The way the obfuscation works is that a ``sister'' field is identified which is used to insert an assignment to the new field. The sister field is chosen randomly. Everytime there is an assignment to the sister field an assignment to the new field is inserted into the code. 
+\begin{listing}{1}
+newFieldName = ``sm$'' + i
+sisterFieldIndex = randomNumberGen() % fields.length
+insert newFieldName in the class
+for(each method in class){
+   search instruction list for assignment to sisterField
+   insert assignment to newField
+}
+\end{listing}
+

@@ -1,0 +1,81 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+	<TITLE>Software Metrics in SandMark</TITLE>
+</HEAD>
+<!--<BODY BACKGROUND="sand.jpg" BGCOLOR="#E6D1B4"
+TEXT="#221100" LINK="#884400" ALINK="#EE7700" VLINK="#442200">-->
+<BGCOLOR="#FFFFFF"
+TEXT="#221100" LINK="#884400" ALINK="#EE7700" VLINK="#442200">
+
+<H1>Software Metrics in SandMark</H1>
+
+<p>
+
+<b>AUTHORS:</b> Christian Collberg ( collberg@cs.arizona.edu )
+                Balamurgan Chirtsabesan ( balamc@cs.arizona.edu )
+	        Tapas Ranjan Sahoo ( tapas@cs.arizona.edu )
+
+<P> 
+The Sandmark statistics module has been designed to obtain various complexity measures of
+the target code. Such statistics information can aid the obfuscation procedures in
+studying and controlling the level of obfuscation. Also, it might be useful in observing
+the watermark code for stealth.
+<br><br>
+The basic modules deal with the various statistics part of the code, namely
+
+<ul>
+<li> <b>method/class size statistics:</b> 
+Various metrics that quantify an individual method/class come under this category such as
+average method/class size(in bytes), number of statements, number of public/instance methods
+in the class, number of instance variables in a class, etc.
+
+<li> <b>method/class internal statistics:</b>
+Method internal statistics focus on factors such as the number of decision points in the
+code of a function, surfaced in IF-THEN-ELSE and other similar constructs. API calls,
+Nested Expressions, number of paramters are few measures that are noted to compute 
+complexity. Similarly, for class internals, factors such as class cohesion and global usage
+of variables are taken into account.
+
+<li> <b> class external statistics:</b>
+These set of statistics show how the class relates to other classes, subsystems, users, etc.
+Factors such as class coupling, number of reuses of a class and number of classes/methods
+thrown away are considered in determining the class external complexity measure.
+
+<li> <b> method/class inheritance statistics: </b>
+Measures such as class hierarchy nesting level, number of abstract classes and extent of
+multiple inheritance by classes gives an ideal measure on the class inheritance.
+Similarly, count of overridden methods and methods inherited by a subclass expresses the
+method inheritance complexity.
+</ul>
+
+<p>
+
+Besides these code statistics modules, various software complexity metrics are also implemented.
+These complexity metrics cover a wide range of program complexity such as hierarchy levels, 
+interaction between different modules, data structure complexities, control flow complexties, etc.
+Some of the software complexity metrics implemented are :
+
+<ul>
+<li> <b>McCabe's Cyclomatic metrics
+<li> <b>Halstead's operator/operand metrics
+<li> <b>Chidamber's object-oriented metrics
+<li> <b>Harrison-Magel's nesting metrics
+<li> <b>Henry-Kafura's coupling metrics
+<li> <b>Munson's data structure metrics</b>
+
+</ul>
+
+In addition to all these complexity measures, several other modules have been implemented. This
+analyzer module performs various sorting operations in application, package, class or 
+method levels based on the complexity measure data obtained from the previous statistic modules.
+
+<p>
+<b> Running the Statistics </b>
+<br>
+To run the statistics, select the statistics option in the Sandmark's main window pane. You need
+to give a jar file as an input. The statistics then gives the various statistical data  of all
+tha classes in tha application in a tabular form.
+
+<p>
+
+</BODY></HTML>

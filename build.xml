@@ -1,0 +1,161 @@
+<project default="superjar" name="sandmark" basedir=".">
+  <!-- Allow any user specific values to override the defaults -->
+  <property file="${user.home}/.smark3.properties" />
+  <!-- Allow user defaults for this project -->
+  <property file="build.properties" />
+  <!-- Set default values for the build -->
+  <property file="default.properties" />
+  <property name="jar.path" 
+            location="${bin.dir}${file.separator}${jar.name}"/>
+  <property name="bcel.jar" 
+            location="${smextern3}${file.separator}BCEL.jar"/>
+  <property name="bloat.jar" 
+            location="${smextern3}${file.separator}bloat-1.0.jar"/>
+  <property name="dynamicjava.jar"
+            location="${smextern3}${file.separator}dynamicjava.jar"/>
+  <property name="junit.jar"
+            location="${smextern3}${file.separator}junit.jar"/>
+  <property name="eclipse.plugin.path"
+            location="/cs/wmark/ash/eclipse/plugins/"/>
+  <property name="swt.jar"
+            location="${eclipse.plugin.path}${file.separator}org.eclipse.swt.gtk_3.0.0${file.separator}ws${file.separator}gtk${file.separator}swt.jar"/>
+  <property name="dtcore.jar"
+            location="${eclipse.plugin.path}${file.separator}org.eclipse.debug.core_3.0.0${file.separator}dtcore.jar"/>
+  <property name="dtui.jar"
+            location="${eclipse.plugin.path}${file.separator}org.eclipse.debug.ui_3.0.0${file.separator}dtui.jar"/>
+  <property name="externaltools.jar"
+            location="${eclipse.plugin.path}${file.separator}org.eclipse.ui.externaltools_3.0.0${file.separator}externaltools.jar"/>
+  <property name="runtime.jar"
+            location="${eclipse.plugin.path}${file.separator}org.eclipse.core.runtime_3.0.0${file.separator}runtime.jar"/>
+  <property name="jface-new.jar"
+            location="${eclipse.plugin.path}${file.separator}org.eclipse.jface_3.0.0${file.separator}jface-new.jar"/>
+  <property name="jface.jar"
+            location="${eclipse.plugin.path}${file.separator}org.eclipse.jface_3.0.0${file.separator}jface.jar"/>
+  <property name="jfacetext.jar"
+            location="${eclipse.plugin.path}${file.separator}org.eclipse.jface.text_3.0.0${file.separator}jfacetext.jar"/>
+  <property name="workbench.jar"
+            location="${eclipse.plugin.path}${file.separator}org.eclipse.ui.workbench_3.0.0${file.separator}workbench.jar"/>
+  
+  <path id="sandmark.classpath">
+    <pathelement location="${bcel.jar}"/>
+    <pathelement location="${bloat.jar}"/>
+    <pathelement location="${dynamicjava.jar}"/>
+    <pathelement location="${junit.jar}"/>
+    <pathelement location="${swt.jar}"/>
+    <pathelement location="${dtcore.jar}"/>
+    <pathelement location="${dtui.jar}"/>
+    <pathelement location="${externaltools.jar}"/>
+    <pathelement location="${runtime.jar}"/>
+    <pathelement location="${jface-new.jar}"/>
+    <pathelement location="${jface.jar}"/>
+    <pathelement location="${jfacetext.jar}"/>
+    <pathelement location="${workbench.jar}"/>
+  </path>
+  
+  <fileset dir="${smextern3}">
+    <patternset id="included.jars">
+      <include name="BCEL.jar"/>
+      <include name="bloat-1.0.jar"/>
+      <include name="dynamicjava.jar"/>
+    </patternset>
+  </fileset>
+  
+  <fileset dir="${src.dir}">
+    <patternset id="sandmark.classes">
+      <include name="sandmark/"/>
+      <include name="junit/"/>
+      <exclude name="sandmark/watermark/gtw/eigen/"/>
+    </patternset>
+  </fileset>
+  
+  <fileset dir="${src.dir}" id="sandmark.docs">
+    <include name="sandmark/**/doc/*"/>
+    <include name="sandmark/html/*"/>
+  </fileset>
+  
+  <fileset dir="${bin.dir}">
+    <patternset id="superjar.files">
+      <include name="org/apache/"/>
+      <include name="EDU/purdue/"/>
+      <include name="koala/dynamicjava/"/>
+    </patternset>
+  </fileset>
+  
+
+  <!-- Compile the sources -->
+  <target name="compile">
+    <mkdir dir="${bin.dir}"/>
+    <javac destdir="${bin.dir}" 
+           classpathref="sandmark.classpath" debug="true"
+           includeJavaRuntime="true" srcdir="${src.dir}"
+           source="1.4">
+       <include name="sandmark/"/>
+       <include name="junit/"/>
+       <exclude name="sandmark/watermark/gtw/eigen/"/>
+    </javac>
+  </target>
+  
+  <target name="docs">
+    <mkdir dir="${bin.dir}"/>
+    <copy todir="${bin.dir}">
+      <fileset refid="sandmark.docs"/>
+    </copy>
+  </target>
+  
+  <target name="algorithms.txt" depends="jar.classes">
+    <delete file="${bin.dir}/Algorithms.txt"/>
+    <java classname="sandmark.util.classloading.BuildClassList"
+          failonerror="true" fork="true" dir=".">
+      <classpath>
+        <path refid="sandmark.classpath"/>
+        <pathelement path="${bin.dir}/sandmark.jar"/>
+      </classpath>
+      <arg value="${bin.dir}/Algorithms.txt"/>
+      <sysproperty key="SMARK_PATH" value="${bin.dir}/sandmark.jar"/>
+    </java>
+    <jar jarfile="${bin.dir}/sandmark.jar" update="true" basedir="${bin.dir}" 
+         includes="Algorithms.txt"/>
+  </target>
+  
+  <target name="clean">
+    <delete dir="${bin.dir}"/>
+  </target>
+
+  <!-- Jar the library -->
+  <target name="jar.classes" depends="compile,docs">
+    <jar jarfile="${bin.dir}/sandmark.jar" manifest="mainclass.mft"
+         update="true">
+	  <fileset dir="${bin.dir}">
+	    <patternset refid="sandmark.classes"/>
+	  </fileset>
+	</jar>
+  </target>
+  
+  <target name="jar" depends="jar.classes"/>
+  
+  <target name="unjar">
+    <mkdir dir="${bin.dir}"/>
+    <unjar dest="${bin.dir}">
+      <fileset dir="${smextern3}">
+        <patternset refid="included.jars"/>
+      </fileset>
+    </unjar>
+  </target>
+
+  <!-- Jar the library -->
+  <target name="superjar" depends="jar,unjar,algorithms.txt">
+    <jar jarfile="${bin.dir}/sandmark.jar" manifest="mainclass.mft"
+         update="true">
+      <fileset dir="${bin.dir}">
+        <patternset refid="superjar.files"/>
+      </fileset>
+    </jar>
+  </target>
+  
+  <target name="eclipse" depends="superjar">
+    <zip jarfile="${bin.dir}/sandmark-eclipse.jar" basedir="${bin.dir}" 
+         includes="sandmark.jar"/>
+    <zip update="true" jarfile="${bin.dir}/sandmark-eclipse.jar"
+         basedir="sandmark/eclipse" includes="plugin.xml plugin.properties"/>
+  </target>
+</project>

@@ -1,0 +1,69 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+	<TITLE>The Collberg-Thomborson Watermarking Algorithm</TITLE>
+</HEAD>
+
+<H1>The Collberg-Thomborson Watermarking Algorithm</H1>
+<H2>Authors</H2>
+<P>Christian Collberg 
+   (<A HREF="mailto:collberg@cs.arizona.edu">collberg@cs.arizona.edu</A>)<BR>
+   Gregg Townsend 
+   (<A HREF="mailto:gmt@cs.arizona.edu">gmt@cs.arizona.edu</A>)<BR>
+</P>
+<H2>Description and Examples</H2>
+<P>
+This algorithm is a dynamic software watermarking method
+that embeds the watermark in the topology of a graph
+structure built at runtime.
+
+Watermarking a Java jar-file using the CT algorithm
+and recognizing that watermark requires several
+phases. First, the source program has to be <b>annotated</b>.
+This means that calls to
+<code>sandmark.watermark.trace.Annotator.mark()</code>
+are added to the source program in locations where it
+is OK to insert watermarking code. Next, the source
+program is compiled and packaged into a jar-file.
+Then the program is <b>traced</b>, i.e. run with a 
+special (secret) input sequence. This constructs a trace-file, 
+a sequence of mark()-calls that were encountered during the
+tracing run. The next step is <b>embedding</b> which is
+where the watermark is actually added to the program, using
+the data from the tracing run.
+</P>
+<P>
+Before distributing the resulting watermarked program
+it should be obfuscated, otherwise it will be susceptible
+to <em>collusive</em> attacks.
+</P>
+<P>
+The watermark is recognized by again running it with the
+special input sequence.
+</P>
+<P>
+These different steps are described further here:
+<ul style=margin-left:3cm>
+   <li> <a href="annotate.html"> Annotation </a>
+   <li> <a href="trace.html"> Tracing </a>
+   <li> <a href="embed.html"> Embedding </a>
+   <li> <a href="recognize.html"> Recognition </a>
+</ul>
+</P>
+
+
+</BODY></HTML>

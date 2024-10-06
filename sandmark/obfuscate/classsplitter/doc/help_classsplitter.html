@@ -1,0 +1,108 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Class Splitter Obfuscation Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Class Splitter Obfuscation Algorithm</H1>
+    <H2>Authors</H2>
+    <P>
+      Ashok Purushotham
+      (<A HREF="mailto:ashok@cs.arizona.edu">ashok@cs.arizona.edu</A>)<BR>
+      Rathna Prabhu Rajendran
+      (<A HREF="mailto:prabhu@cs.arizona.edu">prabhu@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      A class C is split into two classes C1 and C2, such that C2 inherits
+      from C1. C1 has fields and methods that only refer to themselves,
+      whereas C2 has fields and methods that can refer to themselves as well
+      as fields and methods in C1. Bytecode references to C will have to be
+      replaced with references to C2.
+    </P>
+    <P>
+      Dependency Graph Generation<BR>
+      We create a dependency graph G for class C. The nodes of G are the
+      members of C. There is an edge from A to B in G, if the declaration of A
+      must be in scope of B. If there is a path from C to Y in G, then Y must
+      be declared in the child class during splitting. If there is a path from
+      X to Y in G, then either X and Y are both declared in the same class or
+      X is declared in the parent class C1.
+    </P>
+    <P>
+      Topological sort of the Dependency Graph<BR>
+      We perform a topological sort of the dependency graph to know what
+      methods and variables are to be put in which classes. We decide on the
+      placement of the methods and fields in the inheritance tree, based on
+      the results of the topological sort. For instance, the method P must be
+      in the scope of the class in which Q is defined. So Q can be put in the
+      same class as P or in some class inheriting from the class defining P.
+      This ensures that the obfuscation is semantics preserving and gives the
+      same results as before.
+    </P>
+    <H2>Example</H2>
+    <P>
+      Consider the following simple code sample C.java, to which we'll apply
+      the obfuscation technique.
+    </P>
+    <PRE>
+        class C {
+          float f;
+          int v;
+          public C( ) { }
+          public void P( ) {
+            f = 1.2;
+          }
+          public void Q( ) {
+            v = 1;
+            P( );
+          }
+        }
+    </PRE>
+    <P>
+      After obfuscating:
+    </P>
+    <PRE>
+        class C0 {
+          float f;
+          int v;
+          public C0( ) { }
+        }
+        class C1 extends C0 {
+          public C1( ) { }
+          public void P( ) {
+            f = 1.2;
+          }
+        }
+        class C extends C1 {
+          public C( ) { }
+          public void Q( ) {
+            v = 1;
+            P( );
+          }
+        }
+    </PRE>
+    <H2>Configuration</H2>
+    <P>
+      No additional configuration parameters are required to carry out this
+      obfuscation.
+    </P>
+    <H2>References</H2>
+    <BR>
+  </BODY>
+</HTML>

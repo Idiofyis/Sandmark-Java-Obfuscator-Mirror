@@ -1,0 +1,36 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: packimports(3) 
+// Source File Name:   KeyboardInput.java
+
+import java.io.*;
+
+public class KeyboardInput extends KeyboardInput0
+{
+
+    public KeyboardInput()
+    {
+    }
+
+    public static int readInt()
+    {
+        System.out.flush();
+        try
+        {
+            s = input.readLine();
+            if(s.equals(""))
+                return 0;
+            i = (new Integer(s.trim())).intValue();
+        }
+        catch(Exception exception)
+        {
+            System.exit(-1);
+        }
+        return i;
+    }
+
+    static 
+    {
+        input = new BufferedReader(new InputStreamReader(System.in));
+    }
+}

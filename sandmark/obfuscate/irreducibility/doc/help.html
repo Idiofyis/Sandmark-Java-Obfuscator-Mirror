@@ -1,0 +1,48 @@
+<!DOCTYPE doctype PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <style>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      PRE {margin-left:3cm}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </style>
+  <title>Node Splitter Obfuscation Algorithm</title>
+</head>
+<body>
+<h1>Irreducibility Obfuscation Algorithm</h1>
+<h2>Author</h2>
+<p> Edward Carter (<a href="mailto:ecarter@cs.arizona.edu">ecarter@cs.arizona.edu</a>)</p>
+<h2>Description</h2>
+<p> The Irreducibility obfuscation algorithm add conditional branches to
+a method via opaque predicates so that the control flow graph of the
+resulting method is irreducible. &nbsp;For each pair of basic blocks
+(u,v), where v does not dominate u and u is reachable from v, a
+conditional branch from u to v is added with some fixed probability.</p>
+<h2>Example</h2>
+<p> Consider the following code: </p>
+<pre>class A {<br>    int i;<br>    private float f;<br>    public A(){ }<br>    public void dummy() {<br>        i=10;<br>        f=12.2;<br>    }<br>}<br>    </pre>
+<p> After Obfuscation: </p>
+<pre>???    </pre>
+<h2>Configuration</h2>
+<p> There are no extra configuration parameters necessary to run this   
+obfuscator. </p>
+<h2>References</h2>
+<ul>
+			<li>Christian Collberg, Clark Thomborson, and Douglas Low. A Taxonomy
+             of Obfuscating Transformations. Technical Report 148, University of Auckland,
+             July, 1997.
+     </ul>
+<br>
+</body>
+</html>

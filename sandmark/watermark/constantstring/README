@@ -1,0 +1,10 @@
+This directory contains a very simple watermarker
+that adds a constant string containing a watermark
+to a classfile.
+
+ConstantString.java  -- The watermarking code.
+Program.java         -- A test program to watermark.
+Test.java            -- A main wrapper to test the watermarker.
+Makefile             -- Commands to run the test code.
+
+

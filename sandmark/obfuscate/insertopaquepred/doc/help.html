@@ -1,0 +1,54 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Insert Opaque Predicate Obfuscation Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Insert Opaque Predicate Obfuscation Algorithm</H1>
+    <H2>Author</H2>
+    <P>
+      Ginger Myles
+      (<A HREF="mailto:mylesg@cs.arizona.edu">mylesg@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      This obfuscation inserts an opaque predicate into every boolean expression.
+      The boolean expressions are all relational
+      operators that compare integers, so the opaque predicates will simply add an
+      opaquely false value (i.e. value==0) to one of the integer operands. This does 
+      not change the value of the boolean expression, but it does make it difficult to 
+      determine statically.
+    </P>
+    <H2>Example</H2>
+    <H2>Configuration</H2>
+    <P>
+      There are no extra configuration parameters necessary to run this
+      obfuscator.
+    </P>
+    <H2>References</H2>
+     <ul>
+        <li> Christian Collberg, Clark Thomborson, and Douglas Low. Breaking
+             Abstractions and Unstructuring Data Structures. In IEEE International Conference
+             of Computer Languages, 1998.
+        <li> Christian Collberg and Clark Thomborson. Manufacturing Cheap, Resilient, 
+             and Stealthy Opaque Constructs. In ACM SIGPLAN-SIGACT Symposium on
+             Principles of Programming Languages, 1998.
+     </ul>
+    <BR>
+  </BODY>
+</HTML>

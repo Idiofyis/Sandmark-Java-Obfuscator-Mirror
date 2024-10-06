@@ -1,0 +1,95 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Bogus Initializer Watermarking Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Bogus Initializer Static Watermarking Algorithm</H1>
+    <H2>Authors</H2>
+    <P>
+      Ashok Purushotham
+      (<A HREF="mailto:ashok@cs.arizona.edu">ashok@cs.arizona.edu</A>)<BR>
+      Rathna Prabhu
+      (<A HREF=\"mailto:prabhu@cs.arizona.edu\">prabhu@cs.arizona.edu</A>)<BR>
+      Christian Collberg
+      (<A HREF="mailto:collberg@cs.arizona.edu">collberg@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      This algorithm is a Static Watermarker that adds bogus local variables
+      to a method .The number of bogus local variables is entered as a string
+      into the ConstantPool of a classfile.
+    </P>
+    <P STYLE=font-size:small>
+      sm$len: The string in which we hide the number of bogus local variables.
+    </P>
+    <P>
+      The watermark is stored in the initial value of these locals as given:
+    </P>
+    <P>
+      Consider a watermark value "1056", then
+    </P>
+    <PRE>
+        class C1{
+            void m2(){
+            ...
+            int sm$1=10;
+            int sm$2=56;
+            }
+        }</PRE>
+
+    <P>
+      <B>Embedding</B><BR>
+      Consider a watermark "120340". This will be embedded into the classfile
+      by selecting a method and adding 3 bogus local variables as sm$1=12,
+      sm$2=3<SUP STYLE=font-size:small>*</SUP> and sm$3=40. If the number of
+      digits were odd, then add a trailing '0' which we strip out during
+      watermark recognition, eg. consider a watermark "5075441", then sm$1=50,
+      sm$2=75, sm$3=44 and sm$4=10. Basically we insert BIPUSH statements to
+      push the value of a part of the watermark for each Bogus Variable.
+    </P>
+    <P>
+      <B>Recognition</B><BR>
+      Obtain the value of sm$len. Based on the value of sm$len, we use a loop
+      to find out the values of BIPUSH. Inherent advantage is that, we aren't
+      relying on the names of added bogus variables, because some compilers
+      may strip out such information. For example, if watermark was 1056, then
+      the code added during embedding would give us the following:<BR>
+      <BR>
+      0:    bipush            56<BR>
+      2:    istore            %4<BR>
+      4:    bipush            10<BR>
+      6:    istore_3<BR>
+      ..... The method's code<BR>
+      .....<BR>
+      <BR>
+      We strip out the values in BIPUSH statements and reconstruct back the
+      original watermark.
+    </P>
+    <P STYLE=font-size:small>
+      <SUP>*</SUP>
+      Instead of pushing 03, we use 3 as the value of the variable,
+      beacuse the leading zeroes in an integer are stripped out. Therefore
+      while recognizing, we need to check if the value was less than 10
+      and if so, expand it by adding a leading "0".
+    </P>
+    <H2>Example</H2>
+    <H2>Configuration</H2>
+    <H2>References</H2>
+  </BODY>
+</HTML>

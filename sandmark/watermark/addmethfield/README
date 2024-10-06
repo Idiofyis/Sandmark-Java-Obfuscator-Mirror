@@ -1,0 +1,8 @@
+This directory contains a very simple static watermarker
+that embeds the watermark by splitting it in half the first part becomes the name of a new field and the second becomes part of the name of a new method.
+
+The directory contains the following files:
+   AddMethField.java     -- The watermarking code.
+   Makefile              -- Commands to run the test code.
+
+Implemented by: Ginger Myles

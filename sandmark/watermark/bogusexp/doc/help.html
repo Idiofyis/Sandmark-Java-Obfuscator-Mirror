@@ -1,0 +1,58 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>BogusExpression Static Watermarking Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>BogusExpression Static Watermarking Algorithm</H1>
+    <H2>Authors</H2>
+    <P>
+      Balamurgan Chirtsabesan
+      (<A HREF="mailto:balamc@cs.arizona.edu">balamc@cs.arizona.edu</A>)<BR>
+      Tapas Ranjan Sahoo
+      (<A HREF="mailto:tapas@cs.arizona.edu">tapas@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      This algorithm is a very simple watermarker that adds a bogus expression
+      containing a watermark to a classfile.
+    </P>
+    <P>
+      For example, if expression <code> 987+341 </code> is set to  a local
+      variable <code>sm$45</code> ( local containingprefix 'sm$' ) , then the
+      watermark is the value <code>1328</code>,  we will add the instruction
+      <code> int sm$45 = 987+341</code> to the constant pool of a class in the
+      user's application.
+    </P>
+    <P>
+      The watermark value is passed as a parameter, which is split up and an
+      expression is formed using the split values.
+    </P>
+    <P><B>Restrictions</B><BR>
+      The algorithm works only for integer watermarks, and does not support
+      'Strings' or any other types of watermark.
+    </P>
+    <H2>Example</H2>
+    <H2>Configuration</H2>
+    <P>
+      No additional configuration parameters are required for embedding and 
+      recognition.
+    </P>
+    <H2>References</H2>
+  </BODY>
+</HTML>

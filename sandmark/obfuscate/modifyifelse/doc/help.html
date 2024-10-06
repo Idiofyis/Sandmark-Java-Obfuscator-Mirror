@@ -1,0 +1,53 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>ModifyIfElse Obfuscation Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>ModifyIfElse Obfuscation Algorithm</H1>
+    <H2>Author</H2>
+    <P>
+      Kamlesh Kantilal
+      (<A HREF="mailto:kamlesh@cs.arizona.edu">kamlesh@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      The ModifyIfElse obfuscator exchanges the "if" and the "else" part of an
+      if-else statement. It also negates the if instruction (example ifge is
+      replaced by iflt) so that the semantics is preserved.
+    </P>
+    <P>
+      This algorithm parses the instruction list to look for if statements.
+      Once it encounters an if statement it does a post dominator analysis of
+      its "if" part and the "else" part. Thus it gets a list of block which
+      postdominates the "if" block and a list of block that postdominates the
+      "else" block. It then does a intersection to determine the end of block
+      which is the end of the "if"-"else" statement. It then exchanges the
+      group of block on the "if" side with the group of blocks on the "else"
+      side and negates the "if" instruction to preserve the semantics.
+    </P>
+    <H2>Example</H2>
+    <H2>Configuration</H2>
+    <P>
+      There are no extra configuration parameters necessary to run this
+      obfuscator.
+    </P>
+    <H2>References</H2>
+    <BR>
+  </BODY>
+</HTML>

@@ -1,0 +1,107 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>ConstantString Static Watermarking Algorithm</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>ConstantString Static Watermarking Algorithm</H1>
+    <H2>Author</H2>
+    <P>
+      Christian Collberg
+      (<A HREF="mailto:collberg@cs.arizona.edu">collberg@cs.arizona.edu</A>)
+    </P>
+    <H2>Description</H2>
+    <P>
+      This is a very simple algorithm that adds a constant string containing
+      a watermark to a classfile. It embeds a string
+      <CODE>sm$watermark=WATERMARK</CODE> in the constant pool of the
+      application. <CODE>WATERMARK</CODE> is the string to be embedded.
+    </P>
+    <P>
+      <B>Embedding</B><BR>
+      To embed the watermark we pick one of the user's classes at random and
+      adds the appropriate string:
+    </P>
+    <PRE>
+        String jarInput  = props.getProperty("WM_Embed_JarInput");
+        String jarOutput = props.getProperty("WM_Embed_JarOutput");
+        String watermark = props.getProperty("WM_Encode_Watermark");
+
+        sandmark.util.ClassFileCollection cfc =
+           new sandmark.util.ClassFileCollection(jarInput);
+
+        java.util.Iterator classes = cfc.classes();
+        String className = (String) classes.next();
+        org.apache.bcel.classfile.JavaClass origClass = cfc.getClass(className);
+        org.apache.bcel.generic.ClassGen cg = new org.apache.bcel.generic.ClassGen(origClass);
+
+        org.apache.bcel.generic.ConstantPoolGen cp = cg.getConstantPool();
+        int stringIndex = cp.addString("sm$watermark" + "=" + watermark);
+
+        org.apache.bcel.classfile.JavaClass newClass = cg.getJavaClass();
+        cfc.addClass(newClass);
+        cfc.saveJar(jarOutput);
+    </PRE>
+    <P>
+      <B>Recognition</B><BR>
+      During recognition we go through every class in the watermarked jar-file
+      looking for a string in the constant pool that starts with
+      <CODE>sm$watermark</CODE>:
+    </P>
+    <PRE>
+        String jarInput  = props.getProperty("WM_Recognize_JarInput");
+        sandmark.util.ClassFileCollection cfc =
+            new sandmark.util.ClassFileCollection(jarInput);
+        java.util.Iterator classes = cfc.classes();
+        while (classes.hasNext()) {
+           String className = (String) classes.next();
+           org.apache.bcel.classfile.JavaClass clazz = cfc.getClass(className);
+           org.apache.bcel.classfile.ConstantPool cp = clazz.getConstantPool();
+           for (int i=0; i<cp.getLength(); i++) {
+              org.apache.bcel.classfile.Constant c = cp.getConstant(i);
+              if (c instanceof org.apache.bcel.classfile.ConstantString) {
+                 org.apache.bcel.classfile.ConstantString s =
+                     (org.apache.bcel.classfile.ConstantString) c;
+                 String v = (String)s.getConstantValue(cp);
+                 if (v.startsWith("sm$watermark")) {
+                    String w = v.substring("sm$watermark".length()+1);
+                    // w is the watermark
+                 }
+              }
+           }
+        }
+        cfc.close();
+    </PRE>
+    <H2>Example</H2>
+    <P>    
+      For example, if <CODE>SWM_ConstantString_Ident</CODE> is set to
+      <CODE>sm$watermark</CODE> and the watermark is the value
+      <CODE>123456</CODE>, we will add the identifier 
+      <CODE>sm$watermark=123456</CODE> to the constant pool of a random class
+      in the user's application.
+    </P>
+    <H2>Configuration</H2>
+    <UL>
+      <LI><CODE>SWM_ConstantString_Ident</CODE>: 
+	The prefix of the string in which we hide the watermark.
+      </LI>
+    </UL>
+    <H2>References</H2>
+    <BR>
+  </BODY>
+</HTML>

@@ -1,0 +1,31 @@
+/* Javadoc style sheet */
+
+/* Define colors, fonts and other style attributes here to override the defaults */
+
+/* Page background color */
+body { background-color: #E6D1B4 }
+A { color:#8e4c00 }
+/* Table colors */
+.TableHeadingColor     { background: #c17400 } /* Dark mauve */
+.TableSubHeadingColor  { background: #c17400 } /* Light mauve */
+.TableRowColor         { background: #E6D1B4 } /* Sand */
+
+/* Font used in left-hand frame lists */
+.FrameTitleFont   { font-size: 10pts; font-family: Helvetica, Arial, san-serif; color:#EE7700 }
+.FrameHeadingFont { font-size: 10pts; font-family: Helvetica, Arial, san-serif; color:#884400 }
+.FrameItemFont    { font-size: 10pts; font-family: Helvetica, Arial, san-serif; color:#EE7700 }
+
+/* Example of smaller, sans-serif font in frames */
+/* .FrameItemFont  { font-size: 10pt; font-family: Helvetica, Arial, sans-serif; foreground-color:#FFFFFF } */
+
+/* Navigation bar fonts and colors */
+.NavBarCell1    { background-color:#E6D1B4;}/* Light mauve */
+.NavBarCell1Rev { background-color:#c17400;}/* Dark Blue */
+.NavBarFont1    { font-family: Arial, Helvetica, sans-serif; color:#884400;}
+.NavBarFont1Rev { font-family: Arial, Helvetica, sans-serif; color:#E6D1B4;}
+
+.NavBarCell2    { font-family: Arial, Helvetica, sans-serif; background-color:#E6D1B4;}
+.NavBarCell3    { font-family: Arial, Helvetica, sans-serif; background-color:#E6D1B4;}
+
+
+

@@ -1,0 +1,80 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: packimports(3) 
+// Source File Name:   TTTApplet.java
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class TTTApplet extends TTTApplet2
+{
+
+    public TTTApplet()
+    {
+        lab = new Label("Tic-Tac-Toe", 1);
+        pan = new Panel();
+        sq = new Button[9];
+        again = new Button("New game");
+        ply = 2;
+    }
+
+    public void move(int i)
+    {
+        if(!hit() && free())
+        {
+            ply = ply != 2 ? 2 : 1;
+            mark(i);
+            if(hit())
+            {
+                setForeground(Color.blue);
+                lab.setText("Player " + ply + " won!");
+                again.setLabel("Click on here");
+            }
+        } else
+        {
+            if(free())
+                setForeground(Color.magenta);
+            else
+                setForeground(Color.red);
+            lab.setText("Restart game!");
+            again.setLabel("Click on here");
+        }
+    }
+
+    // Unreferenced inner class TTTApplet$1
+
+/* anonymous class */
+    class _cls1
+        implements ActionListener
+    {
+
+        public void actionPerformed(ActionEvent actionevent)
+        {
+            int i = (new Integer(actionevent.getActionCommand())).intValue();
+            move(i);
+        }
+
+    }
+
+
+    // Unreferenced inner class TTTApplet$2
+
+/* anonymous class */
+    class _cls2
+        implements ActionListener
+    {
+
+        public void actionPerformed(ActionEvent actionevent)
+        {
+            setForeground(Color.yellow);
+            for(int i = 0; i < 9; i++)
+                sq[i].setLabel(".");
+
+            lab.setText("Tic-Tac-Toe");
+            again.setLabel("New game");
+        }
+
+    }
+
+}

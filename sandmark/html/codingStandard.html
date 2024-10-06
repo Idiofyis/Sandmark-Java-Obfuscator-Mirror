@@ -1,0 +1,87 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <STYLE>
+      <!--
+      BODY {color:"#000000";
+            background-color:"#FFFFFF"}
+      H1 {font-size:28pt;
+          text-align:center}
+      H2 {margin-bottom:0cm;
+          margin-top:1cm;
+          text-align:left}
+      P {margin-left:1.5cm;}
+      A:link {color:"#884400"}
+      A:active {color:"#EE7700"}
+      A:visited {color:"#442200"}
+      -->
+    </STYLE>
+    <TITLE>Coding standard</TITLE>
+  </HEAD>
+<BODY>
+
+
+<h1>Coding standard</h1>
+<ul>
+    <li> Don't use tab characters.
+    <li> Indent by typing three (3) blanks.
+    <li> Put the left brace (<b>{</b>) on
+          same line as preceding statement. I.e.
+          format an if-statement like this:
+<pre>
+   if () {
+      ...
+   }
+</pre>
+        not like this:
+<pre>
+   if ()
+   {
+     ...
+   }
+</pre>
+        or like this:
+<pre>
+   if ()
+      {
+        ...
+      }
+</pre>
+     <li> Don't use <code>import</code>-statements. 
+           Instead, always use fully qualified names.
+           For example, say 
+<pre>
+   java.util.Properties p = new java.util.Properties();
+</pre>
+           instead of
+<pre>
+   import java.util.*;
+   ...
+   Properties p = new Properties();
+</pre>
+          In a large system like SandMark it is difficult to
+          read the code when you don't know where the
+          a particular name is declared. In SandMark we use
+          deep package hierarchies to organize the code
+          and always refer to every object using its 
+          fully qualified name. This also prevents name
+          clashes.
+   <li> We make one exception: you are allowed to say
+        <code>String</code> rather than <code>java.lang.String</code>!
+   <li> We use the following naming strategy:
+         <ul>
+            <li> Package names are short and in lower case.
+                  We favor deep package hierarchies over
+                  packages with many classes.
+            <li> Class names are typically long and descriptive.
+                  They start with an uppercase letter.
+            <li> Method names start with a lowercase letter.
+         </ul>
+   <li> We make an effort to write methods that pass the ``hand test''.
+	 The ``hand test'' passes if a method is short enough
+	 to be completely covered by the programmer's hand placed horizontally
+	 with fingers together on the screen.  (``Horizontally'' means that the
+	 fingers are pointed to a side of the monitor, not toward the top or bottom.)
+</ul>
+</body>
+</html>
